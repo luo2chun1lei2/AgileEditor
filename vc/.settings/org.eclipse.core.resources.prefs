@@ -1,0 +1,16 @@
+eclipse.preferences.version=1
+encoding//src/VcCmd.py=utf-8
+encoding//src/VcCmdTemplate.py=utf-8
+encoding//src/VcEventPipe.py=utf-8
+encoding//src/VcExecute.py=utf-8
+encoding//src/VcMain.py=utf-8
+encoding//src/VcUtils.py=utf-8
+encoding//src/ViewCmdGroup.py=utf-8
+encoding//src/ViewCmdGroupTree.py=utf-8
+encoding//src/ViewDialog.py=utf-8
+encoding//src/ViewHelp.py=utf-8
+encoding//src/ViewLog.py=utf-8
+encoding//src/ViewMenu.py=utf-8
+encoding//src/ViewMultiPages.py=utf-8
+encoding//src/ViewWindow.py=utf-8
+encoding//src/vc.py=utf-8
