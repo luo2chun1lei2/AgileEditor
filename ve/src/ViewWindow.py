@@ -18,6 +18,12 @@ from ViewMultiEditors import ViewMultiEditors
 from ViewDialogCommon import *
 
 # 编辑器窗口
+# 1, 顶部是菜单和工具栏（内容都随着选中的对象而定）。
+# 2, 项目浏览器
+# 3, 编辑器，使用GtkSourceView。
+# 4, 代码浏览工具。
+# 5, 编译和调试工具。
+# 6, 命令工具（可以编写任意的命令）
 # TODO 应该将基本的项目管理等程序的初始化从画面中拿出来，放入Main中。
 class ViewWindow(Gtk.Window):
     

@@ -164,10 +164,9 @@ class ViewDialogProjectChange(Gtk.Dialog):
 ###########################################################
 
 class ViewDialogProjectOpen(Gtk.Dialog):
-    ''' 显示Project的列表的对话框
-     prj_treeview:ModelProject:被选中的项目。
-     ideWorkshop:ModelWorkshop:
-    '''
+    # 显示Project的列表的对话框
+    # prj_treeview:ModelProject:被选中的项目。
+    # ideWorkshop:ModelWorkshop:
     
     REPONSE_TYPE_NEW_PRJ = 100
     REPONSE_TYPE_DEL_PRJ = 101
@@ -243,7 +242,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
     
     @staticmethod
     def show(parent, ideWorkshop):
-        ''' 返回是被选中的项目。'''
+        # 显示画面，然后返回是被选中的项目。
+        # 如果一个都没有选，就返回None
         
         dialog = ViewDialogProjectOpen(parent, ideWorkshop)
         
@@ -264,16 +264,17 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                 
                 is_continue = False
                     
-            if response == ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ:
+            elif response == ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ:
                 # 创建一个新的对话框
                 prj_name, prj_src_dirs = ViewDialogProjectNew.show(dialog)
                 if not prj_name is None:
+                    # 发动“添加一个新的项目”的动作。
                     VeEventPipe.want_add_new_project(prj_name, prj_src_dirs)
                     
-                    # 更新画面。
-                    dialog._show_data()
+                # 更新当前画面。
+                dialog._show_data()
                     
-            if response == ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ:
+            elif response == ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ:
                 # 删除一个项目 
                 selection = dialog.prj_treeview.get_selection()
                 
@@ -284,9 +285,10 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     
                     VeEventPipe.want_del_project(prj)
                     
-                    dialog._show_data()
+                # 更新当前画面。
+                dialog._show_data()
                     
-            if response == ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ:
+            elif response == ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ:
                 # 修改一个项目 
                 selection = dialog.prj_treeview.get_selection()
                 
@@ -299,10 +301,11 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     if not prj_name is None:
                         VeEventPipe.want_change_project(prj, prj_name, prj_src_dirs)
                     
-                    # 更新画面。
-                    dialog._show_data()
+                # 更新当前画面。
+                dialog._show_data()
                     
             else:
+                # 其他情况，就直接退出。
                 is_continue = False
         
         # 关闭对话框
@@ -310,3 +313,4 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         
         # 返回信息。
         return prj
+    

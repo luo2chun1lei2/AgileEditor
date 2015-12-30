@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-# 画面部分
-# 1, 顶部是菜单和工具栏（内容都随着选中的对象而定）。
-# 2, 项目浏览器
-# 3, 编辑器，使用GtkSourceView。
-# 4, 代码浏览工具。
-# 5, 编译和调试工具。
-# 6, 命令工具（可以编写任意的命令）
-
 import os, sys, getopt
 
 from VeMain import VeMain
@@ -20,6 +12,7 @@ from VeUtils import *
 def usage():
     print 've usage:'
     print '-h, --help: print help message.'
+    print '-l, --list:print the list of projects.'
     print '-p, --project <project name>: open the project.'
     print '-f, --file <file path>: open the file.'
 
@@ -32,11 +25,11 @@ def main(argv):
     
     print "%s,%s" % (sys._getframe().f_code.co_name, sys._getframe().f_lineno)
     
-    want_open_file = None
-    want_open_project_name = None
+    want_open_file = None   # 想要立即打开的文件名字
+    want_open_project_name = None # 想要立即打开的项目名字
     
     try:
-        opts, args = getopt.getopt(argv[1:], 'hp:f:', ['project=', 'file='])
+        opts, args = getopt.getopt(argv[1:], 'hlp:f:', ['list', 'project=', 'file='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -47,6 +40,10 @@ def main(argv):
             '显示帮助信息'
             usage()
             sys.exit(0)
+        elif o in ('-l', '--list'):
+            ' 显示现在的项目列表，然后退出'
+            TODO
+            sys.exit(0)
         elif o in ('-f', '--file'):
             want_open_file = a
         elif o in ('-p', '--project'):
@@ -56,15 +53,9 @@ def main(argv):
             usage()
             sys.exit(2)
     
-    if not is_empty(want_open_file):
-        print 'want to open file:' + want_open_file
-        
-    if not is_empty(want_open_project_name):
-        print 'want to open project:' + want_open_project_name
-
-    # 进入主管理模块
-    ideMain = VeMain.get_instance()
-    ideMain.start(want_open_project_name, want_open_file)
+    # 进入主管理模块，传入需要的参数。
+    veMain = VeMain.get_instance()
+    veMain.start(want_open_project_name, want_open_file)
 
 if __name__ == '__main__':
     '''  主入口  '''

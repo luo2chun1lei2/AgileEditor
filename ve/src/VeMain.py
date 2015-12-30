@@ -48,19 +48,22 @@ class VeMain():
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_CHANGE_PROJECT, self.change_project)
 
     def start(self, want_open_project_name, want_open_file):
+        # 开始启动程序。
         
         from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
         
+        # 打开想要打开的项目
+        prj = None
         if not want_open_project_name is None:
             prj = self.workshop.get_prj(want_open_project_name)
         
-        # 如果没有传入打开某个项目，那么就指定一个。
-        if want_open_project_name is None or prj is None :
+        # 如果没有传入打开某个项目，或者指定的项目不存在，那么就指定一个。
+        if prj is None :
             # 需要让客户选择一个项目
             prj = ViewDialogProjectOpen.show(None, self.workshop)
             
         if prj is None:
-            # 客户还是选择失败，或者退出，那么就不用再运行了
+            # 客户还是选择失败，或者退出，那么就不用再运行了。
             print "指定的项目不存在。"
             return
         
