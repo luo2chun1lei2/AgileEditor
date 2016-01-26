@@ -1,29 +1,25 @@
 #-*- coding:utf-8 -*-
 
-'''
-Ide中每个被打开的文件。
-'''
+#######################################
+# Ide中每个被打开的文件。
 
 import os.path
 
 class ModelFile(object):
-    '''
-    代表Ide中的一个被打开的文件。
-    file_path:路径，如果是None，证明是新建的文件。
-    file_obj:文件对象。
-    file_buf:用于编辑器的buffer。
-    文件状态必须是打开或者创建后，然后进行读写操作，再关闭。
-    '''    
+    # 代表Ide中的一个被打开的文件。
+    # file_path:路径，如果是None，证明是新建的文件。
+    # file_obj:文件对象。
+    # file_buf:用于编辑器的buffer。
+    # 文件状态必须是打开或者创建后，然后进行读写操作，再关闭。
+    
     def __init__(self):
         self.file_obj = None
         self.file_path = None
         self.file_buf = None
     
     def open_file(self, file_path):
-        '''
-        打开指定的文件。
-        return:文件的file_obj.
-        '''
+        # 打开指定的文件。
+        # return:文件的file_obj.
         
         print('Open file ' + file_path)
         
@@ -41,9 +37,8 @@ class ModelFile(object):
         return self.file_obj
     
     def read_file(self, src_buffer):
-        '''
-        buffer: GtkSource.Buffer
-        '''
+        # buffer: GtkSource.Buffer
+        
         if self.file_obj == None:
             print('File is NOT open.')
             return
@@ -62,9 +57,8 @@ class ModelFile(object):
         src_buffer.end_not_undoable_action()
             
     def save_file(self, src_buffer):
-        '''
-        src_buffer:GtkSource.Buffer
-        '''
+        # src_buffer:GtkSource.Buffer
+        
         if self.file_obj == None:
             print('File is Not opened.')
             return
@@ -82,5 +76,3 @@ class ModelFile(object):
             self.file_obj.close()
             self.file_obj = None
             self.file_path = None
-    
-    

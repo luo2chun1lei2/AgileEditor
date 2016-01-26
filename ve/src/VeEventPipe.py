@@ -1,18 +1,15 @@
 #-*- coding:utf-8 -*-
 
-'''
-消息管道。
-所有的事件都发到这里，
-然后调用注册的方法。
-'''
+#######################################
+# 消息管道。
+# 整个程序分成两个大部分，一个是画面显示，一个是数据模型部分。
+# 当数据发生了改变后，应该通知画面更新，而画面接收各种事件后，改变模型。
+# 所有的事件都发到这里，然后调用注册的方法。
 
 from collections import OrderedDict
 
 class VeEventPipe:
-    
-    '''
-    events {event_name, [call_back]}
-    '''
+    # events {event_name, [call_back]}
 
     EVENT_WANT_ADD_NEW_PROJECT = "want-add-new-project"
     EVENT_WANT_DEL_PROJECT = "want-del-old-project"
@@ -23,9 +20,8 @@ class VeEventPipe:
     
     @staticmethod
     def instance():
-        '''
-        单例模式。
-        '''
+        # 单例模式。
+
         if VeEventPipe.ve_event_pipe is None:
             VeEventPipe.ve_event_pipe = VeEventPipe()
             
@@ -68,7 +64,9 @@ class VeEventPipe:
         
         events.remove(call_back)
         
-    #------------------------------------------------------
+    ###################################
+    ## 给外部用的注册方法。
+    
     @staticmethod
     def register_event_call_back(event_name, call_back):
         ep = VeEventPipe.instance()
@@ -86,8 +84,7 @@ class VeEventPipe:
 
     @staticmethod
     def want_add_new_project(prj_name, prj_src_dirs):
-        VeEventPipe.send_event(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, 
-                       prj_name, prj_src_dirs)
+        VeEventPipe.send_event(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, prj_name, prj_src_dirs)
         
     @staticmethod
     def want_del_project(prj):

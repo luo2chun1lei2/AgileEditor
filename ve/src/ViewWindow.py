@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+#######################################
+# 编辑器窗口
+# 1, 顶部是菜单和工具栏（内容都随着选中的对象而定）。
+# 2, 项目浏览器
+# 3, 编辑器，使用GtkSourceView。
+# 4, 代码浏览工具。
+# 5, 编译和调试工具。
+# 6, 命令工具（可以编写任意的命令）
+# TODO 应该将基本的项目管理等程序的初始化从画面中拿出来，放入Main中。
+
 import os, sys, getopt, shutil, re
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
 
@@ -17,20 +27,10 @@ from gi.overrides.Gtk import TextBuffer
 from ViewMultiEditors import ViewMultiEditors
 from ViewDialogCommon import *
 
-# 编辑器窗口
-# 1, 顶部是菜单和工具栏（内容都随着选中的对象而定）。
-# 2, 项目浏览器
-# 3, 编辑器，使用GtkSourceView。
-# 4, 代码浏览工具。
-# 5, 编译和调试工具。
-# 6, 命令工具（可以编写任意的命令）
-# TODO 应该将基本的项目管理等程序的初始化从画面中拿出来，放入Main中。
 class ViewWindow(Gtk.Window):
     
-    '''
-    ideWorkshop:ModelWorkshop:当前的workshop。
-    cur_prj:ModelProject:当前打开的项目。
-    '''
+    # ideWorkshop:ModelWorkshop:当前的workshop。
+    # cur_prj:ModelProject:当前打开的项目。
     
     ###################################
     ## 返回值的定义
@@ -67,9 +67,7 @@ class ViewWindow(Gtk.Window):
             self.ide_open_file(None, path)
         
     def _create_layout(self):
-        '''
-        创建画面。
-        '''
+        # 创建画面。
         Gtk.Window.__init__(self, title=self.PROGRAM_NAME)
 
         # 设定窗口的大小。
@@ -126,7 +124,7 @@ class ViewWindow(Gtk.Window):
         self.add(vbox)
         
     def create_fs_tree(self):
-        ''' 创建文件系统树控件。 '''
+        # 创建文件系统树控件。
         fstree = ViewFsTree()
         
         # 加入事件。
@@ -141,7 +139,7 @@ class ViewWindow(Gtk.Window):
     ## 创建画面
 
     def create_src_list(self):
-        ''' 显示分析结果的列表 '''
+        # 显示分析结果的列表
         pass
     
     ###################################

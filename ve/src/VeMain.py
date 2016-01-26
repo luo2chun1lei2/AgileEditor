@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+#######################################
+## VE主入口程序，并且管理窗口和数据。
+
 import os, sys, getopt, shutil
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
 from gi.overrides.Gtk import TextBuffer
@@ -19,14 +22,10 @@ from ViewWindow import ViewWindow
 from VeEventPipe import VeEventPipe
 
 class VeMain():
-    '''
-    VE主入口程序。
-    并且管理窗口和数据。
-    数据是 workshop -> project + file，
-    而画面就可能有各种情况了。
-    ve_path string ve配置的路径
-    '''
-    
+    # 数据是 workshop -> project + file，
+    # 而画面就可能有各种情况了。
+    # ve_path string ve配置的路径
+
     DEFAULT_VE_CONFIG_PATH = '~/.ve'
     
     ve_main_instance = None
@@ -39,10 +38,12 @@ class VeMain():
         return VeMain.ve_main_instance
 
     def __init__(self):
-        # 加载工作空间。
+        
+        # 加载数据模型
         self.ve_path = os.path.expanduser(VeMain.DEFAULT_VE_CONFIG_PATH)
         self.workshop = ModelWorkshop(self.ve_path)
         
+        # 在EventPipe注册事件处理方法。
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, self.add_new_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_DEL_PROJECT, self.del_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_CHANGE_PROJECT, self.change_project)
@@ -67,17 +68,21 @@ class VeMain():
             print "指定的项目不存在。"
             return
         
-        # 创建窗口，并进入主循环。
+        # 创建窗口，注册关闭事件
         editorWin = ViewWindow(self.workshop, prj, want_open_file)
         editorWin.connect("delete-event", Gtk.main_quit)
+        
         # - 全屏
         editorWin.maximize()
         
+        # - 设定图标。
         base_path = os.path.dirname((os.path.abspath(sys.argv[0])))
         editorWin.set_icon_from_file(os.path.join(base_path, "ve.png"))
         
+        # - 显示画面
         editorWin.show_all()
-
+        
+        # - 并进入主循环。
         Gtk.main()
         
     def add_new_project(self, prj_name, prj_src_dirs):
@@ -102,4 +107,5 @@ class VeMain():
         
         # - 加入新的项目
         self.add_new_project(prj_name, prj_src_dirs)
+
         

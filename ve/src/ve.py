@@ -1,27 +1,25 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
+#######################################
+## 命令参数分析，启动程序。
+
 import os, sys, getopt
 
 from VeMain import VeMain
 from VeUtils import *
 
-#######################################
-## 窗口和主函数
-
 def usage():
     print 've usage:'
     print '-h, --help: print help message.'
-    print '-l, --list:print the list of projects.'
     print '-p, --project <project name>: open the project.'
     print '-f, --file <file path>: open the file.'
 
 def main(argv):
-    ''' 分析命令参数
-	命令(ve=visual editor)部分
-	ve -p/--project <project_name>
-	ve -f/--file <file_path>
-    '''
+    # 分析命令参数
+    #命令(ve=visual editor)部分
+    #ve -p/--project <project_name>
+    #ve -f/--file <file_path>
     
     print "%s,%s" % (sys._getframe().f_code.co_name, sys._getframe().f_lineno)
     
@@ -29,7 +27,7 @@ def main(argv):
     want_open_project_name = None # 想要立即打开的项目名字
     
     try:
-        opts, args = getopt.getopt(argv[1:], 'hlp:f:', ['list', 'project=', 'file='])
+        opts, args = getopt.getopt(argv[1:], 'hp:f:', ['project=', 'file='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -39,10 +37,6 @@ def main(argv):
         if o in ('-h', '--help'):
             '显示帮助信息'
             usage()
-            sys.exit(0)
-        elif o in ('-l', '--list'):
-            ' 显示现在的项目列表，然后退出'
-            TODO
             sys.exit(0)
         elif o in ('-f', '--file'):
             want_open_file = a
