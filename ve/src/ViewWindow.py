@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
 #######################################
@@ -9,7 +8,7 @@
 # 4, 代码浏览工具。
 # 5, 编译和调试工具。
 # 6, 命令工具（可以编写任意的命令）
-# TODO 应该将基本的项目管理等程序的初始化从画面中拿出来，放入Main中。
+# TODO 大量功能的入口函数在这里，是否合适？而且越来越复杂，无法维护。
 
 import os, sys, getopt, shutil, re
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
@@ -974,10 +973,9 @@ class ViewWindow(Gtk.Window):
         self.ide_goto_line(line_number)
     
     def ide_find(self, search_entry):
-        '''
-        如果当前编辑器中有选中的文字，就将此文字放入检索本中。
-        search_text string 需要检索的文字
-        '''
+        # 如果当前编辑器中有选中的文字，就将此文字放入检索本中。
+        # search_text string 需要检索的文字
+        
         view_editor = self.multiEditors.get_current_ide_editor()
         if view_editor is None:
             return
@@ -991,6 +989,8 @@ class ViewWindow(Gtk.Window):
          
         text = buf.get_text(start, end, False)
 
+        # TODO 算是临时方案，首先设定为“”，然后再设定为需要的检索文字，这样就可以100%引发text_changed事件。
+        search_entry.set_text("")
         search_entry.set_text(text)
     
     def _ide_search_init(self, text_buffer):

@@ -1,7 +1,7 @@
-#!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-''' 画面：显示多个编辑器的图形界面 '''
+#######################################
+# 画面：显示多个编辑器的图形界面
 
 import os, sys, getopt
 from collections import OrderedDict
@@ -11,10 +11,9 @@ from ModelFile import ModelFile
 from ViewMenu import ViewMenu
 
 class ViewEditor:
-    ''' 一个编辑器的信息
-    editor GtkSource.View 源代码的编辑器控件
-    ide_file ModelFile 编辑的文件
-    '''
+    # 一个编辑器的信息
+    # editor GtkSource.View 源代码的编辑器控件
+    # ide_file ModelFile 编辑的文件
     
     # 编辑器当前的状态。
     (
@@ -27,16 +26,14 @@ class ViewEditor:
         self.ide_file = ide_file
 
 class ViewMultiEditors:
-    '''
-    内部管理多个打开文件的编辑器，可以
-    1, 打开一个文件，如果已经存在，就显示已经打开的。
-    2, 关闭一个文件。
-    3, 得到当前的文件。
+    # 内部管理多个打开文件的编辑器，可以
+    # 1, 打开一个文件，如果已经存在，就显示已经打开的。
+    # 2, 关闭一个文件。
+    # 3, 得到当前的文件。
     
-    notebook Gtk.NoteBook 管理多个控件的Tab Page控件。
-    文件名字为“”，表明是一个新文件，且所有的新文件都是一个。
-    dic_editors [str, ViewEditor] 数组：文件路径（绝对），编辑器
-    '''
+    # notebook Gtk.NoteBook 管理多个控件的Tab Page控件。
+    # 文件名字为“”，表明是一个新文件，且所有的新文件都是一个。
+    # dic_editors [str, ViewEditor] 数组：文件路径（绝对），编辑器
     
     def __init__(self, on_process_func):
         ''' 
@@ -125,10 +122,9 @@ class ViewMultiEditors:
         return abs_file_path
     
     def show_editor(self, abs_file_path):
-        ''' 显示一个文件在编辑器中，
-        如果文件已经打开，显示此文件的编辑器放在最前面。
-        如果没有打开，就打开。
-        '''
+        # 显示一个文件在编辑器中，
+        # 如果文件已经打开，显示此文件的编辑器放在最前面。
+        # 如果没有打开，就打开。
         
         if abs_file_path in self.dic_editors: # 文件已经打开过
             current_file_path = self.get_current_abs_file_path()
