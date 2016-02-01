@@ -113,6 +113,14 @@ cp ./doc/global/examples/gtags.conf etc/
 
 #-p emu_its --file /home/luocl/workshop/src/emu/teei_its/its_base/lib/its_base.cc
 
+程序结构设计：
+1，总体结构是按照MVC的方式。
+	1, Model以Workshop为核心，包括在里面打开的所有项目，它可以调用下面的各种功能，比如文件打开或者保存等。
+		Workshop只有一个，用单例模式提供给其他模块调用，每一级模型提供自己的功能。
+	1，View是画面，包含各种画面的组件，监视Workshop中的各种事件，并显示出来。
+	1，Control接收各种输入（主要是来自于画面），然后调用Workshop的功能。
+2，另外，最好开始融入“关系”模型，画面根据模型来生成自己的画面，而数据发生变化后，则画面跟着变化。
+
 当前的问题：
 1，快速关闭文件，容易崩溃，应该是使用了失效的iter。
 2，打开程序后，第一次编辑文件后保存，马上移动光标，容易崩溃。
