@@ -2,7 +2,7 @@
 1，需要安装Python 2.6，用于Python语言。
 2，需要安装PyGObject，用于使用Gnome控件（适用于Gnome 3.0）。
 3，eclipse 4.4（Java开发环境），再安装PyDev。
-4，需要安装id-utils。
+4，需要安装id-utils，这部分实际上没有仔细的运行。
 5, sudo apt-get install python-bzrlib
 
 参考：
@@ -13,6 +13,10 @@
 
 3, gtk source view的语言分析
 /usr/share/gtksourceview-2.0/language-specs
+
+4，修改global的配置文件，加入需要避免的路径。
+cp ./doc/global/examples/gtags.conf etc/
+在common::skip中加入obj/
 
 总的要求：
 1，集成开发环境。选择使用python开发自己的程序，利用pyGObject来实现大部分的缺省功能。
@@ -109,7 +113,7 @@
 
 #-p emu_its --file /home/luocl/workshop/src/emu/teei_its/its_base/lib/its_base.cc
 
-需要完成：
+当前的问题：
 1，快速关闭文件，容易崩溃，应该是使用了失效的iter。
 2，打开程序后，第一次编辑文件后保存，马上移动光标，容易崩溃。
 3，画面提供控制台，随时可以输入命令。
@@ -126,9 +130,3 @@
 14，项目可以修改名字。
 16，每次切换文件的时候，之前的检索项目就无效了，而且再检索的时候，如果检索内容和之前相同，就不再检查。
 	应该每个文件都有自己的检索项目。
-
-__SVN_REVISION_H__
-VERSION_NUMBER
-
-cp ./doc/global/examples/gtags.conf etc/
-在common::skip中加入obj/

@@ -1,18 +1,17 @@
 #-*- coding:utf-8 -*-
 
-'''
-通用对话框
-'''
+# 通用对话框
 
 from gi.repository import Gtk, Gdk
 
 class ViewDialogCommon:
+    # 通用的对话框
+    # 可以显示一个Entry或者两个Entry的对话框，然后得到输入的结果。
     
     @staticmethod
     def show_one_entry(widget, dlg_title, entry_label):
-        '''
-        return (response:Gtk.ResponseType, text:string)
-        '''
+        # 显示一个Entry
+        # return (response:Gtk.ResponseType, text:string)
         
         dialog = Gtk.Dialog(title=dlg_title,
                             transient_for=widget,
@@ -59,7 +58,8 @@ class ViewDialogCommon:
     
     @staticmethod
     def show_two_entry(widget, dlg_title, label_title1, label_title2):
-        # return (response:Gtk.ResponseType, text:string, text:string)
+        # 显示两个Entry
+        # return (response:Gtk.ResponseType, text1:string, text2:string)
         
         dialog = Gtk.Dialog(title=dlg_title,
                             transient_for=widget,

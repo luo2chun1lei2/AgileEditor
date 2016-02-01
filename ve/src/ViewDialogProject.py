@@ -1,8 +1,7 @@
 #-*- coding:utf-8 -*-
 
-'''
-管理项目。
-'''
+# 关于项目的对话框
+# 以“项目列表对话框”为核心，新建、修改都是从此出发，当然这两个对话框也可以单独调用。
 
 import os, string
 import ConfigParser
@@ -17,7 +16,8 @@ from VeEventPipe import VeEventPipe
 ###########################################################
 
 class ViewDialogProjectNew(Gtk.Dialog):
-    ''' 新建Project的对话框 '''
+    # 新建项目的对话框
+    # 有可能需要有多个路径，比如用于排斥，或者用于和其他项目进行引用。
     
     def __init__(self, parent):
         
@@ -41,12 +41,13 @@ class ViewDialogProjectNew(Gtk.Dialog):
         vbox.pack_start(self.entry_prj_name, True, True, 0)
          
         ###############################
-        ## 代码位置（TODO:应该允许有多个）
+        ## 代码位置
+        ## TODO: 无法允许有多个路径，但是是否可以实验去掉若干路径？还有查询辅助库。
         lbl_src_path = Gtk.Label("代码路径")
         vbox.pack_start(lbl_src_path, True, True, 0)
                 
-        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ', \
-                                           Gtk.FileChooserAction.SELECT_FOLDER)
+        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ', 
+                                                         Gtk.FileChooserAction.SELECT_FOLDER)
         vbox.pack_start(self.picker_src_path, True, True, 1.0)
          
         ###############################
@@ -62,8 +63,7 @@ class ViewDialogProjectNew(Gtk.Dialog):
         prj_name = None
         prj_src_path = None
         
-        need_show = True
-        while need_show:
+        while True:
         
             response = dialog.run()
             
@@ -71,15 +71,16 @@ class ViewDialogProjectNew(Gtk.Dialog):
                 # 如果选择OK的话，就创建对应的Project项目。
                 prj_name = dialog.entry_prj_name.get_text()
                 prj_src_path = dialog.picker_src_path.get_filename()
+                
                 if is_empty(prj_name):
-                    # 重新回到对话框
+                    # 项目名字为空，重新回到对话框
                     continue
                     
                 if is_empty(prj_src_path):
-                    # 重新回到对话框
+                    # 项目文件路径为空，重新回到对话框
                     continue
                 
-            need_show = False
+            break
         
         dialog.destroy()
         
@@ -89,7 +90,7 @@ class ViewDialogProjectNew(Gtk.Dialog):
 ###########################################################
 
 class ViewDialogProjectChange(Gtk.Dialog):
-    ''' 修改Project的对话框 '''
+    # 修改Project的对话框
     
     def __init__(self, parent):
         
@@ -117,7 +118,8 @@ class ViewDialogProjectChange(Gtk.Dialog):
         lbl_src_path = Gtk.Label("代码路径")
         vbox.pack_start(lbl_src_path, True, True, 0)
                 
-        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ', Gtk.FileChooserAction.SELECT_FOLDER)
+        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ', 
+                                                         Gtk.FileChooserAction.SELECT_FOLDER)
         vbox.pack_start(self.picker_src_path, True, True, 1.0)
          
         ###############################
@@ -178,15 +180,15 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         self.ideWorkshop = ideWorkshop
         self.selected_project = None
         
-        Gtk.Dialog.__init__(self, "选择项目", parent, 0,
-                            (Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ,
-                             Gtk.STOCK_DELETE, ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ,
-                             Gtk.STOCK_EDIT, ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ,
-                             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                             Gtk.STOCK_OK, Gtk.ResponseType.OK
+        Gtk.Dialog.__init__(self, "打开项目", parent, 0,
+                            (Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ, # 新项目
+                             Gtk.STOCK_DELETE, ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ, # 删除项目
+                             Gtk.STOCK_EDIT, ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ, # 打开项目
+                             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, # 退出
+                             Gtk.STOCK_OK, Gtk.ResponseType.OK # 打开项目
                              ))
         
-        self.set_default_size(300, 400)
+        self.set_default_size(600, 400)
         
         vbox = Gtk.VBox(spacing = 10)
         
@@ -233,7 +235,9 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         liststore = Gtk.ListStore(str, str)
         
         for prj in ideWorkshop.projects:
-            liststore.append([prj.prj_name, os.path.dirname(prj.config_path)])
+            # TODO 似乎代码路径只能有一个，虽然写的是数组。
+            #liststore.append([prj.prj_name, os.path.dirname(prj.src_dirs[0])])
+            liststore.append([prj.prj_name, prj.src_dirs[0]])
             
         self.prj_treeview.set_model(liststore)
         
@@ -247,8 +251,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         
         dialog = ViewDialogProjectOpen(parent, ideWorkshop)
         
-        is_continue = True
-        while is_continue:
+        while True:
         
             prj = None
             response = dialog.run()
@@ -262,7 +265,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
                 
-                is_continue = False
+                break
                     
             elif response == ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ:
                 # 创建一个新的对话框
@@ -306,7 +309,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     
             else:
                 # 其他情况，就直接退出。
-                is_continue = False
+                break
         
         # 关闭对话框
         dialog.destroy()

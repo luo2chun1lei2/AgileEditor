@@ -73,6 +73,7 @@ class VeMain():
         editorWin.connect("delete-event", Gtk.main_quit)
         
         # - 全屏
+        # TODO 无法记住之前的位置和大小吗？
         editorWin.maximize()
         
         # - 设定图标。
@@ -86,9 +87,12 @@ class VeMain():
         Gtk.main()
         
     def add_new_project(self, prj_name, prj_src_dirs):
-        
+        # 添加一个新的项目
         prj_path = os.path.join(self.workshop.ws_path, prj_name)
         prj = ModelProject.create(prj_path, prj_name, prj_src_dirs)
+        
+        if prj is None:
+            return
         
         # 预处理
         prj.prepare()
@@ -96,6 +100,7 @@ class VeMain():
         self.workshop.add_project(prj)
         
     def del_project(self, prj):
+        # 删除一个项目
         prj.remove()
         self.workshop.del_project(prj)
         
@@ -107,5 +112,3 @@ class VeMain():
         
         # - 加入新的项目
         self.add_new_project(prj_name, prj_src_dirs)
-
-        
