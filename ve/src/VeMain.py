@@ -65,7 +65,6 @@ class VeMain():
             
         if prj is None:
             # 客户还是选择失败，或者退出，那么就不用再运行了。
-            print "指定的项目不存在。"
             return
         
         # 创建窗口，注册关闭事件
