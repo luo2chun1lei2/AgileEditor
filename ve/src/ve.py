@@ -4,7 +4,7 @@
 #######################################
 ## 命令参数分析，启动程序。
 
-import os, sys, getopt
+import os, sys, getopt, logging
 
 from VeMain import VeMain
 from VeUtils import *
@@ -21,7 +21,8 @@ def main(argv):
     #ve -p/--project <project_name>
     #ve -f/--file <file_path>
     
-    print "%s,%s" % (sys._getframe().f_code.co_name, sys._getframe().f_lineno)
+    # 设定日志
+    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
     
     want_open_file = None   # 想要立即打开的文件名字
     want_open_project_name = None # 想要立即打开的项目名字

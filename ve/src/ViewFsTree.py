@@ -95,7 +95,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         else:
             self.dirname = None #os.path.expanduser('~')
             
-        print "Init is OK."
+        # print "Init is OK."
 
     def _save_user_data(self, iter, tree_path):
         ''' 将Tree Path保存到TreeIter中。'''

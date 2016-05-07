@@ -263,14 +263,16 @@ class ViewWindow(Gtk.Window):
     ## 基本功能
     
     def ide_new_project(self):
-        ''' 新建项目 '''
+        # 新建项目 
         
         prj_name, prj_src_dirs = ViewDialogProjectNew.show(self)
         if prj_name is None:
             return False
         
-        prj_path = os.path.join(self.ideWorkshop.ws_path, prj_name)
-        prj = ModelProject.create(prj_path, prj_name, prj_src_dirs)
+        prj = self.ideWorkshop.create_project(prj_name, prj_src_dirs)
+        if prj is None:
+            print "Failed to create project:%s, and src dirs:%s", (prj_name, prj_src_dirs)
+            return False
         
         # 预处理
         prj.prepare()
@@ -282,7 +284,7 @@ class ViewWindow(Gtk.Window):
         return True
         
     def ide_open_project(self, prj_name=None):
-        ''' 打开项目 '''
+        # 打开项目
         
         prj = None
         

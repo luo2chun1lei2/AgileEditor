@@ -3,7 +3,7 @@
 # 工作站模型。
 # 负责整个工作站的工作，比如项目的添加、删除等，还包括配置文件和设定工作目录。
 
-import os, string
+import os, string, logging
 import ConfigParser
 from gi.repository import Gtk, Gdk
 
@@ -11,7 +11,6 @@ from VeUtils import *
 from ModelProject import ModelProject
 
 class ModelWorkshop(object):
-    
     # 管理项目的工作区域。
     # 以 ws.conf 文件为核心。(ini文件)
     # 属性：
@@ -19,17 +18,17 @@ class ModelWorkshop(object):
     #    ws_config_path:string:workshop的配置文件的路径。
     #    projects:[ModelProject]:所有项目。
     
-    # 缺省Workshop的路径
     DEF_WS_PATH = ".ve"
+    # 缺省Workshop的路径
     
-    # Section name of project
     SEC_NAME_PRJ = 'projects'
+    # Section name of project
     
     def __init__(self, ws_path):
         # ws_path:string:workshop的路径。
         
         if is_empty(ws_path):
-            print 'workshop路径不正确。%s' % (ws_path)
+            logging.error('workshop路径不正确。%s' % (ws_path))
             ws_path = ModelWorkshop.DEF_WS_PATH
         
         # 设定Workshop的路径
@@ -38,7 +37,7 @@ class ModelWorkshop(object):
         # 如果文件夹不存在，则创建
         if not os.path.exists(self.ws_path):
             os.mkdir(self.ws_path)
-            print '创建了workshop:%s' % self.ws_path
+            logging.error('创建了workshop:%s' % (self.ws_path))
             
         # 得到Workshop的配置文件
         self.ws_config_path = os.path.join(self.ws_path, 'ws.conf')
@@ -47,7 +46,7 @@ class ModelWorkshop(object):
         if not os.path.exists(self.ws_config_path):
             # 创建一个空的项目配置文件。
             self._create_conf(self.ws_config_path)
-            print '创建了Workshop配置文件:%s' % (self.ws_config_path)
+            logging.error('创建了Workshop配置文件:%s' % (self.ws_config_path))
         
         # 读取配置文件。 
         self.projects =  self._read_conf(self.ws_config_path)
@@ -62,6 +61,17 @@ class ModelWorkshop(object):
                 return prj
             
         return None
+    
+    def create_project(self, prj_name, prj_src_dirs):
+        # 创建一个项目。
+        # prj_name:string:项目的名字。
+        # src_dirs:[string]:代码所在的目录。
+        # return:[ModelProject]:如果创建不成功，就返回None
+        
+        prj_path = os.path.join(self.ws_path, prj_name)
+        prj = ModelProject.create(prj_path, prj_name, prj_src_dirs)
+        
+        return prj
         
     def add_project(self, project):
         # 添加一个项目。
@@ -105,16 +115,13 @@ class ModelWorkshop(object):
         
         # 清空原来的项目组，然后读取配置文件中的项目组。
         prjs = []
-        for section in cf.sections():
-            
-            # 如果是 [projects]
-            if section == ModelWorkshop.SEC_NAME_PRJ:
-                prj_infoes = cf.items(ModelWorkshop.SEC_NAME_PRJ)
-                # print 'projects:', prj_infoes
-                for prj_info in prj_infoes:
-                    prj_dir = os.path.join(self.ws_path, prj_info[1]) # 取后面的值
-                    prj = ModelProject.open(prj_dir)
-                    prjs.append(prj)
+        
+        prj_infoes = cf.items(ModelWorkshop.SEC_NAME_PRJ)
+        # print 'projects:', prj_infoes
+        for prj_info in prj_infoes:
+            prj_dir = os.path.join(self.ws_path, prj_info[1]) # 取后面的值
+            prj = ModelProject.open(prj_dir)
+            prjs.append(prj)
         
         return prjs
 

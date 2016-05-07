@@ -87,8 +87,7 @@ class VeMain():
         
     def add_new_project(self, prj_name, prj_src_dirs):
         # 添加一个新的项目
-        prj_path = os.path.join(self.workshop.ws_path, prj_name)
-        prj = ModelProject.create(prj_path, prj_name, prj_src_dirs)
+        prj = self.workshop.create_project(prj_name, prj_src_dirs)
         
         if prj is None:
             return
