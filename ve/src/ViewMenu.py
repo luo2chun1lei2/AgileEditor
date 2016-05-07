@@ -1,15 +1,6 @@
 #-*- coding:utf-8 -*-
 
-'''
-Ide的菜单和工具的模块。
-1, Menu：
- Project (New Project, Open Project, Project Preference | Quit )
- File（New File，Open File，Save File，Save File As ...）
- Edit (Copy, Paste)
- Help（Information）
-
-2, ToolBar：New，Open, Save, Save As
-'''
+# 菜单和工具的模块。
 
 from gi.repository import Gtk, Gdk, GtkSource
 
