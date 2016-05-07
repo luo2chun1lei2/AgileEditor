@@ -1,17 +1,15 @@
 #-*- coding:utf-8 -*-
 
-'''
-操纵Tag相关的处理。
-目前使用Global（gtags）来实现。
-可供选择的还有ctags和cscope。
+# 操纵Tag相关的处理。
+# 目前使用Global（gtags）来实现。
+# 可供选择的还有ctags和cscope。
+# 
+# Global的问题:
+# 1,只能有一个代码目录，所以必须将代码集中在一起。
+# 2,不能指定Tags等文件所在的目录，所以Tags文件必须在代码目录的开始。
+# 3,使用ctag来更加详细的管理tag。
 
-Global的问题:
-1,只能有一个代码目录，所以必须将代码集中在一起。
-2,不能指定Tags等文件所在的目录，所以Tags文件必须在代码目录的开始。
-3,使用ctag来更加详细的管理tag。
-
-每个ModelProject对应一个IdeTags。
-'''
+# 每个ModelProject对应一个IdeTags。
 
 import os
 import subprocess

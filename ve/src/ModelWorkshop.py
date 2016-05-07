@@ -1,8 +1,7 @@
 #-*- coding:utf-8 -*-
 
-'''
-管理项目。
-'''
+# 工作站模型。
+# 负责整个工作站的工作，比如项目的添加、删除等，还包括配置文件和设定工作目录。
 
 import os, string
 import ConfigParser
@@ -12,42 +11,52 @@ from VeUtils import *
 from ModelProject import ModelProject
 
 class ModelWorkshop(object):
-    '''
-    管理项目的工作区域。
-    以 ws.conf 文件为核心。(ini文件)
-    属性：
-        ws_path:string:workshop的路径。
-        ws_config_path:string:workshop的配置文件的路径。
-        projects:[ModelProject]:所有项目。
-    '''
     
+    # 管理项目的工作区域。
+    # 以 ws.conf 文件为核心。(ini文件)
+    # 属性：
+    #    ws_path:string:workshop的路径。
+    #    ws_config_path:string:workshop的配置文件的路径。
+    #    projects:[ModelProject]:所有项目。
+    
+    # 缺省Workshop的路径
+    DEF_WS_PATH = ".ve"
+    
+    # Section name of project
     SEC_NAME_PRJ = 'projects'
     
     def __init__(self, ws_path):
-        '''
-        ws_path:string:workshop的路径。
-        '''
+        # ws_path:string:workshop的路径。
         
         if is_empty(ws_path):
-            print 'ide的workshop路径不正确。%s' % ws_path
+            print 'workshop路径不正确。%s' % (ws_path)
+            ws_path = ModelWorkshop.DEF_WS_PATH
         
+        # 设定Workshop的路径
         self.ws_path = ws_path
         
+        # 如果文件夹不存在，则创建
         if not os.path.exists(self.ws_path):
             os.mkdir(self.ws_path)
-            print '创建了workshop的路径。%s' % self.ws_path
+            print '创建了workshop:%s' % self.ws_path
             
+        # 得到Workshop的配置文件
         self.ws_config_path = os.path.join(self.ws_path, 'ws.conf')
+        
+        # 如果配置文件不存在，则创建
         if not os.path.exists(self.ws_config_path):
             # 创建一个空的项目配置文件。
-            self._create_conf(self.ws_config_path)  
-        
-        print 'workshop的路径：%s，配置文件:%s' % (self.ws_path, self.ws_config_path)
+            self._create_conf(self.ws_config_path)
+            print '创建了Workshop配置文件:%s' % (self.ws_config_path)
         
         # 读取配置文件。 
         self.projects =  self._read_conf(self.ws_config_path)
         
-    def get_prj(self, project_name):
+    def get_project(self, project_name):
+        # 根据项目名字，得到项目。
+        # project_name:string:项目的名字
+        # return:ModelProject:项目对象，如果没有找到，返回None
+        
         for prj in self.projects:
             if prj.prj_name == project_name:
                 return prj
@@ -55,61 +64,74 @@ class ModelWorkshop(object):
         return None
         
     def add_project(self, project):
-        ''' 添加一个项目。'''
+        # 添加一个项目。
         self.projects.append(project)
         
         # 马上保存。
         self.save_conf()
     
     def del_project(self, project):
-        ''' 删除一个项目。 '''
+        # 删除一个项目。
         self.projects.remove(project)
         self.save_conf()
     
     def save_conf(self):
-        ''' 保存当前的worshop的信息。'''
+        # 保存当前的workshop的信息。
         self._write_conf(self.projects)
       
     def _create_conf(self, config_path):
-        ''' 生成缺省的配置文件。
-        加入了一个[projects] 
-        ''' 
+        # 生成缺省的配置文件。
+        # 加入了一个[projects]
+        
+        # 创建解析器
         cf = ConfigParser.ConfigParser()
         
+        # 添加一个基本的节点
         cf.add_section(ModelWorkshop.SEC_NAME_PRJ)
         
+        # 写入数据
         fo_config = open(self.ws_config_path, 'w+')
         cf.write(fo_config)
         fo_config.close()
         
     def _read_conf(self, config_path):
-        ''' 读取workshop的配置文件 '''
+        # 读取workshop的配置文件 
         
+        # 创建解析器
         cf = ConfigParser.ConfigParser()
+        
+        # 读取和分析数据
         cf.read(config_path)
         
+        # 清空原来的项目组，然后读取配置文件中的项目组。
         prjs = []
-        
         for section in cf.sections():
             
+            # 如果是 [projects]
             if section == ModelWorkshop.SEC_NAME_PRJ:
                 prj_infoes = cf.items(ModelWorkshop.SEC_NAME_PRJ)
-                print 'projects:', prj_infoes
+                # print 'projects:', prj_infoes
                 for prj_info in prj_infoes:
-                    prj_dir = prj_info[1]
+                    prj_dir = os.path.join(self.ws_path, prj_info[1]) # 取后面的值
                     prj = ModelProject.open(prj_dir)
                     prjs.append(prj)
         
         return prjs
 
     def _write_conf(self, projects):
+        # 写入workshop的配置文件
+        
+        # 创建解析器
         cf = ConfigParser.ConfigParser()
         
+        # 添加 [projects]
         cf.add_section(ModelWorkshop.SEC_NAME_PRJ)
+        # 写入每个项目的路径。
         for n, prj in enumerate(projects):
-            cf.set(ModelWorkshop.SEC_NAME_PRJ, "project" + str(n), \
-                   os.path.dirname(prj.config_path) )
+            # project<no> = basename(dirname(project.config_path))
+            cf.set(ModelWorkshop.SEC_NAME_PRJ, "project" + str(n), os.path.basename(os.path.dirname(prj.config_path)))
         
+        # 写入数据
         fo_config = open(self.ws_config_path, 'w')
         cf.write(fo_config)
         fo_config.close()

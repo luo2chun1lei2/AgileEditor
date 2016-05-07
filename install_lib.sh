@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo apt-get install python-bzrlib
+sudo apt-get install python-bzrlib python-pyinotify

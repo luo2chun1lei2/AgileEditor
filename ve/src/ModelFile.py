@@ -1,12 +1,12 @@
 #-*- coding:utf-8 -*-
 
 #######################################
-# Ide中每个被打开的文件。
+# VE中每个被打开的文件。
 
 import os.path
 
 class ModelFile(object):
-    # 代表Ide中的一个被打开的文件。
+    # 代表一个被打开的文件。
     # file_path:路径，如果是None，证明是新建的文件。
     # file_obj:文件对象。
     # file_buf:用于编辑器的buffer。

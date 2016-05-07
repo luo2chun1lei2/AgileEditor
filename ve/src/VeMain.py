@@ -56,7 +56,7 @@ class VeMain():
         # 打开想要打开的项目
         prj = None
         if not want_open_project_name is None:
-            prj = self.workshop.get_prj(want_open_project_name)
+            prj = self.workshop.get_project(want_open_project_name)
         
         # 如果没有传入打开某个项目，或者指定的项目不存在，那么就指定一个。
         if prj is None :

@@ -1,11 +1,9 @@
 #-*- coding:utf-8 -*-
 
-'''
-管理项目。
-1, 必须创建一个项目，项目的配置放在~/.wside/project_name/project.conf 缺省目录。
-2, 项目由一个wsproject.ini文件来标志。
-3, 
-'''
+# 管理项目。
+# 1, 项目的配置放在 <workshop_path>/<project_name>/project.conf 缺省目录。
+# 2, 项目由一个wsproject.ini文件来标志。
+# 3, 
 
 import os
 import ConfigParser
