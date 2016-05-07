@@ -262,6 +262,9 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                 
                 if selection.get_selected():
                     selected_pathes = selection.get_selected_rows()[1]
+                    if len(selected_pathes) == 0:
+                        continue
+                    
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
                 
@@ -283,6 +286,9 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                 
                 if selection.get_selected():
                     selected_pathes = selection.get_selected_rows()[1]
+                    if len(selected_pathes) == 0:
+                        continue
+                    
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
                     
@@ -297,6 +303,9 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                 
                 if selection.get_selected():
                     selected_pathes = selection.get_selected_rows()[1]
+                    if len(selected_pathes) == 0:
+                        continue
+                    
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
                     
