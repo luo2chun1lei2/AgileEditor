@@ -9,10 +9,9 @@ from gi.repository import GObject, Gtk, Gdk, GtkSource
 from VeUtils import *
 from ModelTags import ModelGTags
 
-###########################################################
-
 class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
     '''
+    调用方式是 editor.props.completion 's provider add this provider.
     快捷键的调用顺序：
     do_match
     do_populate
