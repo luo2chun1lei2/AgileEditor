@@ -79,6 +79,7 @@ class ViewDialogTagsOpen(Gtk.Dialog):
         self.show_all()
         
     def on_row_activated(self, treeview, path_str, column):
+        # 双击，如同点了OK按钮。
         self.response(Gtk.ResponseType.OK)
     
     @staticmethod

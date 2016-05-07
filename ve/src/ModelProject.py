@@ -190,27 +190,43 @@ class ModelProject(object):
         return self.prj_tags.prepare()
     
     def query_tags_by_file(self, file_path):
+        # 查询指定文件中的所有TAG
+        # file_path:string:文件的路径
+        # return:[string]:tag信息的数组
         return self.prj_tags.query_tags_by_file(file_path)
     
     def query_defination_tags(self, name):
+        # 查询某个定义所在的TAG信息
+        # name:string:要查询的名字
+        # return:[string]:tag信息的数组
         return self.prj_tags.query_defination_tags(name)
     
     def query_reference_tags(self, name):
+        # 查询某个名字的引用
+        # name:string:要查询的名字
+        # return:[string]:tag信息的数组
         return self.prj_tags.query_reference_tags(name)
     
     def get_completion_tags(self, prefix):
-        ''' 根据前缀，查询到什么Tag符合要求。
-        prefix string 前缀，比如“do_w”，查询符合条件[do_w.*]的tag名字。
-        return [IdeOneTag] 包含名字的数组，如果没有符合的，就长度为空。
-        '''
+        # 根据前缀，查询到什么Tag符合要求。
+        # prefix string 前缀，比如“do_w”，查询符合条件[do_w.*]的tag名字。
+        # return [IdeOneTag] 包含名字的数组，如果没有符合的，就长度为空。
         return self.prj_tags.query_prefix_tags(prefix)
     
     def query_grep_tags(self, pattern, ignoreCase):
+        # 根据pattern查询TAG
+        # pattern:string:名字的模式
+        # ignoreCase:bool:是否忽略大小写
+        # return:[string]:Tag信息的数组
         return self.prj_tags.query_grep_tags(pattern, ignoreCase)
         
     def query_grep_filepath(self, pattern, ignoreCase=False):
+        # 根据模式查找文件
+        # pattern:string:文件名字的模式
+        # ignoreCase:bool:是否忽略大小写
+        # return:[string]:Tag信息的数组
         return self.prj_tags.query_grep_filepath(pattern, ignoreCase)
     
     def get_completion_provider(self):
-        ''' 返回一个单词补全的提供者 '''
-        return VeWordProvider(self)#self.prj_tags)
+        # 返回一个单词补全的提供者
+        return VeWordProvider(self)

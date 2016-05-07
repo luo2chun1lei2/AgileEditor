@@ -186,7 +186,7 @@ class ViewMultiEditors:
     
     def _ide_show_status(self, statusbar, row, column):
         statusbar.pop(0)
-        msg = 'Ln %d, Col %d' % (row, column)
+        msg = 'Line %4d, Column %3d' % (row, column)
         statusbar.push(0, msg)
     
     def _ide_only_open_file(self, ide_file, file_path, editor):
@@ -302,13 +302,18 @@ class ViewMultiEditors:
             src_buffer.set_highlight_syntax(True)                # 语法高亮
             
         #src_buffer.connect("changed", self.on_src_bufer_changed)
+        # 可以利用 styleSchemeManager.get_scheme_ids() 得到所有的id
+        # ['cobalt', 'kate', 'oblivion', 'solarized-dark', 'solarized-light', 'tango', 'classic']
         styleSchemeManager = GtkSource.StyleSchemeManager.get_default()
-        styleScheme = styleSchemeManager.get_scheme("kate")
-        src_buffer.set_style_scheme(styleScheme)
+        styleScheme = styleSchemeManager.get_scheme("cobalt")
+        if styleScheme is not None:
+            self.styleScheme = styleScheme # 不能丢弃
+            src_buffer.set_style_scheme(self.styleScheme)
         
         return src_buffer
     
     def _set_src_language(self, src_buffer, file_path):
+        
         if file_path is None:
             src_buffer.set_language(None)
             return src_buffer

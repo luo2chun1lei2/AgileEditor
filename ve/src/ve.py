@@ -4,6 +4,10 @@
 #######################################
 ## 命令参数分析，启动程序。
 
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkSource', '3.0') 
+
 import os, sys, getopt, logging
 
 from VeMain import VeMain

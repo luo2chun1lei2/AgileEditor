@@ -66,7 +66,8 @@ class ViewTagList:
 
         # column for line no
         renderer = Gtk.CellRendererText()
-        renderer.set_property("cell-background", "cyan");
+        # 颜色参考 /usr/share/X11/rgb.txt 文件。
+        renderer.set_property("cell-background", "light grey");
         column = Gtk.TreeViewColumn("行号", renderer,
                                     text=self.COLUMN_TAG_LINE_NO)
         column.set_sort_column_id(self.COLUMN_TAG_LINE_NO)

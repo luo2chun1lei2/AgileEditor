@@ -183,7 +183,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         Gtk.Dialog.__init__(self, "打开项目", parent, 0,
                             (Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ, # 新项目
                              Gtk.STOCK_DELETE, ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ, # 删除项目
-                             Gtk.STOCK_EDIT, ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ, # 打开项目
+                             Gtk.STOCK_EDIT, ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ, # 改变项目
                              Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, # 退出
                              Gtk.STOCK_OK, Gtk.ResponseType.OK # 打开项目
                              ))
@@ -202,6 +202,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         ## 项目的列表(项目的名字|项目的路径)。
     
         treeview = Gtk.TreeView()
+        treeview.connect("row-activated", self.on_row_activated)
         
         renderer_prj_name = Gtk.CellRendererText()
         #renderer_prj_name.connect("row-activated", self.on_render_selected)
@@ -326,3 +327,6 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         # 返回信息。
         return prj
     
+    def on_row_activated(self, treeview, path_str, column):
+        # 双击，如同点了OK按钮。
+        self.response(Gtk.ResponseType.OK)
