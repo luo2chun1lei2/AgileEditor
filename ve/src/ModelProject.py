@@ -2,12 +2,10 @@
 
 # 管理项目。
 # 1, 根据配置文件显示项目。
-# 2, 可以添加不同的路径。
-# 3, 
+# 2, 还包括项目中的TAG检索等功能。
 
 import os, logging
 import ConfigParser
-from gi.repository import GObject, Gtk, Gdk, GtkSource
 
 from VeUtils import *
 from ModelTags import ModelGTags

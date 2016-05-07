@@ -1,8 +1,6 @@
 #-*- coding:utf-8 -*-
 
-'''
-提供单词补全的功能。
-'''
+# 提供单词补全的功能。
 
 import os
 import ConfigParser
@@ -38,8 +36,8 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         
         self.ide_prj = ide_prj
         self.name = ""
-        #super(VeWordProvider, self).__init__()
-    #    self.prj_tags = ideTags
+        # super(VeWordProvider, self).__init__()
+        # self.prj_tags = ideTags
     
     def do_get_name(self):
         '''
@@ -86,12 +84,11 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         #print 'do_activate_proposal'
         return False
     
-    def do_get_start_iter(self, context, proposal, ite):
-        '''
-        计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
-        调用非常的频繁，不知道为什么
-        return:Bool:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
-        '''
+    def do_get_start_iter(self, context, proposal):
+        # 计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
+        # 调用非常的频繁，不知道为什么
+        # return:Bool:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
+        
         #print 'do_get_start_iter'
         return False
     
@@ -100,7 +97,7 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         看看是否和当前的情况匹配，然后添加自己的Proposal。
         return:Bool:True，如果匹配。
         '''
-        ite = context.get_iter()
+        (isproposal, ite) = context.get_iter()
         
         completion = context.props.completion
         view = completion.get_view()

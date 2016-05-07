@@ -5,7 +5,6 @@
 
 import os, string, logging
 import ConfigParser
-from gi.repository import Gtk, Gdk
 
 from VeUtils import *
 from ModelProject import ModelProject
