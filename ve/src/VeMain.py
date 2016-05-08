@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
 #######################################
@@ -6,17 +5,11 @@
 
 import os, sys, getopt, shutil
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
-from gi.overrides.Gtk import TextBuffer
 
 from ModelWorkshop import ModelWorkshop
 from ModelProject import ModelProject
 from ViewDialogTags import ViewDialogTagsOpen
 from ModelFile import ModelFile
-from ViewMenu import ViewMenu
-from ViewFsTree import ViewFsTree, FsTreeModel
-from ViewTagList import ViewTagList
-from ViewHelp import ViewDialogInfo
-from ViewMultiEditors import ViewMultiEditors
 from ViewWindow import ViewWindow
 
 from VeEventPipe import VeEventPipe
@@ -29,6 +22,7 @@ class VeMain():
     DEFAULT_VE_CONFIG_PATH = '~/.ve'
     
     ve_main_instance = None
+    # 静态单实例
     
     @staticmethod
     def get_instance():

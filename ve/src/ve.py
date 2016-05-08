@@ -14,6 +14,7 @@ from VeMain import VeMain
 from VeUtils import *
 
 def usage():
+    # 显示使用信息
     print 've usage:'
     print '-h, --help: print help message.'
     print '-p, --project <project name>: open the project.'
@@ -21,11 +22,11 @@ def usage():
 
 def main(argv):
     # 分析命令参数
-    #命令(ve=visual editor)部分
-    #ve -p/--project <project_name>
-    #ve -f/--file <file_path>
+    # 命令(ve=visual editor)部分
+    # ve -p/--project <project_name>
+    # ve -f/--file <file_path>
     
-    # 设定日志
+    # 设定日志的等级和格式
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
     
     want_open_file = None   # 想要立即打开的文件名字
@@ -57,5 +58,5 @@ def main(argv):
     veMain.start(want_open_project_name, want_open_file)
 
 if __name__ == '__main__':
-    '''  主入口  '''
+    # 主入口  
     main(sys.argv)

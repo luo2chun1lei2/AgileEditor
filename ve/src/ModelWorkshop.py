@@ -62,7 +62,7 @@ class ModelWorkshop(object):
         return None
     
     def create_project(self, prj_name, prj_src_dirs):
-        # 创建一个项目。
+        # 创建一个项目，并没有加入到workshop中。
         # prj_name:string:项目的名字。
         # src_dirs:[string]:代码所在的目录。
         # return:[ModelProject]:如果创建不成功，就返回None
@@ -73,14 +73,14 @@ class ModelWorkshop(object):
         return prj
         
     def add_project(self, project):
-        # 添加一个项目。
+        # 添加一个项目到workshop中，并保存配置。
         self.projects.append(project)
         
         # 马上保存。
         self.save_conf()
     
     def del_project(self, project):
-        # 删除一个项目。
+        # 从列表中删除一个项目，并保存配置，项目实际的配置没有删除。
         self.projects.remove(project)
         self.save_conf()
     
