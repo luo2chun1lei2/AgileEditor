@@ -2,6 +2,7 @@
 
 # 菜单和工具的模块。
 
+import logging
 from gi.repository import Gtk, Gdk, GtkSource
 
 # 菜单的设定。
@@ -72,9 +73,7 @@ MENU_CONFIG = """
 """
 
 class ViewMenu(object):
-    '''
-    管理Ide菜单和工具栏
-    '''
+    # 管理菜单和工具栏
     
     # 当前的状态。
     (
@@ -198,8 +197,9 @@ class ViewMenu(object):
         return self.menu_status
     
     def _create_menu(self, window):
-        ''' 创建菜单 '''
-        # 菜单
+        # 创建菜单和工具栏
+        
+        # 主菜单
         action_group = Gtk.ActionGroup("menu_actions")
         
         self.add_project_menu_actions(action_group)
@@ -250,7 +250,7 @@ class ViewMenu(object):
         #self.popup = uimanager.get_widget("/PopupMenu")
         
     def add_project_menu_actions(self, action_group):
-        ''' Project菜单设定。 '''
+        # Project菜单设定。
         action_projectmenu = Gtk.Action("ProjectMenu", "Project", None, None)
         action_group.add_action(action_projectmenu)
 
@@ -284,8 +284,8 @@ class ViewMenu(object):
         action_group.add_action(action_app_quit)
         self.action_app_quit = action_app_quit
         
-    # File项目的菜单设定。
     def add_file_menu_actions(self, action_group):
+        # File项目的菜单设定。
         action_filemenu = Gtk.Action("FileMenu", "File", None, None)
         action_group.add_action(action_filemenu)
 
@@ -353,7 +353,7 @@ class ViewMenu(object):
         ])
         
     def add_help_menu_actions(self, action_group):
-        ''' Help菜单设定。 '''
+        # Help菜单设定。 
         action_helptmenu = Gtk.Action("HelpMenu", "Help", None, None)
         action_group.add_action(action_helptmenu)
 
@@ -370,101 +370,101 @@ class ViewMenu(object):
         uimanager.add_ui_from_string(MENU_CONFIG)
 
         # Add the accelerator group to the toplevel window
-        #accelgroup = uimanager.get_accel_group()
-        #self.add_accel_group(accelgroup)
+        # accelgroup = uimanager.get_accel_group()
+        # self.add_accel_group(accelgroup)
     
         return uimanager
     
     def on_menu_project_new(self, widget):
-        print("A Project|New menu item was selected.")
+        logging.debug("A Project|New menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_NEW)
         
     def on_menu_project_open(self, widget):
-        print("A Project|Open menu item was selected.")
+        logging.debug("A Project|Open menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_OPEN)
         
     def on_menu_project_setting(self, widget):
-        print("A Project|Preferences menu item was selected.")
+        logging.debug("A Project|Preferences menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_PREFERENCES)
         
     def on_menu_project_close(self, widget):
-        print("A Project|Close menu item was selected.")
+        logging.debug("A Project|Close menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_CLOSE)
         
     def on_menu_project_update_tags(self, widget):
-        print("A Project|Update Tags menu item was selected.")
+        logging.debug("A Project|Update Tags menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_UPDATE_TAGS)
     
     def on_menu_app_quit(self, widget):
-        print("A App|Quit as menu item was selected.")
+        logging.debug("A App|Quit as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_APP_QUIT)
     
     def on_menu_file_new(self, widget):
-        print("A File|New menu item was selected.")
+        logging.debug("A File|New menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_NEW)
         
     def on_menu_file_open(self, widget):
-        print('A File|Open menu item was selected.')
+        logging.debug('A File|Open menu item was selected.')
         self.on_menu_func(widget, self.ACTION_FILE_OPEN)
     
     def on_menu_file_close(self, widget):
-        print("A File|Close menu item was selected.")
+        logging.debug("A File|Close menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_CLOSE)
         
     def on_menu_file_save(self, widget):
-        print("A File|Save menu item was selected.")
+        logging.debug("A File|Save menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE)
         
     def on_menu_file_save_as(self, widget):
-        print("A File|Save as menu item was selected.")
+        logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
 
     def on_menu_edit_redo(self, widget):
-        print("A Edit|Redo as menu item was selected.")
+        logging.debug("A Edit|Redo as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_REDO)
     
     def on_menu_edit_undo(self, widget):
-        print("A Edit|Undo as menu item was selected.")
+        logging.debug("A Edit|Undo as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_UNDO)
 
     def on_menu_edit_cut(self, widget):
-        print("A Edit|Cut as menu item was selected.")
+        logging.debug("A Edit|Cut as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_CUT)
         
     def on_menu_edit_copy(self, widget):
-        print("A Edit|Copy as menu item was selected.")
+        logging.debug("A Edit|Copy as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_COPY)
 
     def on_menu_edit_paste(self, widget):
-        print("A Edit|Paste as menu item was selected.")
+        logging.debug("A Edit|Paste as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_PASTE)
         
     def on_menu_edit_select_all(self, widget):
-        print("A Edit|Select All as menu item was selected.")
+        logging.debug("A Edit|Select All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_SELECT_ALL)
         
     def on_menu_edit_delete_line(self, widget):
-        print("A Edit|Delete Line All as menu item was selected.")
+        logging.debug("A Edit|Delete Line All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_DELETE_LINE)
         
     def on_menu_edit_comment(self, widget):
-        print("A Edit|comment Line All as menu item was selected.")
+        logging.debug("A Edit|comment Line All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_COMMENT)
     
     def on_menu_edit_uncomment(self, widget):
-        print("A Edit|uncomment Line All as menu item was selected.")
+        logging.debug("A Edit|uncomment Line All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_UNCOMMENT)
     
     def on_menu_edit_replace(self, widget):
-        print("A Edit|replace Line All as menu item was selected.")
+        logging.debug("A Edit|replace Line All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_REPLACE)
     
     def on_menu_search_jumpto(self, widget):
-        print("A Search|JumpTo menu item was selected.")
+        logging.debug("A Search|JumpTo menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_JUMP_TO)
         
     def on_menu_search_find(self, widget):
-        print("A Search|find menu item was selected.")
+        logging.debug("A Search|find menu item was selected.")
         ''' 跳转到 SearchEntry中。'''
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND, self.search_entry)
         self.search_entry.grab_focus()
@@ -480,34 +480,35 @@ class ViewMenu(object):
         self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive)
     
     def on_menu_search_find_next(self, widget):
-        print("A Search|find next menu item was selected.")
+        logging.debug("A Search|find next menu item was selected.")
         search_text = self.search_entry.get_text()
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND_NEXT, search_text)
     
     def on_menu_search_find_in_files(self, widget):
-        print("A Search|find in files menu item was selected.")
+        logging.debug("A Search|find in files menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND_IN_FILES)
         
     def on_menu_search_find_path(self, widget):
-        print("A Search|find path menu item was selected.")
+        logging.debug("A Search|find path menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND_PATH)
         
     def on_menu_search_defination_by_dialog(self, widget):
-        print("A Search|find defination by dialog menu item was selected.")
+        logging.debug("A Search|find defination by dialog menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_DIALOG_DEFINATION)
     
     def on_menu_search_defination(self, widget):
-        print("A Search|defination menu item was selected.")
+        logging.debug("A Search|defination menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_DEFINATION)
         
     def on_menu_search_reference(self, widget):
-        print("A Search|reference menu item was selected.")
+        logging.debug("A Search|reference menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_REFERENCE)
         
     def on_menu_search_back_tag(self, widget):
-        print("A Search|back tag menu item was selected.")
+        logging.debug("A Search|back tag menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_BACK_TAG)
 
     def on_menu_help_info(self, widget):
-        print("A Help|Infomation as menu item was selected.")
+        logging.debug("A Help|Infomation as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_HELP_INFO)
+        

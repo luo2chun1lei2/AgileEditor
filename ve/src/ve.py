@@ -27,7 +27,7 @@ def main(argv):
     # ve -f/--file <file_path>
     
     # 设定日志的等级和格式
-    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
+    logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
     
     want_open_file = None   # 想要立即打开的文件名字
     want_open_project_name = None # 想要立即打开的项目名字
