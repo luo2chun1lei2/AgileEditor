@@ -722,9 +722,14 @@ class ViewWindow(Gtk.Window):
         src_buffer.delete_mark(end_mark)
     
     def ide_edit_replace(self):
-        ''' 在项目的文件中查找，不是寻找定义。 '''
-        response, replace_from, replace_to = ViewDialogCommon.show_two_entry(self, "替换", '从', '到')
-        if response != Gtk.ResponseType.OK or replace_from is None or replace_from == '' or replace_to is None or replace_to == '':
+        # 在项目的文件中查找，不是寻找定义。
+        
+        # 看看是否已经选中了单词
+        tag_name = self._ide_get_selected_text_or_word()
+        
+        response, replace_from, replace_to = ViewDialogCommon.show_two_entry(self, "替换", '从', tag_name, '到', "")
+        if response != Gtk.ResponseType.OK or replace_from is None or replace_from == '' or \
+            replace_to is None or replace_to == '':
             return
         
         self._ide_replace_in_file(replace_from, replace_to)

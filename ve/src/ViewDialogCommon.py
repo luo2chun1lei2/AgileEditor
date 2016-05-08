@@ -57,7 +57,7 @@ class ViewDialogCommon:
         return response, text
     
     @staticmethod
-    def show_two_entry(widget, dlg_title, label_title1, label_title2):
+    def show_two_entry(widget, dlg_title, label_title1, text1, label_title2, text2):
         # 显示两个Entry
         # return (response:Gtk.ResponseType, text1:string, text2:string)
         
@@ -91,6 +91,7 @@ class ViewDialogCommon:
         
         entryLine = Gtk.Entry()
         entryLine.set_activates_default(True)
+        entryLine.set_text(text1)
         table.attach_defaults(entryLine, 1, 2, 0, 1)
         label.set_mnemonic_widget(entryLine)
         
@@ -100,6 +101,7 @@ class ViewDialogCommon:
         
         entryLine2 = Gtk.Entry()
         entryLine2.set_activates_default(True)
+        entryLine2.set_text(text2)
         table.attach_defaults(entryLine2, 1, 2, 1, 2)
         label.set_mnemonic_widget(entryLine2)
         
