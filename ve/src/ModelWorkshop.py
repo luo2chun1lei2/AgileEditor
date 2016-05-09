@@ -134,8 +134,8 @@ class ModelWorkshop(object):
         cf.add_section(ModelWorkshop.SEC_NAME_PRJ)
         # 写入每个项目的路径。
         for n, prj in enumerate(projects):
-            # project<no> = basename(dirname(project.config_path))
-            cf.set(ModelWorkshop.SEC_NAME_PRJ, "project" + str(n), os.path.basename(os.path.dirname(prj.config_path)))
+            # project<no> = basename(dir_path(project.config_path))
+            cf.set(ModelWorkshop.SEC_NAME_PRJ, "project" + str(n), os.path.basename(os.path.dir_path(prj.config_path)))
         
         # 写入数据
         fo_config = open(self.ws_config_path, 'w')
