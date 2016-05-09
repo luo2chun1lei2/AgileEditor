@@ -4,7 +4,7 @@
 # 显示信息不够完成，还缺少idutils工具支持。
 
 import logging
-from gi.repository import Gtk, GObject, GLib
+from gi.repository import Gtk, Gdk, GObject, GLib
 from ModelTags import ModelTag
 
 class ViewTagList:
@@ -22,17 +22,19 @@ class ViewTagList:
 
         self.ideWindow = ideWindow
 
-        #vbox = Gtk.VBox(spacing=8)
-        #self.window.add(vbox)
+        # 总的容器
+        vbox = Gtk.VBox(spacing=2)
+        
+        # 显示标题
+        label = Gtk.Label(label='Tag List')
+        #isOK, color = Gdk.Color.parse("White")
+        #label.modify_bg(Gtk.StateType.NORMAL, color)
+        vbox.pack_start(label, False, False, 0)
 
-        #label = Gtk.Label(label='This is the bug list 
-        # (note: not based on real data, it would be nice to have a nice ODBC interface to bugzilla or so, though).')
-        #vbox.pack_start(label, False, False, 0)
-
+        # Tag列表包含在一个ScrollWindow中。
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        #vbox.pack_start(sw, True, True, 0)
         
         self.model = self.create_model([])
         
@@ -43,8 +45,10 @@ class ViewTagList:
         sw.add(treeview)
 
         self.add_columns(treeview)
+        vbox.pack_start(sw, True, True, 0)
 
-        self.view = sw
+        # 设定需要传出的控件。
+        self.view = vbox
         self.taglistview = treeview
         
     def create_model(self, tags):
