@@ -39,16 +39,16 @@ class ViewDialogCommon:
         label = Gtk.Label.new_with_mnemonic(entry_label)
         table.attach_defaults(label, 0, 1, 0, 1)
         
-        entryLine = Gtk.Entry()
-        entryLine.set_activates_default(True)
-        table.attach_defaults(entryLine, 1, 2, 0, 1)
-        label.set_mnemonic_widget(entryLine)
+        entry1 = Gtk.Entry()
+        entry1.set_activates_default(True)
+        table.attach_defaults(entry1, 1, 2, 0, 1)
+        label.set_mnemonic_widget(entry1)
         
         hbox.show_all()
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            text = entryLine.get_text()
+            text = entry1.get_text()
         else:
             text = None
 
@@ -89,28 +89,28 @@ class ViewDialogCommon:
         label = Gtk.Label.new_with_mnemonic(label_title1)
         table.attach_defaults(label, 0, 1, 0, 1)
         
-        entryLine = Gtk.Entry()
-        entryLine.set_activates_default(True)
-        entryLine.set_text(text1)
-        table.attach_defaults(entryLine, 1, 2, 0, 1)
-        label.set_mnemonic_widget(entryLine)
+        entry1 = Gtk.Entry()
+        entry1.set_activates_default(True)
+        entry1.set_text(text1)
+        table.attach_defaults(entry1, 1, 2, 0, 1)
+        label.set_mnemonic_widget(entry1)
         
         # 第二组
         label2 = Gtk.Label.new_with_mnemonic(label_title2)
         table.attach_defaults(label2, 0, 1, 1, 2)
         
-        entryLine2 = Gtk.Entry()
-        entryLine2.set_activates_default(True)
-        entryLine2.set_text(text2)
-        table.attach_defaults(entryLine2, 1, 2, 1, 2)
-        label.set_mnemonic_widget(entryLine2)
+        entry2 = Gtk.Entry()
+        entry2.set_activates_default(True)
+        entry2.set_text(text2)
+        table.attach_defaults(entry2, 1, 2, 1, 2)
+        label.set_mnemonic_widget(entry2)
         
         hbox.show_all()
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            text1 = entryLine.get_text()
-            text2 = entryLine2.get_text()
+            text1 = entry1.get_text()
+            text2 = entry2.get_text()
         else:
             text1 = None
             text2 = None

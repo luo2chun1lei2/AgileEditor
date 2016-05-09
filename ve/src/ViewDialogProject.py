@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 
+###########################################################
 # 关于项目的对话框
 # 以“项目列表对话框”为核心，新建、修改都是从此出发，当然这两个对话框也可以单独调用。
 
@@ -10,7 +11,6 @@ from gi.repository import Gtk, Gdk
 
 from VeUtils import *
 from ModelProject import ModelProject
-
 from VeEventPipe import VeEventPipe
 
 ###########################################################
@@ -197,7 +197,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         lbl_prj_list = Gtk.Label("项目列表")
         lbl_prj_list.set_justify(Gtk.Justification.LEFT)
         vbox.pack_start(lbl_prj_list, False, True, 0)
-         
+        
         ###############################
         ## 项目的列表(项目的名字|项目的路径)。
     
@@ -222,7 +222,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
          
         ###############################
         box = self.get_content_area()
-        box.add(vbox)
+        box.pack_start(vbox, True, True, 0)
         
         self.prj_treeview = treeview
         
