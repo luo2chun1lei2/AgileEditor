@@ -925,8 +925,8 @@ class ViewWindow(Gtk.Window):
             tag = tags[0]
             self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
-            ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags)
+            # 显示列表，让使用者挑选一个
+            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
             if tag:
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
     
@@ -949,7 +949,7 @@ class ViewWindow(Gtk.Window):
             self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
             ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags)
+            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
             if tag:
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
                 
@@ -1086,7 +1086,7 @@ class ViewWindow(Gtk.Window):
             self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
             ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags)
+            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
             if tag:
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
                 
@@ -1114,7 +1114,7 @@ class ViewWindow(Gtk.Window):
             self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
             ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags)
+            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
             if tag:
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         

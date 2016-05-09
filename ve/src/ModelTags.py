@@ -41,7 +41,8 @@ class GtProcess(object):
         # cmd_env:Map<string, string>:命令的环境变量定义
 
         p_cmd = ' '.join(pargs)
-        p = subprocess.Popen(p_cmd, shell=True, cwd=self.work_dir, env=cmd_env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # TODO: 不能使用 “ env=cmd_env,”，会导致$HOME/.globalrc不起作用，奇怪？
+        p = subprocess.Popen(p_cmd, shell=True, cwd=self.work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdoutput, erroutput) = p.communicate()
 
 class ModelGTags(object):

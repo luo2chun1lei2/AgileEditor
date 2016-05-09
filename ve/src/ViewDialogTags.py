@@ -1,8 +1,6 @@
 #-*- coding:utf-8 -*-
 
-'''
-和Tag相关的对话框。
-'''
+# 和Tag相关的对话框。
 
 import os
 import ConfigParser
@@ -15,11 +13,10 @@ from VeWordProvider import VeWordProvider
 ###########################################################
 
 class ViewDialogTagsOpen(Gtk.Dialog):
-    ''' 显示Tag的列表的对话框
-    tags:[IdeOneTag]:Tag列表。
-    '''
+    # 显示Tag的列表的对话框，可以选中一项。
+    # tags:[IdeOneTag]:Tag列表。
     
-    def __init__(self, parent, tags):
+    def __init__(self, parent, tags, prj):
     
         self.parent = parent
         self.tags = tags
@@ -29,7 +26,7 @@ class ViewDialogTagsOpen(Gtk.Dialog):
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                              Gtk.STOCK_OK, Gtk.ResponseType.OK))
         
-        self.set_default_size(800, 600)
+        self.set_default_size(1200, 600)
         self.set_default_response(Gtk.ResponseType.OK)
         
         vbox = Gtk.VBox(spacing = 10)
@@ -45,7 +42,11 @@ class ViewDialogTagsOpen(Gtk.Dialog):
         liststore = Gtk.ListStore(str, str, str)
         
         for tag in tags:
-            liststore.append([tag.tag_file_path, str(tag.tag_line_no), tag.tag_content])
+            # 去掉路径前缀
+            file_path = tag.tag_file_path
+            if prj is not None:
+                file_path = file_path.replace(prj.src_dirs[0] + '/', '')
+            liststore.append([file_path, str(tag.tag_line_no), tag.tag_content])
             
         treeview = Gtk.TreeView(model=liststore)
         
@@ -54,7 +55,7 @@ class ViewDialogTagsOpen(Gtk.Dialog):
         treeview.append_column(column_prj_name)
         
         renderer_line_number = Gtk.CellRendererText()
-        renderer_line_number.set_property("cell-background", "yellow")
+        renderer_line_number.set_property("cell-background", "light grey")
         column_prj_dir = Gtk.TreeViewColumn("行号", renderer_line_number, text=1)
         treeview.append_column(column_prj_dir)
         
@@ -83,10 +84,12 @@ class ViewDialogTagsOpen(Gtk.Dialog):
         self.response(Gtk.ResponseType.OK)
     
     @staticmethod
-    def show(parent, tags):
-        ''' 返回是被选中的项目。'''
+    def show(parent, tags, prj):
+        # 返回是被选中的项目。
+        # tags:[string]:tag信息
+        # prj:ModelProject:当前Project信息。
         
-        dialog = ViewDialogTagsOpen(parent, tags)
+        dialog = ViewDialogTagsOpen(parent, tags, prj)
         
         tag = None
         response = dialog.run()

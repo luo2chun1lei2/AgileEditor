@@ -1,22 +1,15 @@
 #-*- coding:utf-8 -*-
 
-'''
-检索用的对话框
-'''
-
-title = "Search Entry"
-description = """GtkEntry allows to display icons and progress information.
-This demo shows how to use these features in a search entry.
-"""
+# TODO: 没有被使用！
+# 检索用的对话框
 
 from gi.repository import Gtk, GObject
 
 class ViewDialogSearch:
-    ''' 检索文字用的对话框。
-    Entry 文本框:输入检索的文字
-    Button 查找按钮：查找下一个
-    CheckBox 是否忽略大小写
-    '''
+    # 检索文字用的对话框。
+    # Entry 文本框:输入检索的文字
+    # Button 查找按钮：查找下一个
+    # CheckBox 是否忽略大小写
     
     def __init__(self):
 
