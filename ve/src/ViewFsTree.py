@@ -67,11 +67,12 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     # 文件列表模型，是TreeView的TreeModel的一个实现。
     
     __gtype_name__ = 'FsTreeModel'
+    # 新类型的名字，GTK新类型必须有的。
     
     column_types = (GdkPixbuf.Pixbuf, str, int, str, str, str)
-    # 列的类型
+    # 列的类型，因为第一项和第二项联合显示，所以后面column_names和columns_visibles比这个少一个。
     
-    column_names = ['文件名字 ', '大小', '模式', '最后修改时间', 'Abs Path']
+    column_names = ['文件名字 ', '大小', '模式', '最后修改时间', '绝对路径']
     # 列的标题
     
     column_visibles = [True, False, False, False, False]
@@ -463,7 +464,6 @@ class ViewFsTree:
         cell = Gtk.CellRendererText()
         self.tvcolumn[0].pack_start(cell, True)
         self.tvcolumn[0].add_attribute(cell, 'text', 1)
-        
         self.tvcolumn[0].set_visible(column_visibles[0])
         self.treeview.append_column(self.tvcolumn[0])
         

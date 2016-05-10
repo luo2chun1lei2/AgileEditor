@@ -465,7 +465,7 @@ class ViewMenu(object):
         
     def on_menu_search_find(self, widget):
         logging.debug("A Search|find menu item was selected.")
-        ''' 跳转到 SearchEntry中。'''
+        # 跳转到 SearchEntry中。
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND, self.search_entry)
         self.search_entry.grab_focus()
         

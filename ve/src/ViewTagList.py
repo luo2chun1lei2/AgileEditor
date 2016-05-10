@@ -87,12 +87,14 @@ class ViewTagList:
         renderer.set_property("cell-background", "light grey");
         column = Gtk.TreeViewColumn("行号", renderer, text=self.COLUMN_TAG_LINE_NO)
         column.set_sort_column_id(self.COLUMN_TAG_LINE_NO)
+        column.set_alignment(0.5) # 标题的对齐
         treeview.append_column(column)
 
         # column for tag
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Tag", renderer, text=self.COLUMN_TAG_NAME)
         column.set_sort_column_id(self.COLUMN_TAG_NAME)
+        column.set_alignment(0.5) # 标题的对齐
         treeview.append_column(column)
         
     def _on_row_activated(self, treeview, path, column):
