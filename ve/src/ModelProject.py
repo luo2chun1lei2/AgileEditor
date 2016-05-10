@@ -89,6 +89,18 @@ class ModelProject(object):
         
         self.prj_tags = ModelGTags(self)
     
+    def is_valid(self):
+        # 检查这个项目是否有效
+        # return:Bool:
+        
+        if len(self.src_dirs) == 0:
+            return True
+        
+        if not os.path.exists(self.src_dirs[0]):
+            return False;
+        
+        return True
+    
     def read(self, config_path):
         # 读取一个现存的配置文件
         # config_path:string:配置文件的路径

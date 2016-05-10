@@ -111,4 +111,7 @@ class ViewTagList:
         self.ideWindow.ide_editor_set_focus()
         
     def get_view(self):
+        # 返回容器控件
+        # return:Widget:
+        
         return self.view

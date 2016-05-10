@@ -45,7 +45,7 @@ class VeMain():
     def start(self, want_open_project_name, want_open_file):
         # 开始启动程序。
         
-        from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
+        from ViewDialogProject import ViewDialogProjectOpen
         
         # 打开想要打开的项目
         prj = None

@@ -4,7 +4,7 @@
 # 关于项目的对话框
 # 以“项目列表对话框”为核心，新建、修改都是从此出发，当然这两个对话框也可以单独调用。
 
-import os, string
+import os, string, logging
 import ConfigParser
 
 from gi.repository import Gtk, Gdk
@@ -244,6 +244,19 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         
     def on_render_selected(self, widget, path, column):
         self.selected_project = self.ideWorkshop[path]
+        
+    @staticmethod
+    def _show_error(window, message):
+        # 显示错误消息
+        dialog = Gtk.MessageDialog(transient_for=window,
+                                   modal=True,
+                                   destroy_with_parent=True,
+                                   message_type=Gtk.MessageType.ERROR,
+                                   buttons=Gtk.ButtonsType.OK,
+                                   text=message)
+        dialog.run()
+
+        dialog.destroy()
     
     @staticmethod
     def show(parent, ideWorkshop):
@@ -258,7 +271,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
             response = dialog.run()
                 
             if response == Gtk.ResponseType.OK:
-                # 如果选择OK的话，就创建对应的Project项目。
+                # 如果选择OK的话，就打开对应的Project项目。
                 selection = dialog.prj_treeview.get_selection()
                 
                 if selection.get_selected():
@@ -268,6 +281,12 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
+                    
+                    # 还需要检查一下prj是否合法
+                    if not prj.is_valid():
+                        logging.error("This project is NOT valid.")
+                        ViewDialogProjectOpen._show_error(dialog, "This project is NOT valid.")
+                        continue
                 
                 break
                     
