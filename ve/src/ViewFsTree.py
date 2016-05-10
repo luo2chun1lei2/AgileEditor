@@ -271,7 +271,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         # return:bool,GtkTreeIter:
         
         if not self._tp_is_ok(tree_path):
-            print "[E]Cannot get iter of %s" % (tree_path)
+            logging.error("Cannot get iter of %s" % tree_path)
             return False, None
 
         it = Gtk.TreeIter()
@@ -341,7 +341,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
             self._save_user_data(it, tree_path)
             return True, it
         else:
-            print "[E]Can not get children."
+            logging.error("Can not get children.")
             return False, None
      
     def do_iter_has_child(self, iter):
@@ -350,7 +350,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         
         tree_path = self.get_path(iter)
         if tree_path is None:
-            print "[E]Has no child"
+            logging.error("Has no child")
             return False
         else:
             # TODO 空文件夹怎么办？
@@ -375,7 +375,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         else:
             tree_path = self._get_user_data(parent)
             if tree_path is None:
-                print "[E] tree_path is None. %d" % (n)
+                logging.error("tree_path is None. %d" % n)
             tree_path.append_index(n)
             
         if self._tp_is_ok(tree_path):
@@ -384,7 +384,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
             return True, it
         else:
             # 没有下一个
-            print "[E]Can not get No. %d child." % (n)
+            logging.error("Can not get No. %d child." % n)
             self._tp_is_ok(tree_path)
             return False, None
 
@@ -428,7 +428,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
             self._save_user_data(it, tree_path)
             return True, it
         else:
-            print "[E]Can not get Parent iter."
+            logging.error("Can not get Parent iter.")
             return False, None
 
 # 需要注册这个对象到GObject中。
@@ -438,16 +438,8 @@ GObject.type_register(FsTreeModel)
 class ViewFsTree:
     # 初始化文件系统列表控件。
     # 外部是滚动条，内部是ListView。
-    
-    #def delete_event(self, widget, event, data=None):
-    #    gtk.main_quit()
-    #    return False
 
     def __init__(self):
-        # Create a new window
-        #self.window = gtk.Window(type=gtk.WINDOW_TOPLEVEL)
-        #self.window.set_size_request(300, 200)
-        #self.window.connect("delete_event", self.delete_event)
 
         # 创建文件系统的模型。
         self.listmodel = FsTreeModel()
@@ -496,8 +488,6 @@ class ViewFsTree:
         #这个时候还没有设定项目的目录，所以没有必要设定list model.
         #self.treeview.set_model(self.listmodel)
         
-        #self.window.set_title(self.listmodel.dir_path)
-        
     def show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。
         
@@ -513,4 +503,20 @@ class ViewFsTree:
         self.treeview.expand_to_path(tree_path)
         # 选中
         self.treeview.set_cursor(tree_path)
+    
+    def set_model(self, model):
+        # 设定Tree的Model
+        # model:TreeModel:
+        # return:Nothing
+        self.treeview.set_model(model)
         
+    def get_view(self):
+        # 返回外部需要包含的控件
+        # return:Gtk.Widget:
+        return self.scrolledwindow
+    
+    def get_treeview(self):
+        # 返回TreeView控件
+        # return:TreeView:
+        return self.treeview
+    

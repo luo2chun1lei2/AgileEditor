@@ -92,11 +92,11 @@ class ViewWindow(Gtk.Window):
         #hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         
         # 左边的文件系统树
-        fstreeScroll, self.ideFsTree = self.create_fs_tree()
+        self.ideFsTree = self.create_fs_tree()
         #hbox.pack_start(ideFsTree, False, False, 0)
         #resize:子控件是否跟着paned的大小而变化。
         #shrink:子控件是否能够比它需要的大小更小。
-        panedFsAndEditor.pack1(fstreeScroll, resize=False, shrink=True)
+        panedFsAndEditor.pack1(self.ideFsTree.get_view(), resize=False, shrink=True)
         
         panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         
@@ -109,8 +109,7 @@ class ViewWindow(Gtk.Window):
         
         # 右边的Tag列表。
         self.ideTagList = ViewTagList(self)
-        taglistview = self.ideTagList.view
-        panedEdtiorAndTagList.pack2(taglistview, resize=False, shrink=True)
+        panedEdtiorAndTagList.pack2(self.ideTagList.get_view(), resize=False, shrink=True)
         
         panedFsAndEditor.pack2(panedEdtiorAndTagList, resize=True, shrink=True)
         # 设定divider的位置.
@@ -124,15 +123,16 @@ class ViewWindow(Gtk.Window):
         
     def create_fs_tree(self):
         # 创建文件系统树控件。
+        # return:ViewFsTree:需要外部包含的控件，以及FsTree这个实例。
         fstree = ViewFsTree()
         
         # 加入事件。
-        select = fstree.treeview.get_selection()
+        select = fstree.get_treeview().get_selection()
         select.connect("changed", self.on_fstree_selection_changed)
         
-        fstree.treeview.connect("row-activated", self.on_fstree_row_activated)
+        fstree.get_treeview().connect("row-activated", self.on_fstree_row_activated)
         
-        return fstree.scrolledwindow, fstree
+        return fstree
     
     ###################################
     ## 创建画面
@@ -310,7 +310,7 @@ class ViewWindow(Gtk.Window):
         # TODO:有多个代码的项目，应该显示哪个目录？
         if len(prj.src_dirs) > 0:
             treeModel = FsTreeModel(prj.src_dirs[0])
-            self.ideFsTree.treeview.set_model(treeModel)
+            self.ideFsTree.set_model(treeModel)
 
         return True
     
@@ -329,7 +329,7 @@ class ViewWindow(Gtk.Window):
         
         # 跟新当前项目的文件列表
         treeModel = FsTreeModel(self.cur_prj.src_dirs[0])
-        self.ideFsTree.treeview.set_model(treeModel)
+        self.ideFsTree.set_model(treeModel)
         
         # 更新右边的TAGS
         self.cur_prj.prepare()
@@ -848,15 +848,15 @@ class ViewWindow(Gtk.Window):
         self.ide_menu.set_status(ViewMenu.STATUS_FILE_OPEN_CHANGED)
         
     def ide_refresh_file_tag_list(self, tags):
-        ''' 根据Tag的列表，更新文件对应的Tag列表
-        tags:[IdeOneTag]:Tag列表。
-        '''
+        # 根据Tag的列表，更新文件对应的Tag列表
+        # tags:[IdeOneTag]:Tag列表。
+        
         self.ideTagList.set_model(tags)
         
     def ide_goto_line(self, line_number):
-        ''' 跳转到当前文件的行。
-        line_number:int:行号（从1开始）
-        '''
+        # 跳转到当前文件的行。
+        # line_number:int:行号（从1开始）
+        
         #print 'goto line number:', line_number
         text_buf = self._ide_get_editor_buffer()
         it = text_buf.get_iter_at_line(line_number-1)
