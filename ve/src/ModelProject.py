@@ -148,7 +148,7 @@ class ModelProject(object):
                 
         if not os.path.exists(self.config_path):
             logging.debug('create config path:%s' % (self.config_path))
-            basename = os.path.dir_path(self.config_path)
+            basename = os.path.dirname(self.config_path)
             if not os.path.exists(basename):
                 os.mkdir(basename)
             os.mknod(self.config_path)
@@ -183,7 +183,7 @@ class ModelProject(object):
                 
         if os.path.exists(self.config_path):
             logging.debug('remove config path:%s and project dir.' % self.config_path)
-            basename = os.path.dir_path(self.config_path)
+            basename = os.path.dirname(self.config_path)
             os.remove(self.config_path)
             os.removedirs(basename)
             
