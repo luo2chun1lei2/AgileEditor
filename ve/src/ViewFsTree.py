@@ -83,7 +83,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
 
         GObject.GObject.__init__(self)
         
-        # TODO:在TreeIter中只能保存Int类型的参数，所以需要用id将object类型转成int的一个索引号，
+        # TODO:在TreeIter中只能保存Int类型的参数（放string不行吗？），所以需要用id将object类型转成int的一个索引号，
         # 然后在pool中保存，但是没有地方释放！
         # 对策：以后可以变成包含文件路径和TreeIter的数据，这样可以节约TreeIter。
         self.pool = {}
@@ -91,28 +91,11 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         if dir_path:
             self.dir_path = os.path.abspath(dir_path)
             # 得到整个目录中的文件和子文件夹，以及其下的所有文件。
+            # TODO: 是否应该懒加载？
             self.files = self._build_file_dict(self.dir_path)
         else:
-            self.dir_path = None #os.path.expanduser('~')
+            self.dir_path = None
             
-    def _save_user_data(self, iter, tree_path):
-        # 将Tree Path保存到TreeIter中。
-        
-        str = tree_path.to_string()
-        iter.user_data = id(str)
-        self.pool[iter.user_data] = str
-        
-    def _get_user_data(self, iter):
-        # 将Tree Path从TreeIter中取出来。
-        
-        if iter.user_data not in self.pool:
-            logging.error('index %d not in pool' % (iter.user_data))
-            return None
-        
-        str_tree_path = self.pool[iter.user_data]
-        
-        return Gtk.TreePath.new_from_string(str_tree_path)
-    
     # TODO:以后文件越来越多，应该修改成使用时才打开。
     def _build_file_dict(self, dirname):
         # 生成dirname目录下面的所有文件的列表，包括子目录。
@@ -150,14 +133,41 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     
     def get_column_names(self):
         # 得到列的标题名字。
+        # return:[String]:每列的名字数组
+        
         return self.column_names[:]
     
     def get_column_visible(self):
         # 得到列是否显示。
+        # return:[Bool]:每列是否显示的数组
+        
         return self.column_visibles[:]
+    
+    def _save_tp_in_iter(self, iter, tree_path):
+        # 将TreePath保存到TreeIter中，另外缓存。
+        
+        str = tree_path.to_string()
+        iter.user_data = id(str)
+        self.pool[iter.user_data] = str
+        
+    def _get_tp_in_iter(self, iter):
+        # 将Tree Path从TreeIter中取出来。
+        # iter:Gtk.TreeIter:目前Tree的迭代子
+        # return:Gtk.TreePath:得到Tree的TreePath
+        
+        if iter.user_data not in self.pool:
+            logging.error('index %d not in pool' % (iter.user_data))
+            return None
+        
+        str_tree_path = self.pool[iter.user_data]
+        
+        return Gtk.TreePath.new_from_string(str_tree_path)
 
     def _get_fp_from_tp(self, tree_path):
-        # 根据 tree path 得到实际的路径（不是绝对路径）。 
+        # 根据 tree path 得到实际的路径（不是绝对路径）。
+        # tree_path:Gtk.TreePath:TreePath
+        # return:String:文件的路径，None，非法情况
+        
         file_path = ''
         file_node = self.files
         
@@ -193,6 +203,8 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     def _tp_is_ok(self, tree_path):
         # 判断 tree path是否正确
         # 如果根据tree path得到真正的文件路径，就认为是合法的。
+        # return:Bool:True,OK，False，错误。
+        
         fp = self._get_fp_from_tp(tree_path)
         return (fp is not None)
     
@@ -222,8 +234,8 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
 
     def is_folder(self, tree_path):
         # 判断指定的路径是否为文件夹。
-        #path:WidgetPath:
-        #return:Bool:true是, False 否。 
+        # path:Gtk.TreePath:
+        # return:Bool:true是, False 否。 
         
         file_node = self._get_node_from_tp(tree_path)
         if file_node is None:
@@ -233,6 +245,9 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     
     def get_n_children_of_tp(self, tree_path):
         # 根据tree_path对应的文件下面的子文件数目。
+        # tree_path:Gtk.TreePath:TreePath
+        # return:int:子文件的数量。
+        
         file_node = self._get_node_from_tp(tree_path)
         if file_node is None:
             return 0
@@ -241,6 +256,9 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         
     def get_tree_path_by_rel_file_path(self, rel_file_path):
         # 根据文件的相对路径，得到TreePath
+        # rel_file_path:string:相对路径
+        # return:Gtk.TreePath:TreePath
+        
         tree_path = Gtk.TreePath.new()
         node = self.files
         for key in rel_file_path.split(os.path.sep):
@@ -257,35 +275,37 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     
     def do_get_column_type(self, index_):
         # 返回此栏的类型。
-        #return:GObject.GType:
+        # return:GObject.GType:
         
         return self.column_types[index_]
 
     def do_get_flags(self):
-        #return:Gtk.TreeModelFlags:对于Model的一些标志，不需要设置。
-        
-        return 0
+        #return:Gtk.TreeModelFlags:是下面的值的 |，设定后，不可修改。 
+        # ITERS_PERSIST = 1  iterators survive all signals emitted by the tree
+        # LIST_ONLY = 2 the model is a list only, and never has children
+
+        return Gtk.TreeModelFlags.ITERS_PERSIST
      
     def do_get_iter(self, tree_path):
-        # 得到指定此路径的枚举器。如果成功，就返回True和对应的Iter，如果没有就返回False和一个无效的Iter。
-        # tree_path:Gtk.TreePath:
-        # return:bool,GtkTreeIter:
+        # 创建指定此路径的枚举器，并返回。
+        # tree_path:Gtk.TreePath:需要检查是否有效。
+        # return:bool,GtkTreeIter:如果成功，就返回True和对应的Iter，如果没有就返回False和一个无效的Iter。
         
         if not self._tp_is_ok(tree_path):
             logging.error("Cannot get iter of %s" % tree_path)
             return False, None
 
-        it = Gtk.TreeIter()
-        self._save_user_data(it, tree_path)
+        itr = Gtk.TreeIter()
+        self._save_tp_in_iter(itr, tree_path)
         
-        return True, it
+        return True, itr
  
-    def do_get_path(self, iter):
-        # 得到一个新创建的TreePath，根据iter。
-        # iter:GtkTreeIter:
-        # return:Gtk.TreePath: 
+    def do_get_path(self, itr):
+        # 得到一个新创建的TreePath，根据itr。
+        # itr:GtkTreeIter:
+        # return:Gtk.TreePath:
         
-        tree_path = self._get_user_data(iter)
+        tree_path = self._get_tp_in_iter(itr)
         return tree_path
  
     def do_get_value(self, iter, column):
@@ -339,7 +359,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         if self._tp_is_ok(tree_path):
             # 还需要判断第一个文件是否存在。
             it = Gtk.TreeIter()
-            self._save_user_data(it, tree_path)
+            self._save_tp_in_iter(it, tree_path)
             return True, it
         else:
             logging.error("Can not get children.")
@@ -348,6 +368,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     def do_iter_has_child(self, iter):
         # 看看iter是否有子。
         # iter:Gtk.TreeIter:
+        # return:Bool:是否有。
         
         tree_path = self.get_path(iter)
         if tree_path is None:
@@ -358,8 +379,9 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
             return self.is_folder(tree_path)
 
     def do_iter_n_children(self, iter):
-        # TODO:没有调用？怎么会？
-        # 返回iter下面的子的数目。
+        # 返回iter下面的子的数目。 TODO:没有调用？怎么会？
+        # iter:Gtk.TreeIter
+        # return:int:子文件的数量。
         
         tree_path = self.get_path(iter)
         return self.get_n_children_of_tp(tree_path)
@@ -374,14 +396,14 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         if parent is None:
             tree_path = Gtk.TreePath.new_from_string(str(n))
         else:
-            tree_path = self._get_user_data(parent)
+            tree_path = self._get_tp_in_iter(parent)
             if tree_path is None:
                 logging.error("tree_path is None. %d" % n)
             tree_path.append_index(n)
             
         if self._tp_is_ok(tree_path):
             it = Gtk.TreeIter()
-            self._save_user_data(it, tree_path)
+            self._save_tp_in_iter(it, tree_path)
             return True, it
         else:
             # 没有下一个
@@ -393,29 +415,27 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         # 设定iter到下一个。
         # return:bool:False, 如果没有了。
         
-        tree_path = self._get_user_data(iter)
+        tree_path = self._get_tp_in_iter(iter)
         
         tree_path.next()
         if self._tp_is_ok(tree_path):
-            self._save_user_data(iter, tree_path)
+            self._save_tp_in_iter(iter, tree_path)
             return True
         else:
             # 没有下一个
-            #print "[E]Can not get Next iter(%s)" % tree_path
             return False
 
     def do_iter_previous(self, iter):
         # 得到iter的上一个Iter。
         # return:bool:
         
-        tree_path = self._get_user_data(iter)
+        tree_path = self._get_tp_in_iter(iter)
         tree_path.next
         if tree_path.prev() :
-            self._save_user_data(iter, tree_path)
+            self._save_tp_in_iter(iter, tree_path)
             return True
         else :
             # 没有下一个
-            #print "[E]Can not get Previous iter"
             return False
     
     def do_iter_parent(self, child):
@@ -423,13 +443,13 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         # child:Gtk.TreeIter:
         # return:bool,Gtk.TreeIter:
         
-        tree_path = self._get_user_data(child)
+        tree_path = self._get_tp_in_iter(child)
         if tree_path.up():
-            it = Gtk.TreeIter()
-            self._save_user_data(it, tree_path)
-            return True, it
+            itr = Gtk.TreeIter()
+            self._save_tp_in_iter(itr, tree_path)
+            return True, itr
         else:
-            logging.error("Can not get Parent iter.")
+            logging.error("Can not get Parent iterator.")
             return False, None
 
 # 需要注册这个对象到GObject中。
