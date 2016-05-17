@@ -74,8 +74,9 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         
         #print 'do_activate_proposal'
         return False
-    
-    def do_get_start_iter(self, context, proposal):
+    # TODO 版本不同
+    #def do_get_start_iter(self, context, proposal):
+    def do_get_start_iter(self, context, a, b):
         # 计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
         # 调用非常的频繁，不知道为什么
         # return:Bool:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
@@ -89,10 +90,12 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         # 如果返回True，会调用do_populate，
         # 返回False，什么都不调用。
         
-        (isproposal, ite) = context.get_iter()
-        
-        if not isproposal:
-            return False
+        #(isproposal, ite) = context.get_iter()
+        # 
+        #if not isproposal:
+        #    return False
+        # TODO 版本不同
+        ite = context.get_iter()
         
         completion = context.props.completion
         view = completion.get_view()
