@@ -197,7 +197,9 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         return self._get_fp_from_tp(tree_path)
     
     def get_abs_filepath(self, filepath):
-        # 得到文件的绝对路径
+        # 根据相对路径，得到文件的绝对路径
+        # filepath:string:相对路径
+        # return:string:绝对路径
         return os.path.join(self.dir_path, filepath)
     
     def _tp_is_ok(self, tree_path):
@@ -399,6 +401,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
             tree_path = self._get_tp_in_iter(parent)
             if tree_path is None:
                 logging.error("tree_path is None. %d" % n)
+                return False, None
             tree_path.append_index(n)
             
         if self._tp_is_ok(tree_path):
@@ -416,6 +419,8 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         # return:bool:False, 如果没有了。
         
         tree_path = self._get_tp_in_iter(iter)
+        if tree_path is None:
+            return False
         
         tree_path.next()
         if self._tp_is_ok(tree_path):
@@ -444,6 +449,9 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         # return:bool,Gtk.TreeIter:
         
         tree_path = self._get_tp_in_iter(child)
+        if tree_path is None:
+                return False, None
+            
         if tree_path.up():
             itr = Gtk.TreeIter()
             self._save_tp_in_iter(itr, tree_path)
@@ -523,7 +531,29 @@ class ViewFsTree:
         self.treeview.expand_to_path(tree_path)
         # 选中
         self.treeview.set_cursor(tree_path)
+        
+    def get_file_path_by_iter(self, itr):
+        # 根据iter得到文件的相对路径
+        # iter:Gtk.TreeIter:Iterator
+        # return:String:文件的相对路径
+        model = self.treeview.get_model()
+        return model._get_fp_from_iter(itr)
     
+    def get_abs_file_path_by_iter(self, itr):
+        # 根据iter得到文件的绝对路径
+        # iter:Gtk.TreeIter:Iterator
+        # return:String:文件的绝对路径
+        model = self.treeview.get_model()
+        fp = model._get_fp_from_iter(itr)
+        return model.get_abs_filepath(fp)
+    
+    # TODO 感觉上不应该这样实现，而应该修改完文件后，刷新Tree
+    def refresh_line(self, itr):
+        # 更新指定itr和之下的所有数据
+        # itr:Gtk.TreeIter:iterator
+        # return:Nothing
+        pass #TODO 没有实现。
+
     def set_model(self, model):
         # 设定Tree的Model
         # model:TreeModel:
