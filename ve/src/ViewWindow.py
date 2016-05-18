@@ -132,6 +132,9 @@ class ViewWindow(Gtk.Window):
         
         fstree.get_treeview().connect("row-activated", self.on_fstree_row_activated)
         
+        # 鼠标释放事件
+        fstree.get_treeview().connect("button_release_event", self.on_fstree_row_button_release)
+        
         return fstree
     
     ###################################
@@ -258,6 +261,36 @@ class ViewWindow(Gtk.Window):
         else:
             # 根据绝对路径显示名字。
             self.ide_open_file(None, abs_path)
+            
+    def on_fstree_row_button_release(self, tree_view, event_button):
+        # 点击了文件树的鼠标
+        # tree_view:GtkTreeView:
+        # event_button:EventButton:
+        # return:Bool:True,已经处理了，False,没有处理。
+        
+        if event_button.type == Gdk.EventType.BUTTON_RELEASE and event_button.button == 3:
+            # 右键，释放
+            
+            self.treemenu = Gtk.Menu()
+            
+            menuitem = Gtk.RadioMenuItem("新建")
+            self.treemenu.append(menuitem)
+            menuitem.show()
+             
+            menuitem = Gtk.RadioMenuItem("删除")
+            self.treemenu.append(menuitem)
+            menuitem.show()
+            
+            menuitem = Gtk.RadioMenuItem("修改")
+            self.treemenu.append(menuitem)
+            menuitem.show()
+        
+            self.treemenu.popup(None, None, None, None, 0, event_button.time)
+            
+            return True
+            
+        else:
+            return False
     
     ###################################
     ## 基本功能
