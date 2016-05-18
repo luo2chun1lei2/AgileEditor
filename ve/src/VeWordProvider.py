@@ -2,8 +2,11 @@
 
 # 提供单词补全的功能。
 
-import os
-import ConfigParser
+import os, ConfigParser
+
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkSource', '3.0') 
 from gi.repository import GObject, Gtk, Gdk, GtkSource
 
 from VeUtils import *
@@ -74,15 +77,20 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         
         #print 'do_activate_proposal'
         return False
+    
     # TODO 版本不同
-    #def do_get_start_iter(self, context, proposal):
-    def do_get_start_iter(self, context, a, b):
-        # 计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
-        # 调用非常的频繁，不知道为什么
-        # return:Bool:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
+    # 新的是 gir1.2-gtksource-3.0 安装版本 3.18.2-1
+    if GtkSource._version == "3.0":
+        def do_get_start_iter(self, context, proposal):
+            return False, None
+    else:
+        def do_get_start_iter(self, context, a, b):
+            # 计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
+            # 调用非常的频繁，不知道为什么
+            # return:Bool, Gtk.TextIter:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
         
-        #print 'do_get_start_iter'
-        return False
+            #print 'do_get_start_iter'
+            return False, None
     
     def do_match(self, context):
         # 看看是否和当前的情况匹配，然后添加自己的Proposal。
@@ -90,12 +98,14 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         # 如果返回True，会调用do_populate，
         # 返回False，什么都不调用。
         
-        #(isproposal, ite) = context.get_iter()
-        # 
-        #if not isproposal:
-        #    return False
         # TODO 版本不同
-        ite = context.get_iter()
+        if GtkSource._version == "3.0":
+            (isproposal, ite) = context.get_iter()
+             
+            if not isproposal:
+                return False
+        else:
+            ite = context.get_iter()
         
         completion = context.props.completion
         view = completion.get_view()
