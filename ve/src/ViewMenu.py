@@ -359,7 +359,7 @@ class ViewMenu(object):
 
         action_help_info = Gtk.Action("HelpInfo", None, "Information", Gtk.STOCK_INFO)
         action_help_info.connect("activate", self.on_menu_help_info)
-        action_group.add_action_with_accel(action_help_info, "<control>H")
+        action_group.add_action_with_accel(action_help_info, "<Alt>H")
         self.action_help_info = action_help_info
         
     def create_ui_manager(self):

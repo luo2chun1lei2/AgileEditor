@@ -563,10 +563,9 @@ class ViewWindow(Gtk.Window):
         Gtk.main_quit()
         
     def ide_help_info(self):
-        dialog = ViewDialogInfo(self)
-        dialog.run()
-         
-        dialog.destroy()
+        # 显示帮助对话框
+        
+        ViewDialogInfo.show(self)
         
     def ide_edit_redo(self, widget):
         ve_editor = self.multiEditors.get_current_ide_editor()
