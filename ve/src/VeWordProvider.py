@@ -12,6 +12,12 @@ from gi.repository import GObject, Gtk, Gdk, GtkSource
 from VeUtils import *
 from ModelTags import ModelGTags
 
+# 说明
+# do_get_start_iter 和 GtkSource.CompletionContext.get_iter() 在最新的Ubuntu 16中修改了，
+# 所以需要进行区别，用环境变量GTKSOURCE_COMPLETION_PROVIDER来代替。
+#     新的是 gir1.2-gtksource-3.0 安装版本 3.18.2-1
+#     旧的是 gir1.2-gtksource-3.0 安装版本 3.10.2-0ubuntu1
+
 class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
     # 继承CompletionProvider
     # 调用方式是 editor.props.completion 's provider add this provider.
@@ -78,9 +84,8 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         #print 'do_activate_proposal'
         return False
     
-    # TODO 版本不同
-    # 新的是 gir1.2-gtksource-3.0 安装版本 3.18.2-1
-    if GtkSource._version == "3.0":
+    # 版本不同
+    if os.getenv('GTKSOURCE_COMPLETION_PROVIDER') == "2.0":
         def do_get_start_iter(self, context, proposal):
             return False, None
     else:
@@ -94,14 +99,14 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
     
     def do_match(self, context):
         # 看看是否和当前的情况匹配，然后添加自己的Proposal。
+        # context:GtkSource.CompletionContext:
         # return:Bool:True，如果匹配。
         # 如果返回True，会调用do_populate，
         # 返回False，什么都不调用。
         
-        # TODO 版本不同
-        if GtkSource._version == "3.0":
+        # 版本不同
+        if os.getenv('GTKSOURCE_COMPLETION_PROVIDER') == "2.0":
             (isproposal, ite) = context.get_iter()
-             
             if not isproposal:
                 return False
         else:
