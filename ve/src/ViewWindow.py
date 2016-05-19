@@ -1112,8 +1112,11 @@ class ViewWindow(Gtk.Window):
         ''' 查找引用
         '''
         tag_name = self._ide_get_selected_text_or_word()
-        tags = self.cur_prj.query_reference_tags(tag_name)
         
+        ModelTask.execute(self._after_ide_search_reference,
+                          self.cur_prj.query_reference_tags, tag_name)
+        
+    def _after_ide_search_reference(self, tag_name, tags):
         if len(tags) == 0:
             info = "没有找到对应\"" + tag_name + "\"的引用。"
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, \
@@ -1249,9 +1252,11 @@ class ViewWindow(Gtk.Window):
         self._ide_grep_in_files(pattern)
         
     def _ide_grep_in_files(self, pattern):
+        # 执行检索
+        ModelTask.execute(self._after_ide_grep_in_files, 
+                          self.cur_prj.query_grep_tags, pattern, False)
         
-        tags = self.cur_prj.query_grep_tags(pattern, ignoreCase=False)
-        
+    def _after_ide_grep_in_files(self, tags):
         if len(tags) == 0:
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
                                        Gtk.ButtonsType.OK, "没有找到对应的定义。")
@@ -1278,8 +1283,10 @@ class ViewWindow(Gtk.Window):
         
     def _ide_grep_path(self, pattern):
         
-        tags = self.cur_prj.query_grep_filepath(pattern, ignoreCase=False)
-        
+        ModelTask.execute(self._after_ide_grep_path, 
+                          self.cur_prj.query_grep_filepath, pattern, False)
+    
+    def _after_ide_grep_path(self, tags):
         if len(tags) == 0:
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
                                        Gtk.ButtonsType.OK, "没有找到对应的定义。")
