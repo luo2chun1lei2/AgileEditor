@@ -22,34 +22,38 @@ class ViewSearchTagList:
 
         self.ideWindow = ideWindow
 
-        # 总的容器
-        vbox = Gtk.VBox(spacing=2)
+        vbox = Gtk.VBox(spacing = 10)
         
-        # 显示标题
-        label = Gtk.Label(label='Search Tag List')
-        vbox.pack_start(label, False, False, 0)
-
-        # Tag列表包含在一个ScrollWindow中。
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        ###############################
+        ## 项目名字
+        lbl_tag_list = Gtk.Label("Tag列表")
+        lbl_tag_list.set_justify(Gtk.Justification.LEFT)
+        vbox.pack_start(lbl_tag_list, False, True, 0)
+         
+        # TreeView
+        treeview = Gtk.TreeView()
         
-        # 生成数据模型(空的)
-        self.model = self._create_model([])
+        renderer_file_path = Gtk.CellRendererText()
+        column_prj_name = Gtk.TreeViewColumn("路径", renderer_file_path, text=0)
+        treeview.append_column(column_prj_name)
         
-        treeview = Gtk.TreeView(model=self.model)
+        renderer_line_number = Gtk.CellRendererText()
+        renderer_line_number.set_property("cell-background", "light grey")
+        column_prj_dir = Gtk.TreeViewColumn("行号", renderer_line_number, text=1)
+        treeview.append_column(column_prj_dir)
         
-        # 添加每列的Render
-        self._add_columns(treeview)
+        renderer_content = Gtk.CellRendererText()
+        column_content = Gtk.TreeViewColumn("内容", renderer_content, text=2)
+        treeview.append_column(column_content)
         
-        treeview.set_rules_hint(True)
-        treeview.set_search_column(self.COLUMN_TAG_NAME)
         treeview.connect("row-activated", self._on_row_activated)
         
-        sw.add(treeview)
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_size_request(600, 400)
+        scrolledwindow.add(treeview)
         
-        vbox.pack_start(sw, True, True, 0)
-
+        vbox.pack_start(scrolledwindow, True, True, 0)
+        
         # 设定需要传出的控件。
         self.view = vbox
         self.taglistview = treeview
@@ -60,56 +64,34 @@ class ViewSearchTagList:
         # prj:ModelProject:当前的项目信息
         # return:Nothing
         
-        self.model = self._create_model(tags) 
-        self.taglistview.set_model(self.model)
+        self.tags = tags
         
-    def _create_model(self, tags):
-        # 根据Tag生成对应的Model。
-        # tags:[string]:tag的信息列表
-        # return:TreeModel:生成TreeModel数据
+        ###############################
+        ## 项目的列表(项目的名字|项目的路径)。
+        liststore = Gtk.ListStore(str, str, str)
         
-        model = Gtk.ListStore(GObject.TYPE_INT, str)
-
         for tag in tags:
-            model.append([tag.tag_line_no, tag.tag_file_path])
-        
-        return model
-        
-    def _add_columns(self, treeview):
-        # 给TreeView添加栏的Render
-        # treeview:TreeView:
-        # return:Nothing
-
-        # column for line no
-        renderer = Gtk.CellRendererText()
-        # 颜色参考 /usr/share/X11/rgb.txt 文件。
-        renderer.set_property("cell-background", "light grey");
-        column = Gtk.TreeViewColumn("行号", renderer, text=self.COLUMN_TAG_LINE_NO)
-        column.set_sort_column_id(self.COLUMN_TAG_LINE_NO)
-        column.set_alignment(0.5) # 标题的对齐
-        treeview.append_column(column)
-
-        # column for tag
-        renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Tag", renderer, text=self.COLUMN_TAG_NAME)
-        column.set_sort_column_id(self.COLUMN_TAG_NAME)
-        column.set_alignment(0.5) # 标题的对齐
-        treeview.append_column(column)
+            # 去掉路径前缀
+            file_path = tag.tag_file_path
+            if prj is not None:
+                file_path = file_path.replace(prj.src_dirs[0] + '/', '')
+            liststore.append([file_path, str(tag.tag_line_no), tag.tag_content])
+            
+        self.taglistview.set_model(liststore)
         
     def _on_row_activated(self, treeview, path, column):
         # 当双击了Tag时
         
-        # 得到行号
-        model = treeview.get_model()
-        miter = model.get_iter(path)
-        line_no = model.get_value(miter, 0)
+        selection = treeview.get_selection()
         
-        logging.debug('tag line no=%d' % line_no)
-        # 跳转到对应的行。
-        self.ideWindow.ide_goto_line(line_no)
+        if selection.get_selected():
+            selected_pathes = selection.get_selected_rows()[1]
+            selected_index = selected_pathes[0].get_indices()[0]
+            tag = self.tags[selected_index]
         
-        # 编辑器获取焦点。
-        self.ideWindow.ide_editor_set_focus()
+            # 跳转到对应的行。
+            self.ideWindow.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
+            self.ideWindow.ide_editor_set_focus()
         
     def get_view(self):
         # 返回容器控件

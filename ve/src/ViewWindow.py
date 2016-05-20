@@ -10,7 +10,7 @@
 # 6, 命令工具（可以编写任意的命令）
 # TODO 大量功能的入口函数在这里，是否合适？而且越来越复杂，无法维护。
 
-import os, sys, getopt, shutil, re
+import os, sys, getopt, shutil, re, logging
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
 from gi.overrides.Gtk import TextBuffer
 
@@ -564,7 +564,7 @@ class ViewWindow(Gtk.Window):
             file_path = path
         
         if response == Gtk.ResponseType.OK:
-            print("File selected: " + file_path)
+            logging.debug("File selected: %s " % file_path)
             
 #             self.multiEditors.show_editor(file_path)
 #             
@@ -599,7 +599,7 @@ class ViewWindow(Gtk.Window):
             清除当前的Buffer。
         \return RLT_XXX
         '''
-        print("ide close file.")
+        logging.debug("close file.")
         
         ide_editor = self.multiEditors.get_current_ide_editor()
         if ide_editor is None or ide_editor.ide_file is None:
@@ -1297,14 +1297,14 @@ class ViewWindow(Gtk.Window):
         if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
             return
         
-        self._ide_grep_path(pattern)
+        self._ide_find_path(pattern)
         
-    def _ide_grep_path(self, pattern):
+    def _ide_find_path(self, pattern):
         
-        ModelTask.execute(self._after_ide_grep_path, 
+        ModelTask.execute(self._after_ide_find_path, 
                           self.cur_prj.query_grep_filepath, pattern, False)
     
-    def _after_ide_grep_path(self, tags):
+    def _after_ide_find_path(self, tags):
         if len(tags) == 0:
             dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
                                        Gtk.ButtonsType.OK, "没有找到对应的定义。")
