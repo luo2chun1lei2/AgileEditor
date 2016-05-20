@@ -7,7 +7,7 @@ import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
 from ModelTags import ModelTag
 
-class ViewTagList:
+class ViewFileTagList:
     # 定制一个ListView，内部显示Tag。
     # ideWindow:EditorWindow:总的编辑窗口。
     

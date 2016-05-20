@@ -25,7 +25,7 @@ from ViewDialogTags import ViewDialogTagsOpen
 from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
-from ViewTagList import ViewTagList
+from ViewFileTagList import ViewFileTagList
 from ViewHelp import ViewDialogInfo
 from ViewSearchTagList import ViewSearchTagList
 from ViewMultiEditors import ViewMultiEditors
@@ -115,7 +115,7 @@ class ViewWindow(Gtk.Window):
         panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
         
         # 右边的Tag列表。
-        self.ideTagList = ViewTagList(self)
+        self.ideTagList = ViewFileTagList(self)
         panedEdtiorAndTagList.pack2(self.ideTagList.get_view(), resize=False, shrink=True)
         
         # 检索Tag列表。
