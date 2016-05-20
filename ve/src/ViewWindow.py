@@ -22,6 +22,7 @@ from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewTagList import ViewTagList
 from ViewHelp import ViewDialogInfo
+from ModelTask import ModelTask
 from gi.overrides.Gtk import TextBuffer
 from ViewMultiEditors import ViewMultiEditors
 from ViewDialogCommon import *

@@ -2,6 +2,7 @@ eclipse.preferences.version=1
 encoding//src/ModelFile.py=utf-8
 encoding//src/ModelProject.py=utf-8
 encoding//src/ModelTags.py=utf-8
+encoding//src/ModelTask.py=utf-8
 encoding//src/ModelWorkshop.py=utf-8
 encoding//src/VeEventPipe.py=utf-8
 encoding//src/VeMain.py=utf-8
