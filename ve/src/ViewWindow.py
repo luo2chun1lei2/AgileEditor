@@ -75,65 +75,50 @@ class ViewWindow(Gtk.Window):
         
         # TODO 下面的布局太乱，应该清晰化和通用化。
         Gtk.Window.__init__(self, title=self.PROGRAM_NAME)
-
-        # 设定窗口的大小。
-        # TODO:全屏，或者记录上一次的大小
-        self.set_default_size(800, 600)
         
-        # 窗口的布局器
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        # 这个不能缺少，当不是最大时，这个是第一推荐尺寸。
+        self.set_default_size(1024, 768)
+        ###################################################
+        ## 重要控件
         
-        # 创建内部的控件。
-        # - 菜单和工具栏
+        # 菜单和工具栏
         self.ide_menu = ViewMenu(self, self.on_menu_func)
-        vbox.pack_start(self.ide_menu.menubar, False, False, 0)
-        vbox.pack_start(self.ide_menu.toolbar, False, False, 0)
         
-        # 中间部分是由 文件系统树|编辑器|代码浏览工具 组成的。
-        
-        # 包含左边文件Tree和文件显示的Pane。
-        # TODO:不是应该用VPaned，怎么使用HPaned。
-        panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        #child1 = panedFsAndEditor.get_child1()
-        
-        #hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        
-        # 左边的文件系统树
+        # 文件系统树
         self.ideFsTree = self.create_fs_tree()
-        #hbox.pack_start(ideFsTree, False, False, 0)
-        #resize:子控件是否跟着paned的大小而变化。
-        #shrink:子控件是否能够比它需要的大小更小。
-        panedFsAndEditor.pack1(self.ideFsTree.get_view(), resize=False, shrink=True)
         
-        panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        
-        # 中间的文件编辑器（包括了切换Tab、编辑器和状态栏）
-        # - 多个Editor的切换Tab
+        # 多个Editor的切换Tab
         self.multiEditors = ViewMultiEditors(self.on_menu_func)
         self.tab_page = self.multiEditors.get_tab_page()
         
-        panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
-        
-        # 右边的Tag列表。
+        # 文件Tag列表。
         self.ideTagList = ViewFileTagList(self)
+        
+        # 项目搜索Tag列表
+        self.searchTagList = ViewSearchTagList(self)
+        
+        ###################################################
+        ## 布局
+        # resize:子控件是否跟着paned的大小而变化。
+        # shrink:子控件是否能够比它需要的大小更小。
+        panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
+        panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
         panedEdtiorAndTagList.pack2(self.ideTagList.get_view(), resize=False, shrink=True)
         
-        # 检索Tag列表。
-        self.searchTagList = ViewSearchTagList(self)
-        #self.searchTagList.get_view().set_size_request(100, 800)
-        
-        # 上面的编辑器和下面的检索框
-        panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL) 
+        panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
         panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
         panedEdtiorAndSearchTag.pack2(self.searchTagList.get_view(), resize=False, shrink=True)
         
+        panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
+        panedFsAndEditor.pack1(self.ideFsTree.get_view(), resize=False, shrink=True)
         panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
-        # 设定divider的位置.
         panedFsAndEditor.set_position(200);
         
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox.pack_start(self.ide_menu.menubar, False, False, 0)
+        vbox.pack_start(self.ide_menu.toolbar, False, False, 0)
         vbox.pack_start(panedFsAndEditor, True, True, 5)
         
-        # - 加入布局器。
         self.add(vbox)
         
     def create_fs_tree(self):
