@@ -49,7 +49,7 @@ class ViewSearchTagList:
         treeview.connect("row-activated", self._on_row_activated)
         
         scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.set_size_request(600, 400)
+        scrolledwindow.set_size_request(0, 100) # 有作用
         scrolledwindow.add(treeview)
         
         vbox.pack_start(scrolledwindow, True, True, 0)

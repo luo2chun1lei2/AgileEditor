@@ -208,14 +208,14 @@ class ModelProject(object):
     def query_defination_tags(self, name):
         # 查询某个定义所在的TAG信息
         # name:string:要查询的名字
-        # return:[string]:tag信息的数组
-        return self.prj_tags.query_defination_tags(name)
+        # return:name, [string]:name, tag信息的数组
+        return name, self.prj_tags.query_defination_tags(name)
     
     def query_reference_tags(self, name):
         # 查询某个名字的引用
         # name:string:要查询的名字
-        # return:[string]:tag信息的数组
-        return self.prj_tags.query_reference_tags(name)
+        # return:name, [string]:name, tag信息的数组
+        return name, self.prj_tags.query_reference_tags(name)
     
     def get_completion_tags(self, prefix):
         # 根据前缀，查询到什么Tag符合要求。

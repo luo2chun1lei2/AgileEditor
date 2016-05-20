@@ -186,7 +186,7 @@ class ModelGTags(object):
 
         (stdoutput, erroutput) = p.communicate()
         
-        return name, self._parse_reference_tags_result(stdoutput)
+        return self._parse_reference_tags_result(stdoutput)
 
     def _parse_reference_tags_result(self, text):
         # 分析名字Tag的查询结果。

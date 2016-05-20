@@ -120,13 +120,14 @@ class ViewWindow(Gtk.Window):
         
         # 检索Tag列表。
         self.searchTagList = ViewSearchTagList(self)
+        #self.searchTagList.get_view().set_size_request(100, 800)
         
         # 上面的编辑器和下面的检索框
         panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL) 
         panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
         panedEdtiorAndSearchTag.pack2(self.searchTagList.get_view(), resize=False, shrink=True)
         
-        panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
+        panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=False, shrink=True)
         # 设定divider的位置.
         panedFsAndEditor.set_position(200);
         
@@ -674,8 +675,7 @@ class ViewWindow(Gtk.Window):
             self.cur_prj.prepare()
             
             # 右边的TAG更新
-            tags = self.cur_prj.query_tags_by_file(ide_editor.ide_file.file_path)
-            self.ide_refresh_file_tag_list(tags)
+            self._ide_query_tags_by_file_and_refresh(ide_editor.ide_file.file_path)
         
         self._set_status(ViewMenu.STATUS_FILE_OPEN)
         
@@ -953,14 +953,18 @@ class ViewWindow(Gtk.Window):
             
         # 分析标记
         if self.cur_prj is not None:
-            tags = self.cur_prj.query_tags_by_file(abs_file_path)
-            self.ide_refresh_file_tag_list(tags)
+            self._ide_query_tags_by_file_and_refresh(abs_file_path)
             
         # 显示文件的路径。
         self.ide_set_title(abs_file_path)
         
         # 在文件树那里同步
         self.ideFsTree.show_file(abs_file_path)
+    
+    def _ide_query_tags_by_file_and_refresh(self, abs_file_path):
+        
+        ModelTask.execute(self.ide_refresh_file_tag_list,
+                          self.cur_prj.query_tags_by_file, abs_file_path)
         
     def _ide_open_page(self, abs_file_path):
         '''
@@ -1107,7 +1111,10 @@ class ViewWindow(Gtk.Window):
         
     def _ide_search_defination(self, tag_name):
         
-        tags = self.cur_prj.query_defination_tags(tag_name)
+        ModelTask.execute(self._after_ide_search_defination,
+                          self.cur_prj.query_defination_tags, tag_name)
+        
+    def _after_ide_search_defination(self, tag_name, tags):
         
         if len(tags) == 0:
             info = "没有找到对应\"" + tag_name + "\"的定义。"
@@ -1116,14 +1123,11 @@ class ViewWindow(Gtk.Window):
             dialog.run()
             dialog.destroy()
             
-        elif len(tags) == 1:
-            ''' 直接跳转。 '''
-            tag = tags[0]
-            self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
-            # 显示列表，让使用者挑选一个
-            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
-            if tag:
+            self.searchTagList.set_model(tags, self.cur_prj)
+            if len(tags) == 1:
+                ''' 直接跳转。 '''
+                tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
     
     def ide_search_reference(self):
@@ -1141,15 +1145,11 @@ class ViewWindow(Gtk.Window):
                                        Gtk.ButtonsType.OK, info)
             dialog.run()
             dialog.destroy()
-            
-        elif len(tags) == 1:
-            ''' 直接跳转。 '''
-            tag = tags[0]
-            self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
-            ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
-            if tag:
+            self.searchTagList.set_model(tags, self.cur_prj)
+            if len(tags) == 1:
+                ''' 直接跳转。 '''
+                tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
                 
     def ide_search_back_tag(self):
@@ -1280,17 +1280,14 @@ class ViewWindow(Gtk.Window):
                                        Gtk.ButtonsType.OK, "没有找到对应的定义。")
             dialog.run()
             dialog.destroy()
-            
-        elif len(tags) == 1:
-            ''' 直接跳转。 '''
-            tag = tags[0]
-            self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
+        
         else:
-            ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
-            if tag:
+            self.searchTagList.set_model(tags, self.cur_prj)
+            if len(tags) == 1:
+                ''' 直接跳转。 '''
+                tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-                
+
     def ide_find_path(self):
         # 检索需要的文件路径
         response, pattern = ViewDialogCommon.show_one_entry(self, "检索文件路径", '模式')
@@ -1317,11 +1314,6 @@ class ViewWindow(Gtk.Window):
                 # 直接跳转。
                 tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-#             else:
-#                 ''' 显示列表，让使用者挑选一个 '''
-#                 tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
-#                 if tag:
-#                     self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         
     def _ide_get_selected_line(self, textview):
         # 得到当前光标所在的行/或者选择的多行的 行范围
@@ -1404,7 +1396,7 @@ class ViewWindow(Gtk.Window):
                 
             text = text_buf.get_text(word_start, word_end, False)
             
-        print 'selected text or word is "', text, '"'
+        logging.debug('selected text or word is "%s"' % text)
 
         return text
     
