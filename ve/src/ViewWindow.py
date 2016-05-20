@@ -12,21 +12,24 @@
 
 import os, sys, getopt, shutil, re
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
+from gi.overrides.Gtk import TextBuffer
+
+from VeUtils import *
 
 from ModelWorkshop import ModelWorkshop
-from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ModelProject import ModelProject
-from ViewDialogTags import ViewDialogTagsOpen
 from ModelFile import ModelFile
+from ModelTask import ModelTask
+
+from ViewDialogTags import ViewDialogTagsOpen
+from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewTagList import ViewTagList
 from ViewHelp import ViewDialogInfo
-from ModelTask import ModelTask
-from gi.overrides.Gtk import TextBuffer
+from ViewSearchTagList import ViewSearchTagList
 from ViewMultiEditors import ViewMultiEditors
 from ViewDialogCommon import *
-from VeUtils import *
 
 class ViewWindow(Gtk.Window):
     
@@ -40,7 +43,7 @@ class ViewWindow(Gtk.Window):
     RLT_CANCEL=1    # 取消
     RLT_ERROR=2     # 错误
     
-    PROGRAM_NAME='Visual Editor '
+    PROGRAM_NAME='Agile Editor '
     
     '''
     总窗口。
@@ -69,6 +72,8 @@ class ViewWindow(Gtk.Window):
         
     def _create_layout(self):
         # 创建画面。
+        
+        # TODO 下面的布局太乱，应该清晰化和通用化。
         Gtk.Window.__init__(self, title=self.PROGRAM_NAME)
 
         # 设定窗口的大小。
@@ -113,13 +118,20 @@ class ViewWindow(Gtk.Window):
         self.ideTagList = ViewTagList(self)
         panedEdtiorAndTagList.pack2(self.ideTagList.get_view(), resize=False, shrink=True)
         
-        panedFsAndEditor.pack2(panedEdtiorAndTagList, resize=True, shrink=True)
+        # 检索Tag列表。
+        self.searchTagList = ViewSearchTagList(self)
+        
+        # 上面的编辑器和下面的检索框
+        panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL) 
+        panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
+        panedEdtiorAndSearchTag.pack2(self.searchTagList.get_view(), resize=False, shrink=True)
+        
+        panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
         # 设定divider的位置.
         panedFsAndEditor.set_position(200);
         
-        #vbox.pack_start(hbox, True, True, 5)
         vbox.pack_start(panedFsAndEditor, True, True, 5)
-                
+        
         # - 加入布局器。
         self.add(vbox)
         
@@ -1035,6 +1047,11 @@ class ViewWindow(Gtk.Window):
     def ide_goto_line(self, line_number):
         # 跳转到当前文件的行。
         # line_number:int:行号（从1开始）
+        # return:Bool:False，以后不再调用，True，以后还会调用。
+        
+        if line_number < 1:
+            logging.error("Error line number %d" % line_number)
+            return False
         
         #print 'goto line number:', line_number
         text_buf = self._ide_get_editor_buffer()
@@ -1294,15 +1311,17 @@ class ViewWindow(Gtk.Window):
             dialog.run()
             dialog.destroy()
             
-        elif len(tags) == 1:
-            ''' 直接跳转。 '''
-            tag = tags[0]
-            self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         else:
-            ''' 显示列表，让使用者挑选一个 '''
-            tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
-            if tag:
+            self.searchTagList.set_model(tags, self.cur_prj)
+            if len(tags) == 1:
+                # 直接跳转。
+                tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
+#             else:
+#                 ''' 显示列表，让使用者挑选一个 '''
+#                 tag = ViewDialogTagsOpen.show(self, tags, self.cur_prj)
+#                 if tag:
+#                     self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
         
     def _ide_get_selected_line(self, textview):
         # 得到当前光标所在的行/或者选择的多行的 行范围

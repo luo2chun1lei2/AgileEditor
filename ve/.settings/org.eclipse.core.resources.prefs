@@ -16,6 +16,7 @@ encoding//src/ViewFsTree.py=utf-8
 encoding//src/ViewHelp.py=utf-8
 encoding//src/ViewMenu.py=utf-8
 encoding//src/ViewMultiEditors.py=utf-8
+encoding//src/ViewSearchTagList.py=utf-8
 encoding//src/ViewTagList.py=utf-8
 encoding//src/ViewWindow.py=utf-8
 encoding//src/ide/IdeFile.py=utf-8
