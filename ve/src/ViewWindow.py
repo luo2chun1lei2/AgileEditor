@@ -127,7 +127,7 @@ class ViewWindow(Gtk.Window):
         panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
         panedEdtiorAndSearchTag.pack2(self.searchTagList.get_view(), resize=False, shrink=True)
         
-        panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=False, shrink=True)
+        panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
         # 设定divider的位置.
         panedFsAndEditor.set_position(200);
         
@@ -604,7 +604,7 @@ class ViewWindow(Gtk.Window):
         
         ide_editor = self.multiEditors.get_current_ide_editor()
         if ide_editor is None or ide_editor.ide_file is None:
-            print('No file is being opened')
+            logging.debug('No file is being opened')
             return self.RLT_OK
         
         needSave = False

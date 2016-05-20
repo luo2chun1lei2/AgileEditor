@@ -22,13 +22,13 @@ class ViewSearchTagList:
 
         self.ideWindow = ideWindow
 
-        vbox = Gtk.VBox(spacing = 10)
+        vbox = Gtk.VBox(spacing = 0)
         
         ###############################
         ## 项目名字
-        lbl_tag_list = Gtk.Label("Tag列表")
-        lbl_tag_list.set_justify(Gtk.Justification.LEFT)
-        vbox.pack_start(lbl_tag_list, False, True, 0)
+        #lbl_tag_list = Gtk.Label("Tag列表")
+        #lbl_tag_list.set_justify(Gtk.Justification.LEFT)
+        #vbox.pack_start(lbl_tag_list, False, True, 0)
          
         # TreeView
         treeview = Gtk.TreeView()
