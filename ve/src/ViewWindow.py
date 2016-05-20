@@ -1254,7 +1254,7 @@ class ViewWindow(Gtk.Window):
         
     def _ide_grep_in_files(self, pattern):
         # 执行检索
-        ModelTask.execute(self._after_ide_grep_in_files, 
+        ModelTask.execute_with_spinner(None, self._after_ide_grep_in_files, 
                           self.cur_prj.query_grep_tags, pattern, False)
         
     def _after_ide_grep_in_files(self, tags):
