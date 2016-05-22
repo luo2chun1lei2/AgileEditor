@@ -12,8 +12,8 @@ from ViewMenu import ViewMenu
 
 class ViewEditor:
     # 一个编辑器的信息
-    # editor GtkSource.View 源代码的编辑器控件
-    # ide_file ModelFile 编辑的文件
+    # editor:GtkSource.View:源代码的编辑器控件
+    # ide_file:ModelFile:编辑的文件
     
     # 编辑器当前的状态。
     (
@@ -29,20 +29,18 @@ class ViewMultiEditors:
     # 内部管理多个打开文件的编辑器，可以
     # 1, 打开一个文件，如果已经存在，就显示已经打开的。
     # 2, 关闭一个文件。
-    # 3, 得到当前的文件。
+    # 3, 得到当前编辑的文件。
     
     # notebook Gtk.NoteBook 管理多个控件的Tab Page控件。
     # 文件名字为“”，表明是一个新文件，且所有的新文件都是一个。
     # dic_editors [str, ViewEditor] 数组：文件路径（绝对），编辑器
     
     def __init__(self, on_process_func):
-        ''' 
-        on_process_func 外部的方法，供调用。
-        '''
+        # on_process_func 外部的方法，供调用。
         
         self.on_process_func = on_process_func
         
-        ''' 生成Tab page 类型的控件。 '''
+        # 生成Tab page 类型的控件。 
         self.notebook = Gtk.Notebook()
         self.notebook.set_scrollable(True)
         self.notebook.connect("switch_page", self.on_switch_page)
@@ -62,14 +60,13 @@ class ViewMultiEditors:
         label.set_markup(title)
         
     def get_tab_page(self):
-        ''' 得到内部的Tab Page控件。'''
+        # 得到内部的Tab Page控件。
         return self.notebook
     
     def get_current_editor(self):
-        '''
-        得到当前的编辑器。
-        如果没有打开的编辑器，就返回None
-        '''
+        # 得到当前的编辑器。
+        # 如果没有打开的编辑器，就返回None
+        
         index = self.notebook.get_current_page()
         if index < 0 :
             return None
@@ -79,9 +76,8 @@ class ViewMultiEditors:
         return oneEditor.editor
     
     def get_current_ide_file(self):
-        ''' 得到当前的编辑器编辑的文件。
-        return ModelFile 编辑的文件，None：如果不存在 
-        '''
+        # 得到当前的编辑器编辑的文件。
+        # return ModelFile 编辑的文件，None：如果不存在 
         
         index = self.notebook.get_current_page()
         if index < 0 :
@@ -101,9 +97,8 @@ class ViewMultiEditors:
         return oneEditor
     
     def get_current_ide_editor(self):
-        ''' 得到当前的编辑器编辑的文件。
-        return ModelFile 编辑的文件，None：如果不存在 
-        '''
+        # 得到当前的编辑器编辑的文件。
+        # return ModelFile 编辑的文件，None：如果不存在
         
         index = self.notebook.get_current_page()
         if index < 0 :
@@ -201,11 +196,10 @@ class ViewMultiEditors:
         self.unfreeze_editor(editor)
 
     def close_editor(self, abs_file_path):
-        '''
-        关闭对应的编辑器
-        abs_file_path string 文件的绝对路径（作为唯一的标志）
-        return False:关闭失败，比如没有这个文件，或者客户又选择不关闭。
-        '''
+        # 关闭对应的编辑器
+        # abs_file_path:string:文件的绝对路径（作为唯一的标志）
+        # return:Bool:False,关闭失败，比如没有这个文件，或者客户又选择不关闭。
+        
         if not abs_file_path in self.dic_editors:
             return False
         
@@ -224,12 +218,12 @@ class ViewMultiEditors:
 #         src_buffer.set_modified(False)
         
     def freeze_editor(self, editor):
-        ''' 冻结编辑器，暂时将completion禁止。'''
+        # 冻结编辑器，暂时将completion禁止。
         completion = editor.props.completion
         completion.block_interactive()
         
     def unfreeze_editor(self, editor):
-        ''' 解冻编辑器，将completion的禁止打开。'''
+        # 解冻编辑器，将completion的禁止打开。
         completion = editor.props.completion
         completion.unblock_interactive()
         
@@ -274,10 +268,10 @@ class ViewMultiEditors:
         return (scrolledCtrl, editor)
     
     def _ide_set_font(self, widget, str_font_desc):
-        ''' 设置控件的字体
-        widget Gtk.Widget 控件
-        str_font_desc String 字体的描述（名字 大小）
-        '''
+        # 设置控件的字体
+        #widget Gtk.Widget 控件
+        #str_font_desc String 字体的描述（名字 大小）
+        
         font_desc = Pango.FontDescription.from_string(str_font_desc)
         widget.modify_font(font_desc)
         
@@ -337,10 +331,10 @@ class ViewMultiEditors:
         return src_buffer
     
     def on_switch_page(self, notebook, page, page_num):
-        ''' 当切换Page时，发生，无论是用户手动还是编程方法调用。
-        page Gtk.Widget 切换到的页的控件
-        page_num int 切换到的页的索引
-        '''
+        # 当切换Page时，发生，无论是用户手动还是编程方法调用。
+        #page Gtk.Widget 切换到的页的控件
+        #page_num int 切换到的页的索引
+        
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._on_switch_page, page_num)
         
     def _on_switch_page(self, page_num):
@@ -373,8 +367,7 @@ class ViewMultiEditors:
         self.dic_editors = new_dic
         
     def on_editor_buffer_modified_changed(self, src_buffer, abs_file_path):
-        ''' 当文件是否修改被改变时 '''
-        #print "modified file: %s" % (abs_file_path)
+        # 当文件是否修改被改变时
         
         index = self._index_of_path(abs_file_path)
         if index < 0: 
