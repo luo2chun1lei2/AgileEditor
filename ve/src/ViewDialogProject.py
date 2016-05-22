@@ -173,6 +173,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
     REPONSE_TYPE_NEW_PRJ = 100
     REPONSE_TYPE_DEL_PRJ = 101
     REPONSE_TYPE_CHANGE_PRJ = 102
+    REPONSE_TYPE_MOVE_PRJ_NEXT = 103
+    REPONSE_TYPE_MOVE_PRJ_PREV = 104
     
     def __init__(self, parent, ideWorkshop):
     
@@ -181,7 +183,9 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         self.selected_project = None
         
         Gtk.Dialog.__init__(self, "打开项目", parent, 0,
-                            (Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ, # 新项目
+                             (Gtk.STOCK_MEDIA_PREVIOUS, ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_PREV, # 上移
+                             Gtk.STOCK_MEDIA_NEXT, ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_NEXT, # 下移
+                             Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ, # 新项目
                              Gtk.STOCK_DELETE, ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ, # 删除项目
                              Gtk.STOCK_EDIT, ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ, # 改变项目
                              Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, # 退出
@@ -233,8 +237,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         
     def _show_data(self):
         ideWorkshop = self.ideWorkshop
+
         liststore = Gtk.ListStore(str, str)
-        
         for prj in ideWorkshop.projects:
             # TODO 似乎代码路径只能有一个，虽然写的是数组。
             #liststore.append([prj.prj_name, os.path.dirname(prj.src_dirs[0])])
@@ -335,6 +339,38 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     
                 # 更新当前画面。
                 dialog._show_data()
+            
+            elif response == ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_PREV:
+                selection = dialog.prj_treeview.get_selection()
+                
+                if selection.get_selected():
+                    selected_pathes = selection.get_selected_rows()[1]
+                    if len(selected_pathes) == 0:
+                        continue
+                    
+                    selected_index = selected_pathes[0].get_indices()[0]
+                    prj = dialog.ideWorkshop.projects[selected_index]
+                    
+                    if dialog.ideWorkshop.move_project_prev(prj):
+                        # 更新当前画面。
+                        dialog._show_data()
+                        dialog.prj_treeview.get_selection().select_path("%s" % (selected_index-1))
+                    
+            elif response == ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_NEXT:
+                selection = dialog.prj_treeview.get_selection()
+                
+                if selection.get_selected():
+                    selected_pathes = selection.get_selected_rows()[1]
+                    if len(selected_pathes) == 0:
+                        continue
+                    
+                    selected_index = selected_pathes[0].get_indices()[0]
+                    prj = dialog.ideWorkshop.projects[selected_index]
+                    
+                    if dialog.ideWorkshop.move_project_next(prj):
+                        # 更新当前画面。
+                        dialog._show_data()
+                        dialog.prj_treeview.get_selection().select_path("%s" % (selected_index+1))
                     
             else:
                 # 其他情况，就直接退出。

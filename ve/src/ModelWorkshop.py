@@ -87,6 +87,38 @@ class ModelWorkshop(object):
     def save_conf(self):
         # 保存当前的workshop的信息。
         self._write_conf(self.projects)
+        
+    def move_project_next(self, prj):
+        # 将指定的项目向后移动
+        # prj:ModelProject:
+        
+        found = self.projects.index(prj)
+        if found < 0:
+            return False
+        elif found >= len(self.projects)-1:
+            return False
+        
+        self.projects[found] = self.projects[found+1]
+        self.projects[found+1] = prj
+
+        self.save_conf()
+        return True
+    
+    def move_project_prev(self, prj):
+        # 将执行的项目向前移动
+        # prj:ModelProject:
+        
+        found = self.projects.index(prj)
+        if found <= 0:
+            return False
+        elif found > len(self.projects)-1:
+            return False
+        
+        self.projects[found] = self.projects[found-1]
+        self.projects[found-1] = prj
+        
+        self.save_conf()
+        return True
       
     def _create_conf(self, config_path):
         # 生成缺省的配置文件。
