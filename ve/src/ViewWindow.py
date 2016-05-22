@@ -20,6 +20,7 @@ from ModelWorkshop import ModelWorkshop
 from ModelProject import ModelProject
 from ModelFile import ModelFile
 from ModelTask import ModelTask
+from ModelTags import *
 
 from ViewDialogTags import ViewDialogTagsOpen
 from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
@@ -28,6 +29,7 @@ from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewFileTagList import ViewFileTagList
 from ViewHelp import ViewDialogInfo
 from ViewSearchTagList import ViewSearchTagList
+from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
 from ViewDialogCommon import *
 
@@ -97,6 +99,13 @@ class ViewWindow(Gtk.Window):
         # 项目搜索Tag列表
         self.searchTagList = ViewSearchTagList(self)
         
+        # 书签列表
+        self.bookmarks = ViewBookmarks(self)
+        
+        # 保存项目用的各种列表的Notebook
+        self.nbPrj = Gtk.Notebook()
+        self.nbPrj.set_scrollable(True)
+        
         ###################################################
         ## 布局
         # resize:子控件是否跟着paned的大小而变化。
@@ -105,9 +114,12 @@ class ViewWindow(Gtk.Window):
         panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
         panedEdtiorAndTagList.pack2(self.ideTagList.get_view(), resize=False, shrink=True)
         
+        self.nbPrj.append_page(self.searchTagList.get_view(), Gtk.Label("检索"))
+        self.nbPrj.append_page(self.bookmarks.get_view(), Gtk.Label("书签"))
+        
         panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
         panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
-        panedEdtiorAndSearchTag.pack2(self.searchTagList.get_view(), resize=False, shrink=True)
+        panedEdtiorAndSearchTag.pack2(self.nbPrj, resize=False, shrink=True)
         
         panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         panedFsAndEditor.pack1(self.ideFsTree.get_view(), resize=False, shrink=True)
@@ -217,6 +229,10 @@ class ViewWindow(Gtk.Window):
             self.ide_search_reference()
         elif action == ViewMenu.ACTION_SEARCH_BACK_TAG:
             self.ide_search_back_tag()
+        elif action == ViewMenu.ACTION_SEARCH_ADD_BOOKMARK:
+            self.ide_add_bookmark()
+        elif action == ViewMenu.ACTION_SEARCH_REMOVE_BOOKMARK:
+            self.ide_remove_bookmark()
             
         elif action == ViewMenu.ACTION_HELP_INFO:
             self.ide_help_info()
@@ -1133,13 +1149,30 @@ class ViewWindow(Gtk.Window):
         else:
             self.searchTagList.set_model(tags, self.cur_prj)
             if len(tags) == 1:
-                ''' 直接跳转。 '''
+                # 直接跳转。
                 tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
                 
     def ide_search_back_tag(self):
         # 回退到上一个位置。
         self._ide_pop_jumps()
+        
+    def ide_add_bookmark(self):
+        # 添加一条书签
+        bookmark = self._ide_make_bookmark()
+        self.cur_prj.add_bookmark(bookmark)
+        
+        self.bookmarks.set_model(self.cur_prj.bookmarks, self.cur_prj)
+    
+    def ide_remove_bookmark(self):
+        # 删除一条书签。
+        selected_index = self.bookmarks.get_selected()
+        if selected_index < 0:
+            return
+        
+        self.cur_prj.remove_bookmark(selected_index)
+        
+        self.bookmarks.set_model(self.cur_prj.bookmarks, self.cur_prj)
     
     def ide_jump_to_line(self, widget):
         # 显示一个对话框，输入需要跳转的行。
@@ -1384,6 +1417,34 @@ class ViewWindow(Gtk.Window):
         logging.debug('selected text or word is "%s"' % text)
 
         return text
+    
+    def _ide_make_bookmark(self):
+        # 根据当前编辑器的当前光标位置，生成一个bookmark
+        # return:ModelTag:书签
+        
+        text_buf = self._ide_get_editor_buffer()
+        
+        # 得到书签名字
+        name = self._ide_get_selected_text_or_word()
+        if name is None:
+            # 就用
+            name = "None"
+            
+        # 得到文件
+        path = self.multiEditors.get_current_abs_file_path()
+        
+        # 得到行号
+        mark = text_buf.get_insert()
+        location = text_buf.get_iter_at_mark(mark)
+        line_no = location.get_line() + 1
+
+        # 得到内容
+        line_start = text_buf.get_iter_at_line(line_no-1)
+        line_end = line_start.copy()
+        line_end.forward_to_line_end()
+        content = text_buf.get_text(line_start, line_end, False)
+
+        return ModelTag(name, path, line_no, content)
     
     def _ide_set_completion(self, ideProject):
         ''' 设定当前的编辑器的单词补足，当切换不同的Project时，才有必要 '''

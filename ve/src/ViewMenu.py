@@ -53,6 +53,9 @@ MENU_CONFIG = """
             <menuitem action='SearchDefination' />
             <menuitem action='SearchReference' />
             <menuitem action='SearchBackTag' />
+            <separator />
+            <menuitem action='SearchAddBookmark' />
+            <menuitem action='SearchRemoveBookmark' />
         </menu>
         <menu action='HelpMenu'>
             <menuitem action='HelpInfo' />
@@ -126,11 +129,14 @@ class ViewMenu(object):
      ACTION_SEARCH_REFERENCE,
      ACTION_SEARCH_BACK_TAG,
      
+     ACTION_SEARCH_ADD_BOOKMARK,
+     ACTION_SEARCH_REMOVE_BOOKMARK,
+     
      ACTION_HELP_INFO,
      
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,     # 切换当前编辑的文件
-     ) = range(33)
+     ) = range(35)
 
     def __init__(self, window, on_menu_func):
         
@@ -350,6 +356,8 @@ class ViewMenu(object):
             ("SearchDefination", None, 'Definition', 'F3', None, self.on_menu_search_defination),
             ("SearchReference", None, 'Reference', 'F4', None, self.on_menu_search_reference),
             ("SearchBackTag", Gtk.STOCK_GO_BACK, 'Back Tag', '<shift><control>Left', None, self.on_menu_search_back_tag),
+            ("SearchAddBookmark", Gtk.STOCK_GO_BACK, 'Add bookmark', '<control>B', None, self.on_menu_search_add_bookmark),
+            ("SearchRemoveBookmark", Gtk.STOCK_GO_BACK, 'Remove bookmark', '<shift><control>B', None, self.on_menu_search_remove_bookmark),
         ])
         
     def add_help_menu_actions(self, action_group):
@@ -507,6 +515,14 @@ class ViewMenu(object):
     def on_menu_search_back_tag(self, widget):
         logging.debug("A Search|back tag menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_BACK_TAG)
+        
+    def on_menu_search_add_bookmark(self, widget):
+        logging.debug("A Search|Add bookmark menu item was selected.")
+        self.on_menu_func(widget, self.ACTION_SEARCH_ADD_BOOKMARK)
+        
+    def on_menu_search_remove_bookmark(self, widget):
+        logging.debug("A Search|Remove bookmark menu item was selected.")
+        self.on_menu_func(widget, self.ACTION_SEARCH_REMOVE_BOOKMARK)
 
     def on_menu_help_info(self, widget):
         logging.debug("A Help|Infomation as menu item was selected.")

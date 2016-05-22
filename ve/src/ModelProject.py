@@ -8,7 +8,7 @@ import os, logging
 import ConfigParser
 
 from VeUtils import *
-from ModelTags import ModelGTags
+from ModelTags import ModelGTags, ModelTag
 from VeWordProvider import VeWordProvider
 
 class ModelProject(object):
@@ -16,6 +16,7 @@ class ModelProject(object):
     # prj_name:string:项目名字
     # src_dirs:[string]:代码的路径数组
     # prj_tags:ModelTags:负责管理Tags文件，和进行分析。
+    # bookmarks:[ModelTag]:书签数组
     
     #没有实现。
     #prj_self_config:string:项目自己配置文件。 project.self.conf
@@ -86,6 +87,7 @@ class ModelProject(object):
         self.config_path = None
         self.prj_name = None
         self.src_dirs = []
+        self.bookmarks = []
         
         self.prj_tags = ModelGTags(self)
     
@@ -188,6 +190,22 @@ class ModelProject(object):
             os.removedirs(basename)
             
         return True
+    
+#     def add_bookmark(self, name, path, line_no, content):
+#         # 添加一个书签
+#         # name:string:书签的名字
+#         # path:string:文件的路径
+#         # line_no:int:行号
+#         self.bookmarks.append(ModelTag(name, path, line_no, content))
+    
+    def add_bookmark(self, bookmark):
+        # bookmark:ModelTag:书签
+        self.bookmarks.append(bookmark)
+    
+    def remove_bookmark(self, no):
+        #  删除一个标签
+        # no:int:书签的索引（0～）
+        del self.bookmarks[no]
     
     ############################################################
     ## 下面是TAG的处理，因为以后如果src很多，那么就会有许多的TAG，所以Project做了隔离。
