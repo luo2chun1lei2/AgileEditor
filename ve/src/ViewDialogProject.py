@@ -173,8 +173,6 @@ class ViewDialogProjectOpen(Gtk.Dialog):
     REPONSE_TYPE_NEW_PRJ = 100
     REPONSE_TYPE_DEL_PRJ = 101
     REPONSE_TYPE_CHANGE_PRJ = 102
-    REPONSE_TYPE_MOVE_PRJ_NEXT = 103
-    REPONSE_TYPE_MOVE_PRJ_PREV = 104
     
     def __init__(self, parent, ideWorkshop):
     
@@ -183,9 +181,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         self.selected_project = None
         
         Gtk.Dialog.__init__(self, "打开项目", parent, 0,
-                             (Gtk.STOCK_MEDIA_PREVIOUS, ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_PREV, # 上移
-                             Gtk.STOCK_MEDIA_NEXT, ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_NEXT, # 下移
-                             Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ, # 新项目
+                             (Gtk.STOCK_NEW, ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ, # 新项目
                              Gtk.STOCK_DELETE, ViewDialogProjectOpen.REPONSE_TYPE_DEL_PRJ, # 删除项目
                              Gtk.STOCK_EDIT, ViewDialogProjectOpen.REPONSE_TYPE_CHANGE_PRJ, # 改变项目
                              Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, # 退出
@@ -201,6 +197,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         lbl_prj_list = Gtk.Label("项目列表")
         lbl_prj_list.set_justify(Gtk.Justification.LEFT)
         vbox.pack_start(lbl_prj_list, False, True, 0)
+        
+        hbox = Gtk.HBox(spacing = 10)
         
         ###############################
         ## 项目的列表(项目的名字|项目的路径)。
@@ -222,7 +220,21 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         scrolledwindow.set_size_request(300, 300)
         scrolledwindow.add(treeview)
         
-        vbox.pack_start(scrolledwindow, True, True, 0)
+        hbox.pack_start(scrolledwindow, True, True, 0)
+        
+        # 包含两个按钮的box
+        box2Btn = Gtk.VBox()
+        
+        btnMovePrev = Gtk.Button("Up")
+        btnMovePrev.connect("clicked", self.on_btn_up_clicked)
+        box2Btn.pack_start(btnMovePrev, False, False, 0)
+        
+        btnMoveNext = Gtk.Button("Down")
+        btnMoveNext.connect("clicked", self.on_btn_down_clicked)
+        box2Btn.pack_start(btnMoveNext, False, False, 0)
+        
+        hbox.pack_start(box2Btn, True, True, 0)
+        vbox.pack_start(hbox, True, True, 0)
          
         ###############################
         box = self.get_content_area()
@@ -339,39 +351,6 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     
                 # 更新当前画面。
                 dialog._show_data()
-            
-            elif response == ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_PREV:
-                selection = dialog.prj_treeview.get_selection()
-                
-                if selection.get_selected():
-                    selected_pathes = selection.get_selected_rows()[1]
-                    if len(selected_pathes) == 0:
-                        continue
-                    
-                    selected_index = selected_pathes[0].get_indices()[0]
-                    prj = dialog.ideWorkshop.projects[selected_index]
-                    
-                    if dialog.ideWorkshop.move_project_prev(prj):
-                        # 更新当前画面。
-                        dialog._show_data()
-                        dialog.prj_treeview.get_selection().select_path("%s" % (selected_index-1))
-                    
-            elif response == ViewDialogProjectOpen.REPONSE_TYPE_MOVE_PRJ_NEXT:
-                selection = dialog.prj_treeview.get_selection()
-                
-                if selection.get_selected():
-                    selected_pathes = selection.get_selected_rows()[1]
-                    if len(selected_pathes) == 0:
-                        continue
-                    
-                    selected_index = selected_pathes[0].get_indices()[0]
-                    prj = dialog.ideWorkshop.projects[selected_index]
-                    
-                    if dialog.ideWorkshop.move_project_next(prj):
-                        # 更新当前画面。
-                        dialog._show_data()
-                        dialog.prj_treeview.get_selection().select_path("%s" % (selected_index+1))
-                    
             else:
                 # 其他情况，就直接退出。
                 break
@@ -385,3 +364,36 @@ class ViewDialogProjectOpen(Gtk.Dialog):
     def on_row_activated(self, treeview, path_str, column):
         # 双击，如同点了OK按钮。
         self.response(Gtk.ResponseType.OK)
+
+    def on_btn_up_clicked(self, button):
+        selection = self.prj_treeview.get_selection()
+                
+        if selection.get_selected():
+            selected_pathes = selection.get_selected_rows()[1]
+            if len(selected_pathes) == 0:
+                return
+            
+            selected_index = selected_pathes[0].get_indices()[0]
+            prj = self.ideWorkshop.projects[selected_index]
+            
+            if self.ideWorkshop.move_project_prev(prj):
+                # 更新当前画面。
+                self._show_data()
+                self.prj_treeview.get_selection().select_path("%s" % (selected_index-1))
+        
+    def on_btn_down_clicked(self, button):
+        selection = self.prj_treeview.get_selection()
+                
+        if selection.get_selected():
+            selected_pathes = selection.get_selected_rows()[1]
+            if len(selected_pathes) == 0:
+                return
+            
+            selected_index = selected_pathes[0].get_indices()[0]
+            prj = self.ideWorkshop.projects[selected_index]
+            
+            if self.ideWorkshop.move_project_next(prj):
+                # 更新当前画面。
+                self._show_data()
+                self.prj_treeview.get_selection().select_path("%s" % (selected_index+1))
+                
