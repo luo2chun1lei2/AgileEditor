@@ -188,7 +188,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                              Gtk.STOCK_OK, Gtk.ResponseType.OK # 打开项目
                              ))
         
-        self.set_default_size(600, 400)
+        self.set_default_size(800, 400)
         
         vbox = Gtk.VBox(spacing = 10)
         
@@ -225,15 +225,17 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         # 包含两个按钮的box
         box2Btn = Gtk.VBox()
         
-        btnMovePrev = Gtk.Button("Up")
+        btnMovePrev = Gtk.Button("上移")
+        btnMovePrev.set_size_request(80, -1)
         btnMovePrev.connect("clicked", self.on_btn_up_clicked)
         box2Btn.pack_start(btnMovePrev, False, False, 0)
         
-        btnMoveNext = Gtk.Button("Down")
+        btnMoveNext = Gtk.Button("下移")
+        btnMoveNext.set_size_request(80, -1)
         btnMoveNext.connect("clicked", self.on_btn_down_clicked)
         box2Btn.pack_start(btnMoveNext, False, False, 0)
         
-        hbox.pack_start(box2Btn, True, True, 0)
+        hbox.pack_start(box2Btn, False, False, 0)
         vbox.pack_start(hbox, True, True, 0)
          
         ###############################
