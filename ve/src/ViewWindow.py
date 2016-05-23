@@ -837,7 +837,8 @@ class ViewWindow(Gtk.Window):
             commend_chars = "#"
         else:
             # 目前只能处理部分程序的comment。
-            commend_chars = None
+            # 
+            commend_chars = "#"
             
         return commend_chars
     
