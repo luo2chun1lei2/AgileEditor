@@ -836,8 +836,7 @@ class ViewWindow(Gtk.Window):
         elif lang_id == "makefile" or lang_id=="sh":
             commend_chars = "#"
         else:
-            # 目前只能处理部分程序的comment。
-            # 
+            # 缺省使用#
             commend_chars = "#"
             
         return commend_chars

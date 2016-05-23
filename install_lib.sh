@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo apt-get install python-bzrlib python-pyinotify
+sudo apt-get install python-bzrlib python-pyinotify ctags global
