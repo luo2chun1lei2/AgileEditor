@@ -241,7 +241,7 @@ class ViewWindow(Gtk.Window):
             self.ide_switch_page(param)
         
         else:
-            print 'Unknown action %d' % action
+            logging.error('Unknown action %d' % action)
             
     def on_src_bufer_changed(self, widget):
         ''' 当文件发了变化后。'''
@@ -264,7 +264,7 @@ class ViewWindow(Gtk.Window):
         abs_path = model.get_abs_filepath(pathname)
         
         if not os.access(abs_path, os.R_OK):
-            print '没有权限进入此目录。'
+            logging.error( '没有权限进入此目录。')
             return
         
         if model.is_folder(tree_path):
@@ -465,7 +465,7 @@ class ViewWindow(Gtk.Window):
         
         prj = self.ideWorkshop.create_project(prj_name, prj_src_dirs)
         if prj is None:
-            print "Failed to create project:%s, and src dirs:%s", (prj_name, prj_src_dirs)
+            logging.error("Failed to create project:%s, and src dirs:%s", (prj_name, prj_src_dirs))
             return False
         
         # 预处理
@@ -583,7 +583,7 @@ class ViewWindow(Gtk.Window):
             result = self.RLT_OK
 
         elif response == Gtk.ResponseType.CANCEL:
-            print("Cancel to open one file.")
+            logging.debug("Cancel to open one file.")
             result = self.RLT_CANCEL
         
         self._set_status(ViewMenu.STATUS_FILE_OPEN)
@@ -637,11 +637,11 @@ class ViewWindow(Gtk.Window):
         如果当前文件已经打开，并且已经修改了，就保存文件。
         '''
         
-        print('ide save file')
+        logging.debug('ide save file')
         
         ide_editor = self.multiEditors.get_current_ide_editor()
         if ide_editor is None:
-            print('No file is being opened.')
+            logging.debug('No file is being opened.')
             return self.RLT_OK
         
         src_buffer = ide_editor.editor.get_buffer()
@@ -657,20 +657,20 @@ class ViewWindow(Gtk.Window):
                 dialog.destroy()
                 
                 if response == Gtk.ResponseType.OK:
-                    print("File selected: " + file_path)
+                    logging.debug("File selected: " + file_path)
                     
                     # 打开一个空的文件，或者里面已经有内容了。
                     ide_editor.ide_file.open_file(file_path)
                     self._set_src_language(src_buffer, file_path)
 
                 elif response == Gtk.ResponseType.CANCEL:
-                    print("Cancel to save one file.")
+                    logging.debug("Cancel to save one file.")
                     return self.RLT_CANCEL
 
             # 将内容保存到文件中。
             ide_editor.ide_file.save_file(self._ide_get_editor_buffer())
             src_buffer.set_modified(False)
-            print('ide save file to disk file.')
+            logging.debug('ide save file to disk file.')
             
             # 重新整理TAGS
             self.cur_prj.prepare()
@@ -688,13 +688,13 @@ class ViewWindow(Gtk.Window):
         然后关闭当前文件，
         创建新的Ide文件，打开这个文件，并保存。
         '''
-        print("ide save as other file.")
+        logging.debug("ide save as other file.")
         
         ide_editor = self.multiEditors.get_current_ide_editor()
         old_file_path = self.multiEditors.get_current_abs_file_path()
         
         if ide_editor.ide_file == None:
-            print('No file is being opened')
+            logging.debug('No file is being opened')
             return self.RLT_OK
         
         # 如果是新文件，则按照Save的逻辑进行
@@ -715,10 +715,10 @@ class ViewWindow(Gtk.Window):
         dialog.destroy()
 
         if response == Gtk.ResponseType.CANCEL:
-            print("Cancel to save as one file.")
+            logging.debug("Cancel to save as one file.")
             return self.RLT_CANCEL
         
-        print("File selected: " + file_path)
+        logging.debug("File selected: " + file_path)
         
         # 将当前文件保存成新文件
         shutil.copy(old_file_path, file_path)
