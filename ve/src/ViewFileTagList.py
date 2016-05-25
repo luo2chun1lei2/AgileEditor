@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 # 在List中显示Tags。
-# 显示信息不够完成，还缺少idutils工具支持。
+# TODO 使用ctags工具的时候，应该用Tree来表示类和函数之间的包含关系。
 
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib

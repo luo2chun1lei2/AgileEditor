@@ -309,7 +309,7 @@ class ModelGTags(object):
         # 显示的结果，每行中用“\t”来分割
         # b_1    b.c    12;"    f    line:12    class:HelloWin
 
-        p_cmd = ' ctags --fields=+n --excmd=number --sort=no -f - ' + file_path
+        p_cmd = ' ctags --fields=+n+K --excmd=number --sort=no -f - ' + file_path
         wsdir = self.project.src_dirs[0]
         logging.debug('cmd:%s, cwd:%s' % (p_cmd, wsdir))
         p = subprocess.Popen(p_cmd, shell=True, cwd=wsdir, env=self.cmd_env,
