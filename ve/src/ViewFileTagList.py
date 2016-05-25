@@ -13,9 +13,10 @@ class ViewFileTagList:
     
     # 设定一个栏目的枚举常量。
     (
-     COLUMN_TAG_LINE_NO, # 行号
+     COLUMN_TAG_TYPE, # 类型
      COLUMN_TAG_NAME,  # Tag名字
-     NUM_COLUMNS) = range(3)
+     COLUMN_TAG_LINE_NO, # 行号
+     ) = range(3)
 
     def __init__(self, ideWindow):
         # ideWindow:ViewWindow:主画面
@@ -61,7 +62,7 @@ class ViewFileTagList:
         # tags:[string]:tag信息的数组
         # return:Nothing
         
-        self.model = self._create_model(tags) 
+        self.model = self._create_model(tags)
         self.taglistview.set_model(self.model)
         
     def _create_model(self, tags):
@@ -69,10 +70,10 @@ class ViewFileTagList:
         # tags:[string]:tag的信息列表
         # return:TreeModel:生成TreeModel数据
         
-        model = Gtk.ListStore(GObject.TYPE_INT, str)
+        model = Gtk.ListStore(str, str, GObject.TYPE_INT)
 
         for tag in tags:
-            model.append([tag.tag_line_no, tag.tag_name])
+            model.append([tag.tag_type, tag.tag_name, tag.tag_line_no])
         
         return model
         
@@ -81,21 +82,30 @@ class ViewFileTagList:
         # treeview:TreeView:
         # return:Nothing
 
-        # column for line no
+        # column for type
         renderer = Gtk.CellRendererText()
         # 颜色参考 /usr/share/X11/rgb.txt 文件。
         renderer.set_property("cell-background", "light grey");
-        column = Gtk.TreeViewColumn("行号", renderer, text=self.COLUMN_TAG_LINE_NO)
-        column.set_sort_column_id(self.COLUMN_TAG_LINE_NO)
+        column = Gtk.TreeViewColumn("类型", renderer, text=self.COLUMN_TAG_TYPE)
+        column.set_sort_column_id(self.COLUMN_TAG_TYPE)
         column.set_alignment(0.5) # 标题的对齐
         treeview.append_column(column)
 
         # column for tag
         renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Tag", renderer, text=self.COLUMN_TAG_NAME)
+        column = Gtk.TreeViewColumn("名字", renderer, text=self.COLUMN_TAG_NAME)
         column.set_sort_column_id(self.COLUMN_TAG_NAME)
         column.set_alignment(0.5) # 标题的对齐
         treeview.append_column(column)
+        
+        # column for line no
+#         renderer = Gtk.CellRendererText()
+#         # 颜色参考 /usr/share/X11/rgb.txt 文件。
+#         renderer.set_property("cell-background", "grey");
+#         column = Gtk.TreeViewColumn("行号", renderer, text=self.COLUMN_TAG_LINE_NO)
+#         column.set_sort_column_id(self.COLUMN_TAG_LINE_NO)
+#         column.set_alignment(0.5) # 标题的对齐
+#         treeview.append_column(column)
         
     def _on_row_activated(self, treeview, path, column):
         # 当双击了Tag时
@@ -103,7 +113,7 @@ class ViewFileTagList:
         # 得到行号
         model = treeview.get_model()
         miter = model.get_iter(path)
-        line_no = model.get_value(miter, 0)
+        line_no = model.get_value(miter, 2)
         
         logging.debug('tag line no=%d' % line_no)
         # 跳转到对应的行。

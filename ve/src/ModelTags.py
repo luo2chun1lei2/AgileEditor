@@ -8,6 +8,38 @@
 # 2, 不能指定Tags等文件所在的目录，所以Tags文件必须在代码目录的开始。
 # 3, 使用ctag来更加详细的管理tag。
 
+# ctags的type
+# C
+#     c  classes
+#     d  macro definitions
+#     e  enumerators (values inside an enumeration)
+#     f  function definitions
+#     g  enumeration names
+#     l  local variables [off]
+#     m  class, struct, and union members
+#     n  namespaces
+#     p  function prototypes
+#     s  structure names
+#     t  typedefs
+#     u  union names
+#     v  variable definitions
+#     x  external and forward variable declarations [off]
+# C++
+#     c  classes
+#     d  macro definitions
+#     e  enumerators (values inside an enumeration)
+#     f  function definitions
+#     g  enumeration names
+#     l  local variables [off]
+#     m  class, struct, and union members
+#     n  namespaces
+#     p  function prototypes
+#     s  structure names
+#     t  typedefs
+#     u  union names
+#     v  variable definitions
+#     x  external and forward variable declarations [off]
+
 # 每个ModelProject对应一个IdeTags。
 
 import os, subprocess, re, logging
@@ -18,12 +50,16 @@ class ModelTag(object):
     # tag_file_path:string:绝对文件路径
     # tag_line_no:int:对应代码的行数
     # tag_content:string:所在行的内容（不一定存在）
+    # tag_type:string:类型，可以通过ctags --list-kinds 来显示。
     
-    def __init__(self, name, file_path=None, line_no=None, content=None):
+    def __init__(self, name, 
+                 file_path=None, line_no=None, content=None,
+                 tag_type=None):
         self.tag_name = name
         self.tag_file_path = file_path
         self.tag_line_no = line_no
         self.tag_content = content
+        self.tag_type = tag_type
 
 class GtProcess(object):
     # TODO: 可以运行程序，显示进度，然后直到找到结束为止。
@@ -275,7 +311,7 @@ class ModelGTags(object):
 
         p_cmd = ' ctags --fields=+n --excmd=number --sort=no -f - ' + file_path
         wsdir = self.project.src_dirs[0]
-        logging.info('cmd:%s, cwd:%s' % (p_cmd, wsdir))
+        logging.debug('cmd:%s, cwd:%s' % (p_cmd, wsdir))
         p = subprocess.Popen(p_cmd, shell=True, cwd=wsdir, env=self.cmd_env,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
 
@@ -297,7 +333,9 @@ class ModelGTags(object):
             tag = ModelTag(name=line[0], 
                            file_path=line[1], 
                            line_no=int(line_no_info[1]), 
-                           content="")
+                           content="", 
+                           tag_type = line[3] 
+                           )
             res.append(tag)
 
         return res
