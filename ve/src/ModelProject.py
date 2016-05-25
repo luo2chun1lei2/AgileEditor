@@ -223,6 +223,12 @@ class ModelProject(object):
         # return:[string]:tag信息的数组
         return self.prj_tags.query_tags_by_file(file_path)
     
+    def query_ctags_of_file(self, file_path):
+        # 查询指定文件中的所有CTAG
+        # file_path:string:文件的路径
+        # return:[string]:tag信息的数组
+        return self.prj_tags.query_ctags_of_file(file_path)
+    
     def query_defination_tags(self, name):
         # 查询某个定义所在的TAG信息
         # name:string:要查询的名字

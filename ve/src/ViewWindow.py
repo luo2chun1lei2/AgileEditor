@@ -964,8 +964,10 @@ class ViewWindow(Gtk.Window):
     
     def _ide_query_tags_by_file_and_refresh(self, abs_file_path):
         
+        #ModelTask.execute(self.ide_refresh_file_tag_list,
+        #                  self.cur_prj.query_tags_by_file, abs_file_path)
         ModelTask.execute(self.ide_refresh_file_tag_list,
-                          self.cur_prj.query_tags_by_file, abs_file_path)
+                          self.cur_prj.query_ctags_of_file, abs_file_path)
         
     def _ide_open_page(self, abs_file_path):
         '''

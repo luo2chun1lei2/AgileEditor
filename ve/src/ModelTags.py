@@ -239,3 +239,65 @@ class ModelGTags(object):
         
         return self._parse_file_tags_result(stdoutput)
     
+    def query_ctags_of_file(self, file_path):
+        # 查询指定文件的cTags:
+        # return:[string]:Tag列表。
+         
+        # 命令 ctags --fields=+n --excmd=number --sort=no -f - b.c
+        # --fields=+n 表示查询什么模式，+表示加入，-表示不要
+        # a   Access (or export) of class members
+        # f   File-restricted scoping [enabled]
+        # i   Inheritance information
+        # k   Kind of tag as a single letter [enabled]
+        # K   Kind of tag as full name
+        # l   Language of source file containing tag
+        # m   Implementation information
+        # n   Line number of tag definition
+        # s   Scope of tag definition [enabled]
+        # S   Signature of routine (e.g. prototype or parameter list)
+        # z   Include the "kind:" key in kind field
+        # t   Type and name of a variable or typedef as "typeref:" field [enabled]
+        # --sort=no 不排序
+        # -f - 输出结果放到标准输出中
+        
+        # --extra=[+|-]flags
+        # f   Include an entry for the base file name of every source file (e.g.  "example.c"), which addresses the first line of
+        #     the file.
+        # q   Include an extra class-qualified tag entry for each tag which is a member of a class (for languages for which  this
+        #     information  is  extracted; currently C++, Eiffel, and Java). The actual form of the qualified tag depends upon the
+        #     language from which the tag was derived (using a form that is most natural for how qualified calls are specified in
+        #     the  language).  For C++, it is in the form "class::member"; for Eiffel and Java, it is in the form "class.member".
+        #     This may allow easier location of a specific tags when multiple occurrences of a tag name occur in  the  tag  file.
+        #     Note, however, that this could potentially more than double the size of the tag file.
+        
+        # 显示的结果，每行中用“\t”来分割
+        # b_1    b.c    12;"    f    line:12    class:HelloWin
+
+        p_cmd = ' ctags --fields=+n --excmd=number --sort=no -f - ' + file_path
+        wsdir = self.project.src_dirs[0]
+        logging.info('cmd:%s, cwd:%s' % (p_cmd, wsdir))
+        p = subprocess.Popen(p_cmd, shell=True, cwd=wsdir, env=self.cmd_env,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
+
+        (stdoutput,erroutput) = p.communicate()
+
+        return self._parse_ctags_of_file(stdoutput)
+        
+    def _parse_ctags_of_file(self, text):
+        # 分析文件内部的Tag的结果
+        # 格式 “文件路径 标记 行数 所在行的内容” 
+        text = re.split('\r?\n', text)
+        
+        res = []
+        for line in text:
+            if line == '':
+                continue
+            line = line.split('\t', 5)
+            line_no_info = line[4].split(":", 2)
+            tag = ModelTag(name=line[0], 
+                           file_path=line[1], 
+                           line_no=int(line_no_info[1]), 
+                           content="")
+            res.append(tag)
+
+        return res
