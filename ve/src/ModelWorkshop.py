@@ -61,6 +61,15 @@ class ModelWorkshop(object):
             
         return None
     
+    def find_project_by_src_path(self, path):
+        # 根据路径，到每个项目的src路径中找，如果发现了就返回项目的名字。
+        # return:string:如果没有找到，None
+        
+        for prj in self.projects:
+            if path.startswith(prj.src_dirs[0]):
+                return prj.prj_name
+        return None
+    
     def create_project(self, prj_name, prj_src_dirs):
         # 创建一个项目，并没有加入到workshop中。
         # prj_name:string:项目的名字。

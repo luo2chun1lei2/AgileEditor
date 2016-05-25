@@ -17,7 +17,8 @@ def usage():
     # 显示使用信息
     print 've usage:'
     print '-h, --help: print help message.'
-    print '-p, --project <project name>: open the project.'
+    print '-p, --project <project name>: open the project. '
+    print '-z: ve will find the corresponding project by current path.'
     print '-f, --file <file path>: open the file.'
 
 def main(argv):
@@ -31,9 +32,10 @@ def main(argv):
     
     want_open_file = None   # 想要立即打开的文件名字
     want_open_project_name = None # 想要立即打开的项目名字
+    want_lazy = False # 想根据当前路径找到项目
     
     try:
-        opts, args = getopt.getopt(argv[1:], 'hp:f:', ['project=', 'file='])
+        opts, args = getopt.getopt(argv[1:], 'hzp:f:', ['project=', 'file='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -46,6 +48,8 @@ def main(argv):
             sys.exit(0)
         elif o in ('-f', '--file'):
             want_open_file = a
+        elif o in ('-z'):
+            want_lazy = True
         elif o in ('-p', '--project'):
             want_open_project_name = a
         else:
@@ -55,7 +59,7 @@ def main(argv):
     
     # 进入主管理模块，传入需要的参数。
     veMain = VeMain.get_instance()
-    veMain.start(want_open_project_name, want_open_file)
+    veMain.start(want_lazy, want_open_project_name, want_open_file)
 
 if __name__ == '__main__':
     # 主入口  

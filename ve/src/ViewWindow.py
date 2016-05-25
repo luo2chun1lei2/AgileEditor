@@ -505,7 +505,9 @@ class ViewWindow(Gtk.Window):
         if len(prj.src_dirs) > 0:
             treeModel = FsTreeModel(prj.src_dirs[0])
             self.ideFsTree.set_model(treeModel)
-
+        
+        # 设置窗口标题。
+        self.ide_set_title("")
         return True
     
     def ide_preferences_project(self):
@@ -1039,7 +1041,7 @@ class ViewWindow(Gtk.Window):
         self.ide_set_title()
 
     def ide_set_title(self, title = ''):
-        self.set_title(self.PROGRAM_NAME + ' ' + title)
+        self.set_title("%s %s:%s" % (self.PROGRAM_NAME, self.cur_prj.prj_name, title))
 
         #TODO:不让状态变化。
         #self.ide_menu.set_status(status)

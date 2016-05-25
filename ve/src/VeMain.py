@@ -41,14 +41,23 @@ class VeMain():
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, self.add_new_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_DEL_PROJECT, self.del_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_CHANGE_PROJECT, self.change_project)
+        
+    def find_corresponding_project(self):
+        # 根据当前路径，找到合适的项目。
+        # return:string:项目的名字，没有找到，None
+        cwd = os.getcwd()
+        return self.workshop.find_project_by_src_path(cwd)
 
-    def start(self, want_open_project_name, want_open_file):
+    def start(self, want_lazy, want_open_project_name, want_open_file):
         # 开始启动程序。
         
         from ViewDialogProject import ViewDialogProjectOpen
         
         # 打开想要打开的项目
         prj = None
+        if want_open_project_name is None and want_lazy:
+            want_open_project_name = self.find_corresponding_project()
+        
         if not want_open_project_name is None:
             prj = self.workshop.get_project(want_open_project_name)
         
