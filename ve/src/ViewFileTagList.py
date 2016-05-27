@@ -136,12 +136,12 @@ class ViewFileTagList:
         column.set_alignment(0.5) # 标题的对齐
         treeview.append_column(column)
         
-        # column for tag
-        renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Scope", renderer, text=self.COLUMN_TAG_SCOPE)
-        column.set_sort_column_id(self.COLUMN_TAG_SCOPE)
-        column.set_alignment(0.5) # 标题的对齐
-        treeview.append_column(column)
+#         # column for tag
+#         renderer = Gtk.CellRendererText()
+#         column = Gtk.TreeViewColumn("Scope", renderer, text=self.COLUMN_TAG_SCOPE)
+#         column.set_sort_column_id(self.COLUMN_TAG_SCOPE)
+#         column.set_alignment(0.5) # 标题的对齐
+#         treeview.append_column(column)
         
         # column for line no
 #         renderer = Gtk.CellRendererText()
@@ -177,3 +177,6 @@ class ViewFileTagList:
         # return:Widget:自身需要加入到容器中的控件。
         
         return self.view
+    
+    def expand_all(self):
+        self.taglistview.expand_all()

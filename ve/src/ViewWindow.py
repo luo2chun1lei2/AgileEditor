@@ -1052,6 +1052,7 @@ class ViewWindow(Gtk.Window):
         # tags:[IdeOneTag]:Tag列表。
         
         self.ideTagList.set_model(tags)
+        self.ideTagList.expand_all()
         
     def ide_goto_line(self, line_number):
         # 跳转到当前文件的行。
