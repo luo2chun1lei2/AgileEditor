@@ -11,7 +11,7 @@
 # TODO 大量功能的入口函数在这里，是否合适？而且越来越复杂，无法维护。
 
 import os, sys, getopt, shutil, re, logging
-from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
+from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Vte
 from gi.overrides.Gtk import TextBuffer
 
 from VeUtils import *
@@ -102,6 +102,21 @@ class ViewWindow(Gtk.Window):
         # 书签列表
         self.bookmarks = ViewBookmarks(self)
         
+        # 控制台
+        self.terminal = Vte.Terminal()
+        self.terminal.set_cursor_blink_mode(Vte.CursorBlinkMode.SYSTEM)
+        self.terminal.set_font(Pango.FontDescription.from_string("Ubuntu mono 12"))
+        # self.terminal.set_scrollback_lines(True) 设置则没有滚动条。
+        self.terminal.set_audible_bell(False)
+        self.terminal.set_input_enabled(True)
+        self.terminal.set_scroll_on_output(True)
+        
+        scrl_terminal = Gtk.ScrolledWindow()
+        scrl_terminal.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        scrl_terminal.set_hexpand(True)
+        scrl_terminal.set_vexpand(True)
+        scrl_terminal.add(self.terminal)
+        
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
         self.nbPrj.set_scrollable(True)
@@ -116,6 +131,8 @@ class ViewWindow(Gtk.Window):
         
         self.nbPrj.append_page(self.searchTagList.get_view(), Gtk.Label("检索"))
         self.nbPrj.append_page(self.bookmarks.get_view(), Gtk.Label("书签"))
+        self.nbPrj.append_page(scrl_terminal, Gtk.Label("控制台"))
+        
         
         panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
         panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
@@ -508,6 +525,7 @@ class ViewWindow(Gtk.Window):
         
         # 设置窗口标题。
         self.ide_set_title("")
+        self._ide_init_ternimal()
         return True
     
     def ide_preferences_project(self):
@@ -1504,3 +1522,13 @@ class ViewWindow(Gtk.Window):
         file_path, line_no = self.jumps.pop()
         self.ide_goto_file_line(file_path, line_no, record=False)
             
+    def _ide_init_ternimal(self):
+        self.terminal.spawn_sync(
+                Vte.PtyFlags.DEFAULT, #default is fine
+                self.cur_prj.src_dirs[0],
+                ["/bin/bash"], #where is the emulator?
+                [], #it's ok to leave this list empty
+                GLib.SpawnFlags.DO_NOT_REAP_CHILD,
+                None, #at least None is required
+                None,
+                )
