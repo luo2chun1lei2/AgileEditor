@@ -51,15 +51,17 @@ class ModelTag(object):
     # tag_line_no:int:对应代码的行数
     # tag_content:string:所在行的内容（不一定存在）
     # tag_type:string:类型，可以通过ctags --list-kinds 来显示。
+    # tag_scope:string:tag所在的类，和上面的没有关系。
     
     def __init__(self, name, 
                  file_path=None, line_no=None, content=None,
-                 tag_type=None):
+                 tag_type=None, tag_scope=None):
         self.tag_name = name
         self.tag_file_path = file_path
         self.tag_line_no = line_no
         self.tag_content = content
         self.tag_type = tag_type
+        self.tag_scope = tag_scope
 
 class GtProcess(object):
     # TODO: 可以运行程序，显示进度，然后直到找到结束为止。
@@ -307,11 +309,11 @@ class ModelGTags(object):
         #     Note, however, that this could potentially more than double the size of the tag file.
         
         # 显示的结果，每行中用“\t”来分割
-        # b_1    b.c    12;"    f    line:12    class:HelloWin
+        # TElement    /home/luocl/myproject/think2/src/element.h    30;"    function    line:30    class:TElement
 
         p_cmd = ' ctags --fields=+n+K --excmd=number --sort=no -f - ' + file_path
         wsdir = self.project.src_dirs[0]
-        logging.debug('cmd:%s, cwd:%s' % (p_cmd, wsdir))
+        logging.info('cmd:%s, cwd:%s' % (p_cmd, wsdir))
         p = subprocess.Popen(p_cmd, shell=True, cwd=wsdir, env=self.cmd_env,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
 
@@ -328,13 +330,24 @@ class ModelGTags(object):
         for line in text:
             if line == '':
                 continue
-            line = line.split('\t', 5)
-            line_no_info = line[4].split(":", 2)
-            tag = ModelTag(name=line[0], 
-                           file_path=line[1], 
-                           line_no=int(line_no_info[1]), 
+            frags = line.split('\t')
+            
+            if len(frags) >= 5:
+                line_no = frags[4].split(":", 2)[1]
+            else:
+                line_no = ""
+                
+            if len(frags) >= 6:
+                tag_scope = frags[5].split(":", 2)[1]
+            else:
+                tag_scope = ""
+                
+            tag = ModelTag(name=frags[0], 
+                           file_path=frags[1], 
+                           line_no=int(line_no),
                            content="", 
-                           tag_type = line[3] 
+                           tag_type = frags[3],
+                           tag_scope = tag_scope
                            )
             res.append(tag)
 

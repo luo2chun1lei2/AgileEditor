@@ -16,7 +16,8 @@ class ViewFileTagList:
      COLUMN_TAG_TYPE, # 类型
      COLUMN_TAG_NAME,  # Tag名字
      COLUMN_TAG_LINE_NO, # 行号
-     ) = range(3)
+     COLUMN_TAG_SCOPE, # 所在范围
+     ) = range(4)
 
     def __init__(self, ideWindow):
         # ideWindow:ViewWindow:主画面
@@ -70,10 +71,10 @@ class ViewFileTagList:
         # tags:[string]:tag的信息列表
         # return:TreeModel:生成TreeModel数据
         
-        model = Gtk.ListStore(str, str, GObject.TYPE_INT)
+        model = Gtk.ListStore(str, str, GObject.TYPE_INT, str)
 
         for tag in tags:
-            model.append([tag.tag_type, tag.tag_name, tag.tag_line_no])
+            model.append([tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
         
         return model
         
@@ -95,6 +96,13 @@ class ViewFileTagList:
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("名字", renderer, text=self.COLUMN_TAG_NAME)
         column.set_sort_column_id(self.COLUMN_TAG_NAME)
+        column.set_alignment(0.5) # 标题的对齐
+        treeview.append_column(column)
+        
+        # column for tag
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Scope", renderer, text=self.COLUMN_TAG_SCOPE)
+        column.set_sort_column_id(self.COLUMN_TAG_SCOPE)
         column.set_alignment(0.5) # 标题的对齐
         treeview.append_column(column)
         
