@@ -43,6 +43,7 @@
 # 每个ModelProject对应一个IdeTags。
 
 import os, subprocess, re, logging
+from VeUtils import *
 
 class ModelTag(object):
     # 一个Tag的信息。
@@ -313,7 +314,7 @@ class ModelGTags(object):
 
         p_cmd = ' ctags --fields=+n+K --excmd=number --sort=no -f - ' + file_path
         wsdir = self.project.src_dirs[0]
-        logging.info('cmd:%s, cwd:%s' % (p_cmd, wsdir))
+        logging.debug('cmd:%s, cwd:%s' % (p_cmd, wsdir))
         p = subprocess.Popen(p_cmd, shell=True, cwd=wsdir, env=self.cmd_env,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE) 
 

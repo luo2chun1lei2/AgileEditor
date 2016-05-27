@@ -6,6 +6,7 @@
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
 from ModelTags import ModelTag
+import VeUtils
 
 class ViewFileTagList:
     # 定制一个ListView，内部显示Tag。
@@ -71,13 +72,49 @@ class ViewFileTagList:
         # tags:[string]:tag的信息列表
         # return:TreeModel:生成TreeModel数据
         
-        model = Gtk.ListStore(str, str, GObject.TYPE_INT, str)
-
-        for tag in tags:
-            model.append([tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
+        model = Gtk.TreeStore(str, str, GObject.TYPE_INT, str)
         
+        # 加入的逻辑：
+        # 如果碰到tag有scope的，就放入到上面和scope同名的class中。
+        last_tag = None
+        last_itr = None
+        for tag in tags:
+            if VeUtils.is_empty(tag.tag_scope):
+                # 如果没有范围，就放在顶层
+                last_itr = self._add_tag_with_group(model, last_tag, last_itr, tag)
+            else:
+                if last_tag is None:
+                    # 如果是第一个，就形成自己的组
+                    last_itr = self._add_tag_with_group(model, last_tag, last_itr, tag)
+                else:
+                    # 如果有上一个
+                    if tag.tag_scope == last_tag.tag_scope:
+                        # 和上一个相等，就放在一个组中
+                        last_itr = model.insert_after(None, last_itr,
+                                [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
+                    elif last_tag.tag_type == "class" and tag.tag_scope == last_tag.tag_name:
+                        last_itr = model.insert_after(last_itr, None,
+                                [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
+                    else:
+                        # 和上一个不同，则建立自己的组和自己
+                        last_itr = self._add_tag_with_group(model, last_tag, last_itr, tag)
+            last_tag = tag
         return model
         
+    def _add_tag_with_group(self, model, last_tag, last_itr, tag):
+        # 根据scope找到对应的tag，如果没有找到就返回None
+        # scope:string:tag的scope名字
+        # return:TreeIter:找到的Iter
+        if tag.tag_type == "class" or VeUtils.is_empty(tag.tag_scope):
+            last_itr = model.append(None, 
+                        [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
+        else:
+            itr = model.append(None, ["scope", tag.tag_scope, -1, ""]) # 组
+            last_itr = model.append(itr, 
+                        [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
+        
+        return last_itr
+     
     def _add_columns(self, treeview):
         # 给TreeView添加栏的Render
         # treeview:TreeView:
@@ -121,9 +158,14 @@ class ViewFileTagList:
         # 得到行号
         model = treeview.get_model()
         miter = model.get_iter(path)
-        line_no = model.get_value(miter, 2)
+        line_no = model.get_value(miter, self.COLUMN_TAG_LINE_NO)
         
         logging.debug('tag line no=%d' % line_no)
+        
+        if line_no < 0:
+            # 不应该跳转的项目
+            return
+        
         # 跳转到对应的行。
         self.ideWindow.ide_goto_line(line_no)
         
@@ -132,6 +174,6 @@ class ViewFileTagList:
         
     def get_view(self):
         # 返回容器控件
-        # return:Widget:
+        # return:Widget:自身需要加入到容器中的控件。
         
         return self.view
