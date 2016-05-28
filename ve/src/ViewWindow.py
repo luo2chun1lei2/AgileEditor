@@ -104,11 +104,11 @@ class ViewWindow(Gtk.Window):
         
         # 控制台
         self.terminal = Vte.Terminal()
-        self.terminal.set_cursor_blink_mode(Vte.CursorBlinkMode.SYSTEM)
+        #self.terminal.set_cursor_blink_mode(Vte.CursorBlinkMode.SYSTEM) # 2.90
         self.terminal.set_font(Pango.FontDescription.from_string("Ubuntu mono 12"))
         # self.terminal.set_scrollback_lines(True) 设置则没有滚动条。
         self.terminal.set_audible_bell(False)
-        self.terminal.set_input_enabled(True)
+        #self.terminal.set_input_enabled(True)    # 2.90
         self.terminal.set_scroll_on_output(True)
         
         scrl_terminal = Gtk.ScrolledWindow()
@@ -1523,7 +1523,18 @@ class ViewWindow(Gtk.Window):
         self.ide_goto_file_line(file_path, line_no, record=False)
             
     def _ide_init_ternimal(self):
-        self.terminal.spawn_sync(
+        if hasattr(self.terminal, "spawn_sync"): # 2.91
+            self.terminal.spawn_sync(
+                Vte.PtyFlags.DEFAULT, #default is fine
+                self.cur_prj.src_dirs[0],
+                ["/bin/bash"], #where is the emulator?
+                [], #it's ok to leave this list empty
+                GLib.SpawnFlags.DO_NOT_REAP_CHILD,
+                None, #at least None is required
+                None,
+                )
+        else: # < 2.90
+            self.terminal.fork_command_full(
                 Vte.PtyFlags.DEFAULT, #default is fine
                 self.cur_prj.src_dirs[0],
                 ["/bin/bash"], #where is the emulator?
