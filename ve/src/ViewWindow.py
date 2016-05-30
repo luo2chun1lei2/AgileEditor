@@ -32,6 +32,7 @@ from ViewSearchTagList import ViewSearchTagList
 from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
 from ViewDialogCommon import *
+from ViewDialogPreferences import ViewDialogPreferences
 
 class ViewWindow(Gtk.Window):
     
@@ -529,8 +530,13 @@ class ViewWindow(Gtk.Window):
         return True
     
     def ide_preferences_project(self):
-        ''' 配置当前的项目 '''
-        pass
+        # 配置当前的项目
+        preferences = ViewDialogPreferences.show(self)
+        if preferences is None:
+            return
+        else:
+            # do something
+            pass
     
     def ide_close_project(self):
         ''' 关闭当前的项目 '''
