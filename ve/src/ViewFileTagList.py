@@ -92,7 +92,7 @@ class ViewFileTagList:
                         # 和上一个相等，就放在一个组中
                         last_itr = model.insert_after(None, last_itr,
                                 [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
-                    elif last_tag.tag_type == "class" and tag.tag_scope == last_tag.tag_name:
+                    elif tag.tag_scope == last_tag.tag_name:
                         last_itr = model.insert_after(last_itr, None,
                                 [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
                     else:
@@ -105,7 +105,7 @@ class ViewFileTagList:
         # 根据scope找到对应的tag，如果没有找到就返回None
         # scope:string:tag的scope名字
         # return:TreeIter:找到的Iter
-        if tag.tag_type == "class" or VeUtils.is_empty(tag.tag_scope):
+        if VeUtils.is_empty(tag.tag_scope):
             last_itr = model.append(None, 
                         [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
         else:
