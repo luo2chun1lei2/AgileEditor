@@ -467,7 +467,14 @@ GObject.type_register(FsTreeModel)
 class ViewFsTree:
     # 初始化文件系统列表控件。
     # 外部是滚动条，内部是ListView。
-
+    
+    TARGETS = [
+              ('MY_TREE_MODEL_ROW', Gtk.TargetFlags.SAME_APP, 0),
+              ('text/plain', 0, 1),
+              ('TEXT', 0, 2),
+              ('STRING', 0, 3),
+              ]
+    
     def __init__(self):
 
         # 创建文件系统的模型。
@@ -475,6 +482,15 @@ class ViewFsTree:
 
         # 创建TreeView。
         self.treeview = Gtk.TreeView()
+        
+        ## 允许拖拽 TODO 无用，好像只能使用TreeStore和ListStore才行。
+        self.treeview.set_reorderable(True)
+        self.treeview.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, 
+                                               self.TARGETS, 
+                                               Gdk.DragAction.DEFAULT | Gdk.DragAction.MOVE)
+        self.treeview.enable_model_drag_dest(self.TARGETS, Gdk.DragAction.DEFAULT)
+        self.treeview.connect("drag-data-received", self.on_drag_data_received)
+        self.treeview.connect("drag_data_get", self.on_drag_data_get_data)
 
         # create the TreeViewColumns to display the data
         column_names = self.listmodel.get_column_names()
@@ -516,6 +532,12 @@ class ViewFsTree:
         #这个时候还没有设定项目的目录，所以没有必要设定list model.
         #self.treeview.set_model(self.listmodel)
         
+    def on_drag_data_received(self, widget, drag_context, x, y, selection_data, info, timestamp):
+        pass
+    
+    def on_drag_data_get_data(self, treeview, context, selection, target_id, etime):
+        pass
+    
     def show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。
         

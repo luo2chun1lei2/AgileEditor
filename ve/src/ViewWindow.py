@@ -531,7 +531,10 @@ class ViewWindow(Gtk.Window):
     
     def ide_preferences_project(self):
         # 配置当前的项目
-        preferences = ViewDialogPreferences.show(self)
+        # TODO 应该把设定放在ModelProject
+        setting = {}
+        setting['style'] = 'kate'
+        preferences = ViewDialogPreferences.show(self, setting)
         if preferences is None:
             return
         else:

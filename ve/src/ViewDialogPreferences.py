@@ -17,9 +17,10 @@ from VeEventPipe import VeEventPipe
 class ViewDialogPreferences(Gtk.Dialog):
     # 显示当前项目各种配置，并可以进行修改。
     
-    def __init__(self, parent):
+    def __init__(self, parent, setting):
         
         self.parent = parent
+        self.setting = setting
         
         Gtk.Dialog.__init__(self, "项目设定", parent, 0,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -59,42 +60,40 @@ class ViewDialogPreferences(Gtk.Dialog):
         #if styleScheme is not None:
         #    self.styleScheme = styleScheme # 不能丢弃
             #src_buffer.set_style_scheme(self.styleScheme)
-        model = Gtk.ListStore.new([str])
-        for style in styles:
-            model.append([style])
+        model = Gtk.ListStore(str)
+        found_index = -1
+        for i in range(len(styles)):
+            model.append([styles[i]])
+            if styles[i] == self.setting['style']:
+                found_index = i
         cmb = Gtk.ComboBox.new_with_model(model)
+        
+        cell_render = Gtk.CellRendererText.new()
+        cmb.pack_start(cell_render, True)
+        cmb.add_attribute(cell_render, "text", 0)
+        cmb.set_active(found_index)
+        cmb.connect("changed", self.on_style_changed)
+        
         return cmb
     
-    @staticmethod
-    def show(parent):
-        dialog = ViewDialogPreferences(parent)
+    def on_style_changed(self, combobox):
+        self.setting['style'] = combobox.get_active()
+        return True
         
-        #dialog._init_styles()
+    @staticmethod
+    def show(parent, setting):
+        dialog = ViewDialogPreferences(parent, setting)
         
         prj_name = None
         prj_src_path = None
         
-        while True:
-        
-            response = dialog.run()
-            
-            if response == Gtk.ResponseType.OK:
-                # 如果选择OK的话，就创建对应的Project项目。
-                prj_name = dialog.entry_prj_name.get_text()
-                prj_src_path = dialog.picker_src_path.get_filename()
-                
-                if is_empty(prj_name):
-                    # 项目名字为空，重新回到对话框
-                    continue
-                    
-                if is_empty(prj_src_path):
-                    # 项目文件路径为空，重新回到对话框
-                    continue
-                
-            break
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            pass
+            # 收集设定？TODO
         
         dialog.destroy()
         
         # 返回信息。
-        return prj_name, [prj_src_path]
+        return setting
     
