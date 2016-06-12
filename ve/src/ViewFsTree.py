@@ -121,6 +121,11 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
                     elif fname.startswith('.'):
                         # 忽略隐藏文件
                         continue
+                    # 下面加入过滤 TODO 以后可以加入SETTING
+                    elif fname.endswith('.o') or fname.endswith('.a'):
+                        continue
+                    elif fname == "GPATH" or fname == "GRTAGS" or fname == "GSYMS" or fname == "GTAGS":
+                        continue
                     else :
                         if stat.S_ISDIR(filestat.st_mode):
                             d[fname] = self._build_file_dict(path)
