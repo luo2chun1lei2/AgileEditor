@@ -103,7 +103,8 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
         # A dictionary containing the files in the given dir_path keyed by filename.
         # If the child filename is a sub-directory, the dict value is a dict. Otherwise it will be None.
 
-        d = OrderedDict()
+        d1 = OrderedDict()
+        d2 = OrderedDict()
         
         if os.access(dirname, os.R_OK):
             for fname in os.listdir(dirname):
@@ -112,7 +113,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
                 try:
                     filestat = os.stat(path)
                 except OSError:
-                    d[fname] = None
+                    d2[fname] = None
                 else:
                     if fname == '.':
                         continue
@@ -128,13 +129,15 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
                         continue
                     else :
                         if stat.S_ISDIR(filestat.st_mode):
-                            d[fname] = self._build_file_dict(path)
+                            d1[fname] = self._build_file_dict(path)
                         else:
-                            d[fname] = None
+                            d2[fname] = None
 
-        d = collections.OrderedDict(sorted(d.items(),key = lambda t:t[0]))
+        d1 = collections.OrderedDict(sorted(d1.items(),key = lambda t:t[0]))
+        d2 = collections.OrderedDict(sorted(d2.items(),key = lambda t:t[0]))
+        d1.update(d2)
         
-        return d
+        return d1
     
     def get_column_names(self):
         # 得到列的标题名字。
