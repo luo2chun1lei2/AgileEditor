@@ -231,10 +231,15 @@ class ViewMenu(object):
         self.search_case_sensitive = Gtk.CheckButton.new_with_label("区分大小写")
         self.search_case_sensitive.set_active(True)
         self.search_case_sensitive.connect("toggled", self.on_search_case_sensitive_toggled)
+        
+        self.search_is_word = Gtk.CheckButton.new_with_label("单词")
+        self.search_is_word.set_active(False)
+        self.search_is_word.connect("toggled", self.on_search_is_word_toggled)
          
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 1)
         hbox.pack_start(self.search_entry, True, True, 10)
         hbox.pack_start(self.search_case_sensitive, True, True, 2)
+        hbox.pack_start(self.search_is_word, True, True, 2)
 
         tool_item = Gtk.ToolItem()
         tool_item.add(hbox)
@@ -480,12 +485,20 @@ class ViewMenu(object):
     def on_search_text_changed(self, search_entry):
         search_text = self.search_entry.get_text()
         need_case_sensitive = self.search_case_sensitive.get_active()
-        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive)
+        need_search_is_word = self.search_is_word.get_active()
+        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive, need_search_is_word)
     
     def on_search_case_sensitive_toggled(self, check_button):
         search_text = self.search_entry.get_text()
         need_case_sensitive = self.search_case_sensitive.get_active()
-        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive)
+        need_search_is_word = self.search_is_word.get_active()
+        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive, need_search_is_word)
+        
+    def on_search_is_word_toggled(self, check_button):
+        search_text = self.search_entry.get_text()
+        need_case_sensitive = self.search_case_sensitive.get_active()
+        need_search_is_word = self.search_is_word.get_active()
+        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive, need_search_is_word)
     
     def on_menu_search_find_next(self, widget):
         logging.debug("A Search|find next menu item was selected.")
