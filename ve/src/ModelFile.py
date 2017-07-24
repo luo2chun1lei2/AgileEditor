@@ -16,6 +16,8 @@ class ModelFile(object):
         self.file_obj = None
         self.file_path = None
         self.file_search_key = None
+        self.file_search_case_sensitive = True
+        self.file_search_is_word = False
     
     def open_file(self, file_path):
         # 打开指定的文件。

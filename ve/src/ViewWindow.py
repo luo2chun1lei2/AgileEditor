@@ -176,7 +176,7 @@ class ViewWindow(Gtk.Window):
     
     ###################################
     ## 回调方法
-    def on_menu_func(self, widget, action, param=None, param2=None, param3=None):
+    def on_menu_func(self, widget, action, param=None, param2=None, param3=None, param4=None):
         if action == ViewMenu.ACTION_PROJECT_NEW:
             self.ide_new_project()
         elif action == ViewMenu.ACTION_PROJECT_OPEN:
@@ -231,7 +231,7 @@ class ViewWindow(Gtk.Window):
         elif action == ViewMenu.ACTION_SEARCH_FIND:
             self.ide_find(param)
         elif action == ViewMenu.ACTION_SEARCH_FIND_TEXT:
-            self.ide_find_text(param, param2, param3)
+            self.ide_find_text(param, param2, param3, param4)
         elif action == ViewMenu.ACTION_SEARCH_FIND_NEXT:
             self.ide_find_next(param)
         elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES:
@@ -979,7 +979,12 @@ class ViewWindow(Gtk.Window):
         self.multiEditors.show_editor(abs_file_path)
         
         view_editor = self.multiEditors.get_editor_by_path(abs_file_path)
+        mdl_file = view_editor.ide_file
+        
+        # 初始化检索。
+        # - 检索会影响到位置，这里只有在函数结尾再加上定位了。
         self._ide_search_init(view_editor.editor.get_buffer())
+        self.ide_menu.set_search_options(mdl_file.file_search_key, mdl_file.file_search_case_sensitive, mdl_file.file_search_is_word)
             
         # 分析标记
         if self.cur_prj is not None:
@@ -1250,21 +1255,36 @@ class ViewWindow(Gtk.Window):
         search_entry.set_text(text)
     
     def _ide_search_init(self, text_buffer):
-        self.search_text = None
         
         self.search_setting = GtkSource.SearchSettings.new()
         self.search_setting.set_regex_enabled(True)
         self.search_setting.set_case_sensitive(True)
+        self.search_setting.set_at_word_boundaries(False)
         self.search_setting.set_wrap_around(True)
-        
+        # Setting 这里设置后，等真的搜索时，会重新设置setting的某些值，这里的只是缺省设置。
+
         self.search_context = GtkSource.SearchContext.new(text_buffer, self.search_setting)
+        
         self.search_context.set_highlight(True)
         
-    def _ide_search_text(self, text_buffer, search_text, need_case_sensitive, search_is_word=False):
+    def _ide_search_text(self, view_editor, need_jump, search_text, need_case_sensitive, search_is_word=False):
+        
+        text_buffer = view_editor.editor.get_buffer()
         
         self.search_context.get_settings().set_search_text(search_text)
         self.search_context.get_settings().set_case_sensitive(need_case_sensitive)
         self.search_context.get_settings().set_at_word_boundaries(search_is_word)
+        
+        # - 将目前的检索选项保存到 ModelFile中。
+        mdl_file = view_editor.ide_file
+        mdl_file.file_search_key = search_text
+        mdl_file.file_search_case_sensitive = need_case_sensitive
+        mdl_file.file_search_is_word = search_is_word
+        logging.debug("save-------------------> %s, %d, %d" % (mdl_file.file_search_key, mdl_file.file_search_case_sensitive, mdl_file.file_search_is_word))
+        
+        # 不需要跳转，就退出。
+        if not need_jump:
+            return
         
         # -从当前的位置查找
         mark = text_buffer.get_insert()
@@ -1278,6 +1298,8 @@ class ViewWindow(Gtk.Window):
             self.ide_jump_to(line_num)
     
     def _ide_search_text_next(self, text_buffer, search_text):
+        # search_text 是无用的。
+        
         # -从新位置查找
         mark = text_buffer.get_insert()
         ite = text_buffer.get_iter_at_mark(mark)
@@ -1292,12 +1314,12 @@ class ViewWindow(Gtk.Window):
             text_buffer.move_mark_by_name("selection_bound", start_iter)
             text_buffer.move_mark_by_name("insert", end_iter)
             
-    def ide_find_text(self, search_text, need_case_sensitive, search_is_word=False):
+    def ide_find_text(self, need_jump, search_text, need_case_sensitive, search_is_word=False):
         view_editor = self.multiEditors.get_current_ide_editor()
         if view_editor is None:
             return
         
-        self._ide_search_text(view_editor.editor.get_buffer(), search_text, need_case_sensitive, search_is_word)
+        self._ide_search_text(view_editor, need_jump, search_text, need_case_sensitive, search_is_word)
         
     def ide_find_next(self, search_text):
         '''

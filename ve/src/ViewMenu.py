@@ -5,6 +5,10 @@
 import logging
 from gi.repository import Gtk, Gdk, GtkSource
 
+class NeedJump:
+    def __init__(self, need):
+        self.need = need
+
 # 菜单的设定。
 MENU_CONFIG = """
 <ui>
@@ -147,6 +151,9 @@ class ViewMenu(object):
         
         self._create_menu(window)
         
+    def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
+        pass
+        
     def set_status(self, status):
         self.menu_status = status
             
@@ -225,16 +232,18 @@ class ViewMenu(object):
         toolbar = uimanager.get_widget("/ToolBar")
         
         # - 加入额外的检索Bar
+        self.need_jump = NeedJump(True)
+        
         self.search_entry = Gtk.SearchEntry()
-        self.search_entry.connect("search-changed", self.on_search_text_changed)
+        self.id_1 = self.search_entry.connect("search-changed", self.on_search_options_changed, self.need_jump)
         
         self.search_case_sensitive = Gtk.CheckButton.new_with_label("区分大小写")
         self.search_case_sensitive.set_active(True)
-        self.search_case_sensitive.connect("toggled", self.on_search_case_sensitive_toggled)
+        self.id_2 = self.search_case_sensitive.connect("toggled", self.on_search_options_changed, self.need_jump)
         
         self.search_is_word = Gtk.CheckButton.new_with_label("单词")
         self.search_is_word.set_active(False)
-        self.search_is_word.connect("toggled", self.on_search_is_word_toggled)
+        self.id_3 = self.search_is_word.connect("toggled", self.on_search_options_changed, self.need_jump)
          
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 1)
         hbox.pack_start(self.search_entry, True, True, 10)
@@ -482,23 +491,15 @@ class ViewMenu(object):
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND, self.search_entry)
         self.search_entry.grab_focus()
         
-    def on_search_text_changed(self, search_entry):
+    def on_search_options_changed(self, widget, need_jump):
         search_text = self.search_entry.get_text()
         need_case_sensitive = self.search_case_sensitive.get_active()
         need_search_is_word = self.search_is_word.get_active()
-        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive, need_search_is_word)
-    
-    def on_search_case_sensitive_toggled(self, check_button):
-        search_text = self.search_entry.get_text()
-        need_case_sensitive = self.search_case_sensitive.get_active()
-        need_search_is_word = self.search_is_word.get_active()
-        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive, need_search_is_word)
         
-    def on_search_is_word_toggled(self, check_button):
-        search_text = self.search_entry.get_text()
-        need_case_sensitive = self.search_case_sensitive.get_active()
-        need_search_is_word = self.search_is_word.get_active()
-        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, search_text, need_case_sensitive, need_search_is_word)
+        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT, need_jump.need, search_text, need_case_sensitive, need_search_is_word)
+        
+        if need_jump.need is False:
+            need_jump.need = True
     
     def on_menu_search_find_next(self, widget):
         logging.debug("A Search|find next menu item was selected.")
@@ -540,4 +541,19 @@ class ViewMenu(object):
     def on_menu_help_info(self, widget):
         logging.debug("A Help|Infomation as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_HELP_INFO)
+        
+    def set_search_options(self, search_text, case_sensitive, is_word):
+        
+        # 在此设置检索用的项目，想让 编辑器 显示检索项目，但是还不能跳转。下面是解决方法：（不优美）
+        # 解决方法是引发事件的动作，放入一个 Object(不能是普通的数据)，然后在 on_search_options_changed 函数中，
+        # 发送了信息后，再把此标志位改过来。
+        
+        self.need_jump.need = False
+        
+        if search_text is None:
+            self.search_entry.set_text("")
+        else:
+            self.search_entry.set_text(search_text)
+        self.search_case_sensitive.set_active(case_sensitive)
+        self.search_is_word.set_active(is_word)
         
