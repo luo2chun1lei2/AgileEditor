@@ -12,6 +12,8 @@ import os, sys, getopt, logging
 from VeMain import VeMain
 from VeUtils import *
 
+import framework.FwControl
+
 def usage():
     # 显示使用信息
     print 've usage:'
