@@ -27,7 +27,7 @@ from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewFileTagList import ViewFileTagList
-from ViewHelp import ViewDialogInfo
+from component.help.ViewHelp import ViewDialogInfo
 from ViewSearchTagList import ViewSearchTagList
 from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors

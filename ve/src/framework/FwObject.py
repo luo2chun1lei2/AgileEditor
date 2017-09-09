@@ -1,12 +1,10 @@
 #-*- coding:utf-8 -*-
 '''
-框架的处理的基础类
+所有对象的基础类，所有模块都是一个对象。
 
 @author: luocl
 '''
 
-import FwObject
-
-class FwProcess(FwObject):
+class FwObject():
     def __init__(self):
         pass

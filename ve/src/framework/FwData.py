@@ -4,6 +4,8 @@
 @author: luocl
 '''
 
-class FwData():
+import FwObject
+
+class FwData(FwObject):
     def __init__(self):
         pass

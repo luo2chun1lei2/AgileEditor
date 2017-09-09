@@ -5,6 +5,9 @@
 @author: luocl
 '''
 
-class FwControl():
+import FwObject
+
+class FwView(FwObject):
     def __init__(self):
         pass
+    

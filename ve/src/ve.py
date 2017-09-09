@@ -12,7 +12,8 @@ import os, sys, getopt, logging
 from VeMain import VeMain
 from VeUtils import *
 
-import framework.FwControl
+# all module must be imported from framework
+from framework import *
 
 def usage():
     # 显示使用信息
