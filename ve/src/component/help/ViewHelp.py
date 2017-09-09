@@ -5,6 +5,8 @@
 import os
 from gi.repository import Gtk, Gdk, GdkPixbuf
 
+from framework import *
+
 class ViewDialogInfo(Gtk.Dialog):
     # 显示“关于”信息的对话框
     
@@ -35,14 +37,14 @@ write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
         dirname = os.path.abspath(os.path.dirname(__file__))
-        filename = os.path.join(dirname, '', 've.png')
+        filename = os.path.join(dirname, '', '../../ve.png')
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
         transparent = pixbuf.add_alpha(True, 0xff, 0xff, 0xff)
     
         about = Gtk.AboutDialog(parent=window,
                                 program_name='Agile Editor',
                                 version='0.2',
-                                copyright='(C) 2016 罗春雷',
+                                copyright='(C) 2017 罗春雷',
                                 license=license,
                                 website='https://github.com/luo2chun1lei2/AgileEditor',
                                 comments='Agile Editor.',
@@ -57,4 +59,4 @@ Boston, MA 02111-1307, USA.
     @staticmethod
     def widget_destroy(widget, button):
         widget.destroy()
-        
+
