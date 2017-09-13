@@ -6,7 +6,7 @@ import os
 import ConfigParser
 from gi.repository import GObject, Gtk, Gdk, GtkSource
 
-from VeUtils import *
+from framework.FwUtils import *
 from ModelTags import ModelGTags
 from VeWordProvider import VeWordProvider
 

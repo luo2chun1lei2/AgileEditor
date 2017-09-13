@@ -9,7 +9,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('GtkSource', '3.0') 
 from gi.repository import GObject, Gtk, Gdk, GtkSource
 
-from VeUtils import *
+from framework.FwUtils import *
 from ModelTags import ModelGTags
 
 # 说明

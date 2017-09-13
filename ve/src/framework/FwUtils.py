@@ -1,6 +1,9 @@
 #-*- coding:utf-8 -*-
+'''
+框架的工具类，属于最底层的接口。
 
-# 各种方便的工具。
+@author: luocl
+'''
 
 import os, logging, threading
 

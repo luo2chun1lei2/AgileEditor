@@ -10,7 +10,7 @@ gi.require_version('Gtk', '3.0')
 import os, sys, getopt, logging
 
 from VeMain import VeMain
-from VeUtils import *
+from framework.FwUtils import *
 
 # all module must be imported from framework
 from framework.FwControl import FwControl

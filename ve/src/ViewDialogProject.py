@@ -9,7 +9,7 @@ import ConfigParser
 
 from gi.repository import Gtk, Gdk
 
-from VeUtils import *
+from framework.FwUtils import *
 from ModelProject import ModelProject
 from VeEventPipe import VeEventPipe
 

@@ -43,7 +43,7 @@
 # 每个ModelProject对应一个IdeTags。
 
 import os, subprocess, re, logging
-from VeUtils import *
+from framework.FwUtils import *
 
 class ModelTag(object):
     # 一个Tag的信息。

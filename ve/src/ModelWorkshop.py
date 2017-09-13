@@ -6,7 +6,7 @@
 import os, string, logging
 import ConfigParser
 
-from VeUtils import *
+from framework.FwUtils import *
 from ModelProject import ModelProject
 
 class ModelWorkshop(object):

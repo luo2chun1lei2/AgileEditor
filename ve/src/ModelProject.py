@@ -7,7 +7,7 @@
 import os, logging
 import ConfigParser
 
-from VeUtils import *
+from framework.FwUtils import *
 from ModelTags import ModelGTags, ModelTag
 from VeWordProvider import VeWordProvider
 

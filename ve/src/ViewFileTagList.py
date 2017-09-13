@@ -6,7 +6,7 @@
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
 from ModelTags import ModelTag
-import VeUtils
+from framework.FwUtils import *
 
 class ViewFileTagList:
     # 定制一个ListView，内部显示Tag。
@@ -79,7 +79,7 @@ class ViewFileTagList:
         last_tag = None
         last_itr = None
         for tag in tags:
-            if VeUtils.is_empty(tag.tag_scope):
+            if is_empty(tag.tag_scope):
                 # 如果没有范围，就放在顶层
                 last_itr = self._add_tag_with_group(model, last_tag, last_itr, tag)
             else:
@@ -105,7 +105,7 @@ class ViewFileTagList:
         # 根据scope找到对应的tag，如果没有找到就返回None
         # scope:string:tag的scope名字
         # return:TreeIter:找到的Iter
-        if VeUtils.is_empty(tag.tag_scope):
+        if is_empty(tag.tag_scope):
             last_itr = model.append(None, 
                         [tag.tag_type, tag.tag_name, tag.tag_line_no, tag.tag_scope])
         else:

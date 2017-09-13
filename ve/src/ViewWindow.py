@@ -14,7 +14,7 @@ import os, sys, getopt, shutil, re, logging
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Vte
 from gi.overrides.Gtk import TextBuffer
 
-from VeUtils import *
+from framework.FwUtils import *
 
 from ModelWorkshop import ModelWorkshop
 from ModelProject import ModelProject
