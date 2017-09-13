@@ -4,7 +4,7 @@
 @author: luocl
 '''
 
-import FwObject
+from FwObject import FwObject
 
 class FwData(FwObject):
     def __init__(self):

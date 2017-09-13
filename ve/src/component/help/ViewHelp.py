@@ -5,8 +5,6 @@
 import os
 from gi.repository import Gtk, Gdk, GdkPixbuf
 
-from framework import *
-
 class ViewDialogInfo(Gtk.Dialog):
     # 显示“关于”信息的对话框
     

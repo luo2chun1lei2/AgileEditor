@@ -5,7 +5,7 @@
 @author: luocl
 '''
 
-import FwObject
+from FwObject import FwObject
 
 class FwProcess(FwObject):
     def __init__(self):

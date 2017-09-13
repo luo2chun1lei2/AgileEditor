@@ -5,7 +5,7 @@
 @author: luocl
 '''
 
-import FwObject
+from FwObject import FwObject
 
 class FwView(FwObject):
     def __init__(self):

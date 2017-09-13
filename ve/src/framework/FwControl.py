@@ -6,7 +6,10 @@
 @author: luocl
 '''
 
-import FwObject, FwView, FwData, FwProcess
+from FwObject import FwObject
+from FwView import FwView
+from FwData import FwData
+from FwProcess import FwProcess
 
 class FwControl(FwObject):
     def __init__(self):

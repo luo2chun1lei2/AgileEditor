@@ -13,7 +13,7 @@ from VeMain import VeMain
 from VeUtils import *
 
 # all module must be imported from framework
-from framework import FwControl
+from framework.FwControl import FwControl
 
 def usage():
     # 显示使用信息
@@ -28,8 +28,6 @@ def main(argv):
     # 命令(ve=visual editor)部分
     # ve -p/--project <project_name>
     # ve -f/--file <file_path>
-    
-    control = FwControl()
     
     # 设定日志的等级和格式
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
