@@ -187,6 +187,23 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         word_start = ite.copy()
 
         # 得到以空格为区分的单词开头。
+        # - 算法就是向前寻找单词的开头，如果开头的前一个是"_"，那么就继续向前找单词开头。
+        #   否则就停下来，返回开头到当前位置的文字。
+
+        # Notice : 上一个字符，实际上包括用户当前输入的字符，比如 “a”，或者 TAB。
+        # fix bug: 编辑文本时，如果在空行输入TAB，就会冒出很多提示，实际上用户只是想TAB而已。
+        # 所以逻辑应该是：如果上一个字符是"\t"，且再之前是"空格"等，就不提示。
+        # bug:如果按下TAB，前面有单词的情况下，虽然显示提示，但是没有吃掉这个TAB。
+        p = word_start.copy()
+        if p.backward_char():
+            pp = p.copy()
+            if pp.backward_char():
+                p_ch= text_buf.get_text(p, ite, False)
+                pp_ch= text_buf.get_text(pp, p, False)
+                if p_ch == '\t' and (pp_ch == ' ' or pp_ch == '\n' or pp_ch == '\r' or pp_ch == '\t'):
+                    #print "completion skip. .%s." % pp_ch
+                    return None
+
         while True:
             if word_start.starts_word():
                 n = word_start.copy()
@@ -197,6 +214,7 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
                 if text_buf.get_text(n, word_start, False) != "_":
                     break
             
+            # 找到上一个单词的开头，发现和已经找到的单词开头一样，就认为无法再向前了。
             t = word_start.copy()
             t.backward_word_start()
             # 如果不进行无法移动的判断，会出现无穷循环问题，比如在“/*”后面敲“*”
@@ -206,6 +224,7 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
                 word_start = t
 
         text = text_buf.get_text(word_start, ite, False)
+        #print "completion word is .%s." % text
         
         # TODO 不需要释放吗？但是如果释放的话，使用几次就崩溃。
         #word_start.free()
