@@ -1,23 +1,56 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 # 对与Ide有帮助和支持的功能。
 
 import os
 from gi.repository import Gtk, Gdk, GdkPixbuf
+from framework.FwBaseComponent import FwBaseComponent
+#from framework.FwComponentFactory import FwComponentFactory
 
-class ViewDialogInfo(Gtk.Dialog):
-    # 显示“关于”信息的对话框
-    
-    def __init__(self, parent):
+''' 例子
+from framework.FwManager import FwManager
+factory = FwManager.instance().findFactory("ViewDialogInfo")  # TODO 这个名字就在这里放着？
+
+dialog = factory.createComponent()
+dialog.show(self)
+factory.destroyComponent(dialog)
+'''
+
+class VeiwDialogInfoFactory():
+
+    fctName = "ViewDialogInfo"
+
+    def __init__(self):
         pass
-    
+
+    def getName(self):
+        return VeiwDialogInfoFactory.fctName
+
+    def createComponent(self):
+        return ViewDialogInfo()
+
+    def destroyComponent(self, component):
+        if component is ViewDialogInfo:
+            # 因为对话框关闭时，实例也自己销毁了，所以这里不用管。
+            pass
+
+class ViewDialogInfo(FwBaseComponent, Gtk.Dialog):
+    # 显示“关于”信息的对话框
+
+    def __init__(self):
+        pass
+
+    def getName(self):
+        # 只需要有一个，不需要区分名字。
+        return "ViewDialogInfo"
+
     @staticmethod
     def show(window):
-    
+
         authors = ['罗春雷']
-    
+
         documentors = ['罗春雷']
-    
+
         license = """
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public License as
@@ -38,7 +71,7 @@ Boston, MA 02111-1307, USA.
         filename = os.path.join(dirname, '', '../../ve.png')
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
         transparent = pixbuf.add_alpha(True, 0xff, 0xff, 0xff)
-    
+
         about = Gtk.AboutDialog(parent=window,
                                 program_name='Agile Editor',
                                 version='0.2',
@@ -50,10 +83,10 @@ Boston, MA 02111-1307, USA.
                                 documenters=documentors,
                                 logo=transparent,
                                 title='关于敏捷编辑器')
-    
+
         about.connect('response', ViewDialogInfo.widget_destroy)
         about.show()
-    
+
     @staticmethod
     def widget_destroy(widget, button):
         widget.destroy()

@@ -4,8 +4,8 @@
 比较常见的是需要编辑的文件、项目列表和当前项目信息等。
 '''
 
-from FwObject import FwObject
+from framework import FwBaseComponent
 
-class FwData(FwObject):
+class FwData():
     def __init__(self):
         pass
