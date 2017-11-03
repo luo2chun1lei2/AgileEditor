@@ -363,7 +363,7 @@ class ViewMultiEditors:
         for k, v in items:
             new_dic[k] = v
         
-        # 将模块的引用修改成新的数据结构。
+        # 将组件的引用修改成新的数据结构。
         self.dic_editors = new_dic
         
     def on_editor_buffer_modified_changed(self, src_buffer, abs_file_path):

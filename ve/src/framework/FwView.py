@@ -5,9 +5,9 @@
 @author: luocl
 '''
 
-from FwObject import FwObject
+from framework import FwBaseComponent
 
-class FwView(FwObject):
+class FwView():
     def __init__(self):
         pass
     

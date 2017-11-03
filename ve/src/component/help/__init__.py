@@ -1,6 +1,4 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 '''
-Created on Sep 9, 2017
-
-@author: luocl
+组件：辅助型的
 '''

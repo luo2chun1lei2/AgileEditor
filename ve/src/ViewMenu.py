@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 
-# 菜单和工具的模块。
+# 菜单和工具的组件。
 
 import logging
 from gi.repository import Gtk, Gdk, GtkSource
