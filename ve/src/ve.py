@@ -64,7 +64,7 @@ def main(argv):
     veMain.start(want_lazy, want_open_project_name, want_open_file)
 
 def new_main(argv):
-    logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
     
     from framework import *
     mng = FwManager.FwManager.instance(argv)
@@ -72,9 +72,5 @@ def new_main(argv):
 
 if __name__ == '__main__':
     # 主入口
-<<<<<<< HEAD
     # main(sys.argv)
     new_main(sys.argv)
-=======
-    main(sys.argv)
->>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
