@@ -787,7 +787,17 @@ class ViewWindow(Gtk.Window):
     def ide_help_info(self):
         # 显示帮助对话框
 
+<<<<<<< HEAD
         ViewDialogInfo.show(self)
+=======
+        # ViewDialogInfo.show(self)
+        from framework.FwManager import FwManager
+        factory = FwManager.instance().findFactory("ViewDialogInfo")  # TODO 这个名字就在这里放着？
+
+        dialog = factory.createComponent()
+        dialog.show(self)
+        factory.destroyComponent(dialog)
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
 
     def ide_edit_redo(self, widget):
         ve_editor = self.multiEditors.get_current_ide_editor()

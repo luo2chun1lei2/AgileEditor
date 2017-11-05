@@ -5,8 +5,12 @@
 
 from framework import FwBaseComponent
 
+<<<<<<< HEAD
 # TODO 不准备要了！
 class FwComponentFactory123():
+=======
+class FwComponentFactory():
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
     def __init__(self):
         pass
 

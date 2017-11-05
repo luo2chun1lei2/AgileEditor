@@ -72,5 +72,9 @@ def new_main(argv):
 
 if __name__ == '__main__':
     # 主入口
+<<<<<<< HEAD
     # main(sys.argv)
     new_main(sys.argv)
+=======
+    main(sys.argv)
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4

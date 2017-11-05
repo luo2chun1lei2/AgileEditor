@@ -5,6 +5,7 @@
 import os
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from framework.FwBaseComponent import FwBaseComponent
+<<<<<<< HEAD
 #from framework.FwComponentFactory import FwComponentFactory
 
 ''' 例子
@@ -17,6 +18,11 @@ factory.destroyComponent(dialog)
 '''
 
 class VeiwDialogInfoFactory():
+=======
+from framework.FwComponentFactory import FwComponentFactory
+
+class VeiwDialogInfoFactory(FwComponentFactory):
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
 
     fctName = "ViewDialogInfo"
 

@@ -3,6 +3,7 @@
 框架的核心处理类
 '''
 
+<<<<<<< HEAD
 import logging
 from framework.FwBaseComponent import FwBaseComponent
 from component.help.ViewHelp import ViewDialogInfo, VeiwDialogInfoFactory
@@ -15,6 +16,11 @@ class FwService:
     def __init__(self, info, component):
         self.info = info
         self.component = component
+=======
+from framework.FwBaseComponent import FwBaseComponent
+from component.help.ViewHelp import ViewDialogInfo, VeiwDialogInfoFactory
+from pkg_resources import _manager
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
 
 class FwManager():
 
@@ -22,6 +28,7 @@ class FwManager():
     _manager = None
 
     @staticmethod
+<<<<<<< HEAD
     def instance(argv):
         if FwManager._manager is None:
             FwManager._manager = FwManager(argv)
@@ -52,10 +59,27 @@ class FwManager():
     ## 组件工厂相关函数
 
     def register(self, name, component):
+=======
+    def instance():
+        if FwManager._manager is None:
+            FwManager._manager = FwManager()
+
+        return FwManager._manager
+
+    def __init__(self):
+        # {<component type name>:string, <component factory instance>:FwComponentFactory}
+        # 注意这里实际上保存的是组件的类型，而不是具体的组件实例。
+        self.componentFactories = {}
+
+        self.registerFactory(VeiwDialogInfoFactory())
+
+    def registerFactory(self, componentFactory):
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
         '''
         @param name: string: 工厂的名字，必须唯一
         @param componentFactory: FwComponentFactory: 工厂的实例
         '''
+<<<<<<< HEAD
         self.components[name] = component
         component.init(self)
 
@@ -107,3 +131,18 @@ class FwManager():
         logging.error("cannot find service %s" % serviceName)
         return (False, None)
         
+=======
+        self.componentFactories[componentFactory.getName()] = componentFactory
+
+    def unregisterFactory(self, factoryName):
+        '''
+        @param factoryName: string: 工厂的名字
+        '''
+        del self.componentFactories[factoryName]
+
+    def findFactory(self, factoryName):
+        ''' 用名字查询工厂
+        @param factoryName: string: 工厂的名字
+        '''
+        return self.componentFactories[factoryName]
+>>>>>>> 5bca6cef5ca332478c19d6fed611cb1fea116cd4
