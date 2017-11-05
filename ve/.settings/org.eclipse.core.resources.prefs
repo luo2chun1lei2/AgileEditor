@@ -20,6 +20,7 @@ encoding//src/ViewMultiEditors.py=utf-8
 encoding//src/ViewSearchTagList.py=utf-8
 encoding//src/ViewWindow.py=utf-8
 encoding//src/component/AppProcess.py=utf-8
+encoding//src/component/AppView.py=utf-8
 encoding//src/component/CommandParser.py=utf-8
 encoding//src/component/__init__.py=utf-8
 encoding//src/component/help/ViewHelp.py=utf-8

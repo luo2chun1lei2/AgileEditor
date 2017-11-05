@@ -1,22 +1,22 @@
 # -*- coding:utf-8 -*-
 '''
-分析输入的命令。
+应用程序的主画面。
 '''
 import logging
 from framework.FwBaseComponent import FwBaseComponent
 
-class CommandParser:
+class AppView:
     def __init__(self):
         pass
     
     def init(self, manager):
-        info = {'name':'command.parse', 'help':'parse the command options, and return result.'}
+        info = {'name':'app.view', 'help':'show the main view of application.'}
         manager.registerService(info, self)
         return True
 
     def dispatchService(self, manager, serviceName, params):
-        if serviceName == "command.parse":
-            logging.debug("parse command")
+        if serviceName == "app.view":
+            logging.debug("show main view and into loop")
             
             return (True, None)
         else:

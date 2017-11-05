@@ -8,6 +8,8 @@ from framework.FwBaseComponent import FwBaseComponent
 from component.help.ViewHelp import ViewDialogInfo, VeiwDialogInfoFactory
 from pkg_resources import _manager
 from component.AppProcess import AppProcess
+from component.AppView import AppView
+from component.CommandParser import CommandParser
 
 class FwService:
     def __init__(self, info, component):
@@ -20,13 +22,15 @@ class FwManager():
     _manager = None
 
     @staticmethod
-    def instance():
+    def instance(argv):
         if FwManager._manager is None:
-            FwManager._manager = FwManager()
+            FwManager._manager = FwManager(argv)
 
         return FwManager._manager
 
-    def __init__(self):
+    def __init__(self, argv):
+        self.argv = argv
+        
         # {<component type name>:string, <component factory instance>:FwComponentFactory}
         # 注意这里实际上保存的是具体的组件实例。
         self.components = {}
@@ -35,12 +39,14 @@ class FwManager():
         self.services = []
 
         # 注册已知的组件工厂。
-        self.register("mainj_app", AppProcess())
+        self.register("app_process", AppProcess())
+        self.register("command_parser", CommandParser())
+        self.register("app_view", AppView())
     
     def run(self):
         ''' 程序运行，整个系统不关闭，则此函数不关闭
         '''
-        pass
+        self.requestService("app.run", {'argv':self.argv})
 
     #######################################################
     ## 组件工厂相关函数
@@ -96,7 +102,7 @@ class FwManager():
         '''
         for service in self.services:
             if service.info['name'] == serviceName:
-                return service.component.dispatch(serviceName, params)
+                return service.component.dispatchService(self, serviceName, params)
                 
         logging.error("cannot find service %s" % serviceName)
         return (False, None)

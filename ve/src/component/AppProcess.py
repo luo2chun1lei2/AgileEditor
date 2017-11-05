@@ -2,6 +2,7 @@
 '''
 应用程序组件。
 '''
+import logging
 from framework.FwBaseComponent import FwBaseComponent
 
 class AppProcess(FwBaseComponent):
@@ -13,8 +14,19 @@ class AppProcess(FwBaseComponent):
         manager.registerService(info, self)
         return True
 
-    def dispatchService(self, serviceName, params):
+    def dispatchService(self, manager, serviceName, params):
         if serviceName == "app.run":
+            logging.debug("run application")
+            
+            # 命令分析
+            (isOK, results) = manager.requestService("command.parse", params['argv'])
+            if not isOK:
+                return (False, None)
+            
+            # 启动主画面。
+            (isOK, results) = manager.requestService("app.view", results)
+            if not isOK:
+                return (False, None)
             
             return (True, None)
         else:

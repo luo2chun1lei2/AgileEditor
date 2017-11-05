@@ -17,13 +17,13 @@ class FwBaseComponent():
     
     def init(self, manager):
         ''' 在Framework中初始化，比如注册服务等。
-           Notice: 不得在此之前，调用任何服务!
+           Notice: 在此之前，不得调用任何服务!
         @param manager: FwManager
         @return bool: 初始化是否成功
         '''
         return False
 
-    def dispatchService(self, serviceName, params):
+    def dispatchService(self, manager, serviceName, params):
         '''
         @return (bool, map): (成功与否，结果）
         '''
