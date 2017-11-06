@@ -23,7 +23,6 @@ from ModelFile import ModelFile
 from ModelTask import ModelTask
 from ModelTags import *
 
-from ViewDialogTags import ViewDialogTagsOpen
 from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
