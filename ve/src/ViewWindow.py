@@ -23,7 +23,7 @@ from ModelFile import ModelFile
 from ModelTask import ModelTask
 from ModelTags import *
 
-from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
+from component.help.ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewFileTagList import ViewFileTagList
@@ -475,7 +475,11 @@ class ViewWindow(Gtk.Window):
     def ide_new_project(self):
         # 新建项目
 
-        prj_name, prj_src_dirs = ViewDialogProjectNew.show(self)
+        #prj_name, prj_src_dirs = ViewDialogProjectNew.show(self)
+        isOK, results = FwManager.instance(None).requestService("dialog.project.new", {'parent':self})
+        prj_name = results['prj_name']
+        prj_src_dirs = results['prj_src_dirs']
+        
         if prj_name is None:
             return False
 
@@ -503,7 +507,9 @@ class ViewWindow(Gtk.Window):
                 if each_prj.prj_name == prj_name:
                     prj = each_prj
         else:
-            prj = ViewDialogProjectOpen.show(self, self.ideWorkshop)
+            isOK, results = FwManager.instance(None).requestService("dialog.project.open", 
+                                        {'parent':self, 'workshop':self.ideWorkshop})
+            prj = results['project']
 
         if prj is None:
             return False

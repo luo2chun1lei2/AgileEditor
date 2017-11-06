@@ -6,6 +6,8 @@
 import os, sys, getopt, shutil
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
 
+from framework.FwManager import FwManager
+
 from ModelWorkshop import ModelWorkshop
 from ModelProject import ModelProject
 from ModelFile import ModelFile
@@ -50,7 +52,7 @@ class VeMain():
     def start(self, want_lazy, want_open_project_name, want_open_file):
         # 开始启动程序。
 
-        from ViewDialogProject import ViewDialogProjectOpen
+        from component.help.ViewDialogProject import ViewDialogProjectOpen
 
         # 打开想要打开的项目
         prj = None
@@ -63,7 +65,9 @@ class VeMain():
         # 如果没有传入打开某个项目，或者指定的项目不存在，那么就指定一个。
         if prj is None :
             # 需要让客户选择一个项目
-            prj = ViewDialogProjectOpen.show(None, self.workshop)
+            isOK, results = FwManager.instance(None).requestService("dialog.project.open", 
+                                        {'parent':None, 'workshop':self.workshop})
+            prj = results['project']
 
         if prj is None:
             # 客户还是选择失败，或者退出，那么就不用再运行了。

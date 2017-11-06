@@ -10,10 +10,47 @@ import ConfigParser
 from gi.repository import Gtk, Gdk
 
 from framework.FwUtils import *
+from framework.FwBaseComponent import FwBaseComponent
+from framework.FwManager import FwManager
+
 from ModelProject import ModelProject
 from VeEventPipe import VeEventPipe
 
 ###########################################################
+
+class ViewDialogProject(FwBaseComponent):
+    # from FwBaseComponnet
+    def __init__(self):
+        pass
+    
+    def init(self, manager):
+        info = {'name':'dialog.project.new', 'help':'show dialog for adding new project.'}
+        manager.registerService(info, self)
+        
+        info = {'name':'dialog.project.open', 'help':'show dialog for opening one project.'}
+        manager.registerService(info, self)
+        
+        info = {'name':'dialog.project.change', 'help':'show dialog for changing one project.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # from FwBaseComponnet
+    def dispatchService(self, manager, serviceName, params):
+        if serviceName == "dialog.project.new":
+            prj_name, prj_src_dirs = ViewDialogProjectNew.show(params['parent'])
+            return (True, {'prj_name':prj_name, 'prj_src_dirs':prj_src_dirs})
+
+        elif serviceName == "dialog.project.open":
+            prj = ViewDialogProjectOpen.show(params['parent'], params['workshop'])
+            return (True, {'project':prj})
+        
+        elif serviceName == "dialog.project.change":
+            prj_name, prj_src_dirs = ViewDialogProjectChange.show(params['parent'], params['project'])
+            return (True, {'prj_name':prj_name, 'prj_src_dirs':prj_src_dirs})
+        
+        else:
+            return (False, None)
 
 class ViewDialogProjectNew(Gtk.Dialog):
     # 新建项目的对话框
@@ -310,7 +347,9 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     
             elif response == ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ:
                 # 创建一个新的对话框
-                prj_name, prj_src_dirs = ViewDialogProjectNew.show(dialog)
+                isOK, results = FwManager.instance(None).requestService("dialog.project.new", {'parent':dialog})
+                prj_name = results['prj_name']
+                prj_src_dirs = results['prj_src_dirs']
                 if not prj_name is None:
                     # 发动“添加一个新的项目”的动作。
                     VeEventPipe.want_add_new_project(prj_name, prj_src_dirs)
@@ -347,7 +386,10 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
                     
-                    prj_name, prj_src_dirs = ViewDialogProjectChange.show(dialog, prj)
+                    isOK, results = FwManager.instance(None).requestService("dialog.project.change", 
+                                        {'parent':dialog, 'project':prj})
+                    prj_name = results['prj_name']
+                    prj_src_dirs = results['prj_src_dirs']
                     if not prj_name is None:
                         VeEventPipe.want_change_project(prj, prj_name, prj_src_dirs)
                     

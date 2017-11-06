@@ -7,12 +7,6 @@ import logging
 
 from framework.FwBaseComponent import FwBaseComponent
 
-from component.AppProcess import AppProcess
-from component.AppView import AppView
-from component.CommandParser import CommandParser
-from component.help.ViewHelp import ViewDialogInfo
-from component.help.ViewDialogCommon import ViewDialogCommon
-
 class FwService:
     def __init__(self, info, component):
         self.info = info
@@ -42,11 +36,19 @@ class FwManager():
 
         # 注册已知的组件工厂。
         # TODO 以后修改成从固定文件夹等搜索组件，然后加载。
+        from component.AppProcess import AppProcess
+        from component.AppView import AppView
+        from component.CommandParser import CommandParser
+        from component.help.ViewHelp import ViewDialogInfo
+        from component.help.ViewDialogCommon import ViewDialogCommon
+        from component.help.ViewDialogProject import ViewDialogProject
+        
         self.register("app_process", AppProcess())
         self.register("command_parser", CommandParser())
         self.register("app_view", AppView())
         self.register("dialog_info", ViewDialogInfo())
         self.register("dialog_common", ViewDialogCommon())
+        self.register("dialog_project", ViewDialogProject())
 
     def run(self):
         ''' 程序运行，整个系统不关闭，则此函数不关闭
