@@ -9,9 +9,10 @@ class FwBaseComponent(object):
     def __init__(self):
         self.name = None
 
+    # TODO 目前没有用，子类可以不实现，如果以后也不再需要，那么就删除。
     def getName(self):
         ''' 获取组件的名字
-        @return string:名字 
+        @return string:名字
         '''
         return self.name
 

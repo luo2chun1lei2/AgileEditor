@@ -5,13 +5,17 @@
 import getopt, logging
 from framework.FwBaseComponent import FwBaseComponent
 
-class CommandParser:
+class CommandParser(FwBaseComponent):
     def __init__(self):
         pass
 
     def init(self, manager):
         info = {'name':'command.parse', 'help':'parse the command options, and return result.'}
         manager.registerService(info, self)
+
+        info = {'name':'command.help', 'help':'show command help infomation to console.'}
+        manager.registerService(info, self)
+
         return True
 
     def dispatchService(self, manager, serviceName, params):
@@ -54,8 +58,8 @@ class CommandParser:
         for o, a in opts:
             if o in ('-h', '--help'):
                 '显示帮助信息'
-                self._commandHelp()
-                return (True, None)
+                # 不调用 self._commandHelp()，让外部以为是错误，不再继续运行。
+                return (False, None)
             elif o in ('-f', '--file'):
                 want_open_file = a
             elif o in ('-z'):

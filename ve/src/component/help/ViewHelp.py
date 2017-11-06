@@ -2,37 +2,10 @@
 
 # 对与Ide有帮助和支持的功能。
 
-import os
+import os, logging
+
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from framework.FwBaseComponent import FwBaseComponent
-#from framework.FwComponentFactory import FwComponentFactory
-
-''' 例子
-from framework.FwManager import FwManager
-factory = FwManager.instance().findFactory("ViewDialogInfo")  # TODO 这个名字就在这里放着？
-
-dialog = factory.createComponent()
-dialog.show(self)
-factory.destroyComponent(dialog)
-'''
-
-class VeiwDialogInfoFactory():
-
-    fctName = "ViewDialogInfo"
-
-    def __init__(self):
-        pass
-
-    def getName(self):
-        return VeiwDialogInfoFactory.fctName
-
-    def createComponent(self):
-        return ViewDialogInfo()
-
-    def destroyComponent(self, component):
-        if component is ViewDialogInfo:
-            # 因为对话框关闭时，实例也自己销毁了，所以这里不用管。
-            pass
 
 class ViewDialogInfo(FwBaseComponent, Gtk.Dialog):
     # 显示“关于”信息的对话框
@@ -40,9 +13,21 @@ class ViewDialogInfo(FwBaseComponent, Gtk.Dialog):
     def __init__(self):
         pass
 
-    def getName(self):
-        # 只需要有一个，不需要区分名字。
-        return "ViewDialogInfo"
+    # from FwBaseComponnet
+    def init(self, manager):
+        info = {'name':'dialog.info', 'help':'show application information dialog.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # from FwBaseComponnet
+    def dispatchService(self, manager, serviceName, params):
+        if serviceName == "dialog.info":
+            ViewDialogInfo.show(None)
+            return (True, None)
+
+        else:
+            return (False, None)
 
     @staticmethod
     def show(window):

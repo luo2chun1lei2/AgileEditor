@@ -15,6 +15,7 @@ from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Vte
 from gi.overrides.Gtk import TextBuffer
 
 from framework.FwUtils import *
+from framework.FwManager import FwManager
 
 from ModelWorkshop import ModelWorkshop
 from ModelProject import ModelProject
@@ -27,11 +28,9 @@ from ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewFileTagList import ViewFileTagList
-from component.help.ViewHelp import ViewDialogInfo
 from ViewSearchTagList import ViewSearchTagList
 from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
-from ViewDialogCommon import *
 from ViewDialogPreferences import ViewDialogPreferences
 
 class ViewWindow(Gtk.Window):
@@ -352,8 +351,8 @@ class ViewWindow(Gtk.Window):
                 return
 
         # 实现对话框，得到文件名字
-        reponse, name = ViewDialogCommon.show_one_entry(self, "新建文件", "文件名字")
-        if not reponse == Gtk.ResponseType.OK or is_empty(name):
+        response, name = self._in_show_dialog_one_entry("新建文件", "文件名字")
+        if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
         # 新建文件
@@ -389,8 +388,8 @@ class ViewWindow(Gtk.Window):
                 return
 
         # 实现对话框，得到文件名字
-        reponse, name = ViewDialogCommon.show_one_entry(self, "新建目录", "目录名字")
-        if not reponse == Gtk.ResponseType.OK or is_empty(name):
+        response, name = self._in_show_dialog_one_entry("新建目录", "目录名字")
+        if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
         # 新建文件
@@ -447,8 +446,8 @@ class ViewWindow(Gtk.Window):
         file_path = self.ideFsTree.get_abs_file_path_by_iter(itr)
 
         # 实现对话框，得到文件名字
-        reponse, name = ViewDialogCommon.show_one_entry(self, "修改文件名字", "新文件名字")
-        if not reponse == Gtk.ResponseType.OK or is_empty(name):
+        response, name = self._in_show_dialog_one_entry("修改文件名字", "新文件名字")
+        if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
         # 修改文件名字
@@ -786,7 +785,9 @@ class ViewWindow(Gtk.Window):
 
     def ide_help_info(self):
         # 显示帮助对话框
-        ViewDialogInfo.show(self)
+        # TODO 必须在这里引入，不知道为什么！
+        # from framework.FwManager import FwManager
+        FwManager.instance(None).requestService("dialog.info", None)
 
     def ide_edit_redo(self, widget):
         ve_editor = self.multiEditors.get_current_ide_editor()
@@ -947,7 +948,13 @@ class ViewWindow(Gtk.Window):
         # 看看是否已经选中了单词
         tag_name = self._ide_get_selected_text_or_word()
 
-        response, replace_from, replace_to = ViewDialogCommon.show_two_entry(self, "替换", '从', tag_name, '到', "")
+        isOK, results = FwManager.instance(None).requestService('dialog.common.two_entry',
+                                    {'transient_for':self, 'title':"替换", 'entry1_label':"从", 'text1':tag_name,
+                                     'entry2_label':"到", 'text2':""})
+        response = results['response']
+        replace_from = results['text1']
+        replace_to = results['text2']
+
         if response != Gtk.ResponseType.OK or replace_from is None or replace_from == '' or \
             replace_to is None or replace_to == '':
             return
@@ -1133,9 +1140,14 @@ class ViewWindow(Gtk.Window):
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.ide_goto_line, line_number)
 
+    def _in_show_dialog_one_entry(self, title, label):
+        isOK, results = FwManager.instance(None).requestService('dialog.common.one_entry',
+                                    {'transient_for':self, 'title':title, 'entry_label':label})
+        return results['response'], results['text']
+
     def ide_find_defination_by_dialog(self):
         ''' 查找定义 '''
-        response, tag_name = ViewDialogCommon.show_one_entry(self, "检索一个TAG", '名字')
+        response, tag_name = self._in_show_dialog_one_entry("检索一个TAG", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 
@@ -1212,8 +1224,7 @@ class ViewWindow(Gtk.Window):
 
     def ide_jump_to_line(self, widget):
         # 显示一个对话框，输入需要跳转的行。
-
-        response, text = ViewDialogCommon.show_one_entry(self, "跳转到行", '行')
+        response, text = self._in_show_dialog_one_entry("跳转到行", '行')
         if response != Gtk.ResponseType.OK or text is None or text == '':
             return
 
@@ -1335,7 +1346,7 @@ class ViewWindow(Gtk.Window):
 
     def ide_find_in_files(self):
         ''' 在项目的文件中查找，不是寻找定义。 '''
-        response, pattern = ViewDialogCommon.show_one_entry(self, "在文件中检索", '模式')
+        response, pattern = self._in_show_dialog_one_entry("在文件中检索", '模式')
         if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
             return
 
@@ -1362,7 +1373,7 @@ class ViewWindow(Gtk.Window):
 
     def ide_find_path(self):
         # 检索需要的文件路径
-        response, pattern = ViewDialogCommon.show_one_entry(self, "检索文件路径", '模式')
+        response, pattern = self._in_show_dialog_one_entry("检索文件路径", '模式')
         if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
             return
 

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 应用程序组件。
-负责整个app的初始化等流程。
+负责整个app的初始化等流程，有比较复杂的 dispatch 实现。
 '''
 import logging
 from framework.FwBaseComponent import FwBaseComponent
@@ -22,6 +22,7 @@ class AppProcess(FwBaseComponent):
             # 命令分析
             (isOK, results) = manager.requestService("command.parse", {'argv':params['argv']})
             if not isOK:
+                manager.requestService("command.help", None)
                 return (False, None)
             logging.debug("service's results: \"%s\"" % results)
 

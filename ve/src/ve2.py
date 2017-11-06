@@ -7,11 +7,11 @@
 '''
 
 import sys, logging
-from framework.FwManager import FwManager
 
 def main(argv):
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
+    from framework.FwManager import FwManager
     mng = FwManager.instance(argv)
     mng.run()
 

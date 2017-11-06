@@ -26,4 +26,4 @@
 '''
 
 # “from package import *” 使用的。
-__all__ = ["FwManager", "FwBaseComponent", "FwComponentFactory"]
+# __all__ = ["FwManager", "FwBaseComponent", "FwComponentFactory"]
