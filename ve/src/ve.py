@@ -63,14 +63,6 @@ def main(argv):
     veMain = VeMain.get_instance()
     veMain.start(want_lazy, want_open_project_name, want_open_file)
 
-def new_main(argv):
-    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
-    
-    from framework import *
-    mng = FwManager.FwManager.instance(argv)
-    mng.run()
-
 if __name__ == '__main__':
     # 主入口
-    # main(sys.argv)
-    new_main(sys.argv)
+    main(sys.argv)

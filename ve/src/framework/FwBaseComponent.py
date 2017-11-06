@@ -4,8 +4,8 @@
 TODO 组件是否需要自己知道名字？
 '''
 
-class FwBaseComponent():
-    
+class FwBaseComponent(object):
+
     def __init__(self):
         self.name = None
 
@@ -14,7 +14,7 @@ class FwBaseComponent():
         @return string:名字 
         '''
         return self.name
-    
+
     def init(self, manager):
         ''' 在Framework中初始化，比如注册服务等。
            Notice: 在此之前，不得调用任何服务!
