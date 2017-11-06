@@ -10,7 +10,7 @@ gi.require_version('Gtk', '3.0')
 import os, sys, getopt, logging
 
 from VeMain import VeMain
-from framework.FwUtils import *
+# from framework.FwUtils import *
 
 # Framework
 from framework.FwManager import FwManager

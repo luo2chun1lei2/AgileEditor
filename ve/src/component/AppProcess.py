@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 应用程序组件。
+负责整个app的初始化等流程。
 '''
 import logging
 from framework.FwBaseComponent import FwBaseComponent
@@ -8,7 +9,7 @@ from framework.FwBaseComponent import FwBaseComponent
 class AppProcess(FwBaseComponent):
     def __init__(self):
         pass
-    
+
     def init(self, manager):
         info = {'name':'app.run', 'help':'run as main application.'}
         manager.registerService(info, self)
@@ -17,17 +18,20 @@ class AppProcess(FwBaseComponent):
     def dispatchService(self, manager, serviceName, params):
         if serviceName == "app.run":
             logging.debug("run application")
-            
+
             # 命令分析
-            (isOK, results) = manager.requestService("command.parse", params['argv'])
+            (isOK, results) = manager.requestService("command.parse", {'argv':params['argv']})
             if not isOK:
                 return (False, None)
-            
+            logging.debug("service's results: \"%s\"" % results)
+
             # 启动主画面。
             (isOK, results) = manager.requestService("app.view", results)
             if not isOK:
                 return (False, None)
-            
+
             return (True, None)
         else:
             return (False, None)
+
+
