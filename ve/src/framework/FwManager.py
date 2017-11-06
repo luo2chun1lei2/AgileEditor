@@ -42,6 +42,7 @@ class FwManager():
         from component.help.ViewHelp import ViewDialogInfo
         from component.help.ViewDialogCommon import ViewDialogCommon
         from component.help.ViewDialogProject import ViewDialogProject
+        from component.help.ViewDialogProjectSetting import ViewDialogProjectSetting
         
         self.register("app_process", AppProcess())
         self.register("command_parser", CommandParser())
@@ -49,6 +50,7 @@ class FwManager():
         self.register("dialog_info", ViewDialogInfo())
         self.register("dialog_common", ViewDialogCommon())
         self.register("dialog_project", ViewDialogProject())
+        self.register("dialog_project_setting", ViewDialogProjectSetting())
 
     def run(self):
         ''' 程序运行，整个系统不关闭，则此函数不关闭

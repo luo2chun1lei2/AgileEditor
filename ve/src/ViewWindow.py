@@ -30,7 +30,7 @@ from ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
 from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
-from ViewDialogPreferences import ViewDialogPreferences
+from component.help import ViewDialogProjectSetting
 
 class ViewWindow(Gtk.Window):
 
@@ -538,7 +538,10 @@ class ViewWindow(Gtk.Window):
         # TODO 应该把设定放在ModelProject
         setting = {}
         setting['style'] = 'kate'
-        preferences = ViewDialogPreferences.show(self, setting)
+        #preferences = ViewDialogPreferences.show(self, setting)
+        isOK, results = FwManager.instance(None).requestService('dialog.project.setting',
+                        {'parent':self, 'setting':setting})
+        preferences = results['setting']
         if preferences is None:
             return
         else:

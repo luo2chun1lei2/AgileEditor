@@ -2,6 +2,7 @@
 
 ###########################################################
 # 项目各种选项的对话框。
+# TODO 这个对话框没有完成，只是一个半成品！
 
 import os, string, logging
 import ConfigParser
@@ -9,12 +10,33 @@ import ConfigParser
 from gi.repository import Gtk, Gdk, GtkSource
 
 from framework.FwUtils import *
+from framework.FwBaseComponent import FwBaseComponent
+
 from ModelProject import ModelProject
 from VeEventPipe import VeEventPipe
 
 ###########################################################
 
-class ViewDialogPreferences(Gtk.Dialog):
+class ViewDialogProjectSetting(FwBaseComponent):
+    def __init__(self):
+        pass
+    
+    def init(self, manager):
+        info = {'name':'dialog.project.setting', 'help':'show dialog for project setting.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # from FwBaseComponnet
+    def dispatchService(self, manager, serviceName, params):
+        if serviceName == "dialog.project.setting":
+            setting = DialogPreferences.show(params['parent'], params['setting'])
+            return (True, {'setting':setting})
+
+        else:
+            return (False, None)
+
+class DialogPreferences(Gtk.Dialog):
     # 显示当前项目各种配置，并可以进行修改。
     
     def __init__(self, parent, setting):
@@ -82,7 +104,7 @@ class ViewDialogPreferences(Gtk.Dialog):
         
     @staticmethod
     def show(parent, setting):
-        dialog = ViewDialogPreferences(parent, setting)
+        dialog = DialogPreferences(parent, setting)
         
         prj_name = None
         prj_src_path = None
