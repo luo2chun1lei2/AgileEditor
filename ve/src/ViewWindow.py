@@ -8,7 +8,6 @@
 # 4, 代码浏览工具。
 # 5, 编译和调试工具。
 # 6, 命令工具（可以编写任意的命令）
-# TODO 大量功能的入口函数在这里，是否合适？而且越来越复杂，无法维护。
 
 import os, sys, getopt, shutil, re, logging
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Vte
@@ -23,14 +22,12 @@ from ModelFile import ModelFile
 from ModelTask import ModelTask
 from ModelTags import *
 
-from component.help.ViewDialogProject import ViewDialogProjectNew, ViewDialogProjectOpen
 from ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
 from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
-from component.help import ViewDialogProjectSetting
 
 class ViewWindow(Gtk.Window):
 
@@ -478,7 +475,6 @@ class ViewWindow(Gtk.Window):
     def ide_new_project(self):
         # 新建项目
 
-        # prj_name, prj_src_dirs = ViewDialogProjectNew.show(self)
         isOK, results = FwManager.instance().requestService("dialog.project.new", {'parent':self})
         prj_name = results['prj_name']
         prj_src_dirs = results['prj_src_dirs']
@@ -796,8 +792,6 @@ class ViewWindow(Gtk.Window):
 
     def ide_help_info(self):
         # 显示帮助对话框
-        # TODO 必须在这里引入，不知道为什么！
-        # from framework.FwManager import FwManager
         FwManager.instance().requestService("dialog.info", None)
 
     def ide_edit_redo(self, widget):

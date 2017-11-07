@@ -9,7 +9,7 @@
 import sys, logging
 
 def main(argv):
-    logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
+    logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
     from framework.FwManager import FwManager
     mng = FwManager.instance()

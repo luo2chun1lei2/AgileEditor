@@ -5,8 +5,6 @@
 
 import logging
 
-from framework.FwComponent import FwComponent
-
 class FwService:
     def __init__(self, info, component):
         self.info = info
@@ -48,14 +46,14 @@ class FwManager():
         # TODO 以后修改成从固定文件夹等搜索组件，然后加载。
         from component.AppProcess import AppProcess
         from component.AppView import AppView
-        from component.CommandParser import CommandParser
-        from component.help.ViewHelp import ViewDialogInfo
+        from component.AppArgs import AppArgs
+        from component.help.ViewDailogInfo import ViewDialogInfo
         from component.help.ViewDialogCommon import ViewDialogCommon
         from component.help.ViewDialogProject import ViewDialogProject
         from component.help.ViewDialogProjectSetting import ViewDialogProjectSetting
 
         self._register("app_process", AppProcess())
-        self._register("command_parser", CommandParser())
+        self._register("command_parser", AppArgs())
         self._register("app_view", AppView())
         self._register("dialog_info", ViewDialogInfo())
         self._register("dialog_common", ViewDialogCommon())

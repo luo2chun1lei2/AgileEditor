@@ -5,7 +5,7 @@
 import getopt, logging
 from framework.FwComponent import FwComponent
 
-class CommandParser(FwComponent):
+class AppArgs(FwComponent):
     def __init__(self):
         pass
 

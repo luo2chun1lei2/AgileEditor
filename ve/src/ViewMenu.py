@@ -62,8 +62,6 @@ MENU_CONFIG = """
             <menuitem action='SearchAddBookmark' />
             <menuitem action='SearchRemoveBookmark' />
         </menu>
-        <menu action='HelpMenu'>
-        </menu>
     </menubar>
 
     <toolbar name='ToolBar'>
