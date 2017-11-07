@@ -44,7 +44,7 @@ class ViewWindow(Gtk.Window):
     RLT_CANCEL = 1  # 取消
     RLT_ERROR = 2  # 错误
 
-    PROGRAM_NAME = 'Agile Editor '
+    PROGRAM_NAME = 'AgileEditor v2.0 - '
 
     '''
     总窗口。
@@ -148,6 +148,9 @@ class ViewWindow(Gtk.Window):
         vbox.pack_start(panedFsAndEditor, True, True, 5)
 
         self.add(vbox)
+
+        # 将已经生成好的控件作为组件注册到框架中。
+        FwManager.instance().load("view_menu", self.ide_menu)
 
     def create_fs_tree(self):
         # 创建文件系统树控件。
@@ -475,11 +478,11 @@ class ViewWindow(Gtk.Window):
     def ide_new_project(self):
         # 新建项目
 
-        #prj_name, prj_src_dirs = ViewDialogProjectNew.show(self)
-        isOK, results = FwManager.instance(None).requestService("dialog.project.new", {'parent':self})
+        # prj_name, prj_src_dirs = ViewDialogProjectNew.show(self)
+        isOK, results = FwManager.instance().requestService("dialog.project.new", {'parent':self})
         prj_name = results['prj_name']
         prj_src_dirs = results['prj_src_dirs']
-        
+
         if prj_name is None:
             return False
 
@@ -507,7 +510,7 @@ class ViewWindow(Gtk.Window):
                 if each_prj.prj_name == prj_name:
                     prj = each_prj
         else:
-            isOK, results = FwManager.instance(None).requestService("dialog.project.open", 
+            isOK, results = FwManager.instance().requestService("dialog.project.open",
                                         {'parent':self, 'workshop':self.ideWorkshop})
             prj = results['project']
 
@@ -538,8 +541,8 @@ class ViewWindow(Gtk.Window):
         # TODO 应该把设定放在ModelProject
         setting = {}
         setting['style'] = 'kate'
-        #preferences = ViewDialogPreferences.show(self, setting)
-        isOK, results = FwManager.instance(None).requestService('dialog.project.setting',
+        # preferences = ViewDialogPreferences.show(self, setting)
+        isOK, results = FwManager.instance().requestService('dialog.project.setting',
                         {'parent':self, 'setting':setting})
         preferences = results['setting']
         if preferences is None:
@@ -795,7 +798,7 @@ class ViewWindow(Gtk.Window):
         # 显示帮助对话框
         # TODO 必须在这里引入，不知道为什么！
         # from framework.FwManager import FwManager
-        FwManager.instance(None).requestService("dialog.info", None)
+        FwManager.instance().requestService("dialog.info", None)
 
     def ide_edit_redo(self, widget):
         ve_editor = self.multiEditors.get_current_ide_editor()
@@ -956,7 +959,7 @@ class ViewWindow(Gtk.Window):
         # 看看是否已经选中了单词
         tag_name = self._ide_get_selected_text_or_word()
 
-        isOK, results = FwManager.instance(None).requestService('dialog.common.two_entry',
+        isOK, results = FwManager.instance().requestService('dialog.common.two_entry',
                                     {'transient_for':self, 'title':"替换", 'entry1_label':"从", 'text1':tag_name,
                                      'entry2_label':"到", 'text2':""})
         response = results['response']
@@ -1149,7 +1152,7 @@ class ViewWindow(Gtk.Window):
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.ide_goto_line, line_number)
 
     def _in_show_dialog_one_entry(self, title, label):
-        isOK, results = FwManager.instance(None).requestService('dialog.common.one_entry',
+        isOK, results = FwManager.instance().requestService('dialog.common.one_entry',
                                     {'transient_for':self, 'title':title, 'entry_label':label})
         return results['response'], results['text']
 

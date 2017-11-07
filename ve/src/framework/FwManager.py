@@ -29,14 +29,13 @@ class FwManager():
     _manager = None
 
     @staticmethod
-    def instance(argv):
+    def instance():
         if FwManager._manager is None:
-            FwManager._manager = FwManager(argv)
+            FwManager._manager = FwManager()
 
         return FwManager._manager
 
-    def __init__(self, argv):
-        self.argv = argv
+    def __init__(self):
 
         # {<component type name>:string, <component factory instance>:FwComponentFactory}
         # 注意这里实际上保存的是具体的组件实例。
@@ -55,15 +54,15 @@ class FwManager():
         from component.help.ViewDialogProject import ViewDialogProject
         from component.help.ViewDialogProjectSetting import ViewDialogProjectSetting
 
-        self.register("app_process", AppProcess())
-        self.register("command_parser", CommandParser())
-        self.register("app_view", AppView())
-        self.register("dialog_info", ViewDialogInfo())
-        self.register("dialog_common", ViewDialogCommon())
-        self.register("dialog_project", ViewDialogProject())
-        self.register("dialog_project_setting", ViewDialogProjectSetting())
+        self._register("app_process", AppProcess())
+        self._register("command_parser", CommandParser())
+        self._register("app_view", AppView())
+        self._register("dialog_info", ViewDialogInfo())
+        self._register("dialog_common", ViewDialogCommon())
+        self._register("dialog_project", ViewDialogProject())
+        self._register("dialog_project_setting", ViewDialogProjectSetting())
 
-    def run(self):
+    def run(self, argv):
         ''' 程序运行，整个系统不关闭，则此函数不关闭
         '''
 
@@ -74,7 +73,7 @@ class FwManager():
                 return False
 
         # 开始运行
-        self.requestService("app.run", {'argv':self.argv})
+        self.requestService("app.run", {'argv':argv})
 
         # 后期收尾
         for (name, component) in self.components.items():
@@ -87,13 +86,29 @@ class FwManager():
     #######################################################
     # # 组件工厂相关函数
 
-    def register(self, name, component):
-        '''
+    def _register(self, name, component):
+        ''' 注册组件，外部不要调用
         @param name: string: 工厂的名字，必须唯一
         @param componentFactory: FwComponentFactory: 工厂的实例
         '''
         self.components[name] = component
         component.onRegistered(self)
+        return True
+
+    def load(self, name, component):
+        ''' 外部使用的，加载一个组件：注册、初始化、通知其他组件都初始化
+        '''
+        if not self._register(name, component):
+            return False
+
+        if not component.onSetup(self):
+            return False
+
+        for oneName, oneComponent in self.components.items():
+            if name != oneName:
+                if not oneComponent.onSetup(self):
+                    return False
+        return True
 
     def unregisterByName(self, componentName):
         '''

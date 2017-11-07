@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 '''
 框架管理的组件的基础类，所有的组件都必须继承实现。
-TODO 组件是否需要自己知道名字？
 '''
 
 class FwComponent(object):
@@ -19,6 +18,8 @@ class FwComponent(object):
 
     def onSetup(self, manager):
         ''' 初始化时，此时大部分组件已经加载，允许向其他组件请求服务。
+        注意：此方法会被反复调用，所以需要注意“重入”问题。
+            另外，可能外部的组件会被替换、卸载，所以不能认为之前已经申请服务，现在不再需要。
         '''
         return True
 

@@ -12,8 +12,8 @@ def main(argv):
     logging.basicConfig(level=logging.DEBUG, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
     from framework.FwManager import FwManager
-    mng = FwManager.instance(argv)
-    mng.run()
+    mng = FwManager.instance()
+    mng.run(argv)
 
 if __name__ == '__main__':
     # 主入口

@@ -65,7 +65,7 @@ class VeMain():
         # 如果没有传入打开某个项目，或者指定的项目不存在，那么就指定一个。
         if prj is None :
             # 需要让客户选择一个项目
-            isOK, results = FwManager.instance(None).requestService("dialog.project.open", 
+            isOK, results = FwManager.instance().requestService("dialog.project.open",
                                         {'parent':None, 'workshop':self.workshop})
             prj = results['project']
 

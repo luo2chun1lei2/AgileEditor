@@ -4,8 +4,10 @@
 
 import os, logging
 
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf
+
 from framework.FwComponent import FwComponent
+from ViewMenu import ViewMenu
 
 class ViewDialogInfo(FwComponent, Gtk.Dialog):
     # 显示“关于”信息的对话框
@@ -13,14 +15,25 @@ class ViewDialogInfo(FwComponent, Gtk.Dialog):
     def __init__(self):
         pass
 
-    # from FwBaseComponnet
+    # from component
     def onRegistered(self, manager):
         info = {'name':'dialog.info', 'help':'show application information dialog.'}
         manager.registerService(info, self)
 
         return True
 
-    # from FwBaseComponnet
+    # from component
+    def onSetup(self, manager):
+        params = {'menu_name':'HelpMenu',
+                  'menuItemName':'HelpInfo',
+                  'title':"Information",
+                  'accel':"<Alt>H",
+                  'command_id':ViewMenu.ACTION_HELP_INFO}
+        manager.requestService("view.menu.add", params)
+
+        return True
+
+    # from component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.info":
             ViewDialogInfo.show(None)
@@ -36,7 +49,7 @@ class ViewDialogInfo(FwComponent, Gtk.Dialog):
 
         documentors = ['罗春雷']
 
-        license = """
+        my_license = """
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public License as
 published by the Free Software Foundation; either version 2 of the
@@ -61,7 +74,7 @@ Boston, MA 02111-1307, USA.
                                 program_name='Agile Editor',
                                 version='0.2',
                                 copyright='(C) 2017 罗春雷',
-                                license=license,
+                                license=my_license,
                                 website='https://github.com/luo2chun1lei2/AgileEditor',
                                 comments='Agile Editor.',
                                 authors=authors,

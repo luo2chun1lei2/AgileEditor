@@ -63,7 +63,6 @@ MENU_CONFIG = """
             <menuitem action='SearchRemoveBookmark' />
         </menu>
         <menu action='HelpMenu'>
-            <menuitem action='HelpInfo' />
         </menu>
     </menubar>
 
@@ -80,7 +79,7 @@ MENU_CONFIG = """
 </ui>
 """
 
-class ViewMenu(object):
+class ViewMenu(FwComponent):
     # 管理菜单和工具栏
 
     # 当前的状态。
@@ -154,19 +153,46 @@ class ViewMenu(object):
 
     # from component
     def onRegistered(self, manager):
-        info = {'name':'menu.add', 'help':'add item in menu.'}
+        info = {'name':'view.menu.add', 'help':'add item in menu.'}
         manager.registerService(info, self)
 
         return True
 
     # from component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "menu.add":
-            # logging.debug("show main view and into loop")
-            # self._show(params)
+        if serviceName == "view.menu.add":
+            self._addMenuItem(params['menu_name'],
+                              params['menuItemName'],
+                              params['title'],
+                              params['accel'],
+                              params['command_id'])
             return (True, None)
         else:
             return (False, None)
+
+    def _addMenuItem(self, menuName, menuItemName, title, accel, commandId):
+        ''' 根据设定，加入一个菜单项目
+        @param menuName: string: 菜单栏目的名字
+        @param menuItemName: string: 菜单项目的名字
+        @param title: string: 菜单显示的名字
+        @param accel: string: 快捷键
+        '''
+        strMenu = """ <ui> <menubar name='MenuBar'>
+                    <menu action='%s'>
+                        <menuitem action='%s' />
+                    </menu>
+            </menubar> </ui> """ % (menuName, menuItemName)
+
+        self.uimanager.add_ui_from_string(strMenu)
+
+        action_groups = self.uimanager.get_action_groups()
+        action_group = action_groups[0]
+
+        action_help_info = Gtk.Action(menuItemName, None, title, Gtk.STOCK_INFO)
+        action_help_info.connect("activate", self.on_common_menu_item, commandId)
+        if not accel is None:
+            action_group.add_action_with_accel(action_help_info, accel)
+        # self.action_help_info = on_common_menu_item
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass
@@ -238,13 +264,13 @@ class ViewMenu(object):
         self.add_search_menu_actions(action_group)
         self.add_help_menu_actions(action_group)
 
-        uimanager = self.create_ui_manager()
-        uimanager.insert_action_group(action_group)
+        self.uimanager = self.create_ui_manager()
+        self.uimanager.insert_action_group(action_group)
 
-        self.menubar = uimanager.get_widget("/MenuBar")
+        self.menubar = self.uimanager.get_widget("/MenuBar")
 
         # 工具栏供
-        self.toolbar = uimanager.get_widget("/ToolBar")
+        self.toolbar = self.uimanager.get_widget("/ToolBar")
 
         # - 加入额外的检索Bar
         self.need_jump = NeedJump(True)
@@ -270,7 +296,7 @@ class ViewMenu(object):
         self.toolbar.insert(tool_item, -1)  # 加在最后
 
         # 快捷菜单
-        window.add_accel_group(uimanager.get_accel_group())
+        window.add_accel_group(self.uimanager.get_accel_group())
 
         # 下面的弹出菜单
         # eventbox = Gtk.EventBox()
@@ -392,10 +418,10 @@ class ViewMenu(object):
         action_helptmenu = Gtk.Action("HelpMenu", "Help", None, None)
         action_group.add_action(action_helptmenu)
 
-        action_help_info = Gtk.Action("HelpInfo", None, "Information", Gtk.STOCK_INFO)
-        action_help_info.connect("activate", self.on_menu_help_info)
-        action_group.add_action_with_accel(action_help_info, "<Alt>H")
-        self.action_help_info = action_help_info
+        # action_help_info = Gtk.Action("HelpInfo", None, "Information", Gtk.STOCK_INFO)
+        # action_help_info.connect("activate", self.on_menu_help_info)
+        # action_group.add_action_with_accel(action_help_info, "<Alt>H")
+        # self.action_help_info = action_help_info
 
     def create_ui_manager(self):
 
@@ -552,9 +578,9 @@ class ViewMenu(object):
         logging.debug("A Search|Remove bookmark menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_REMOVE_BOOKMARK)
 
-    def on_menu_help_info(self, widget):
-        logging.debug("A Help|Infomation as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_HELP_INFO)
+    def on_common_menu_item(self, widget, commandId):
+        logging.debug("Common process of one menu item.")
+        self.on_menu_func(widget, commandId)
 
     def set_search_options(self, search_text, case_sensitive, is_word):
 
