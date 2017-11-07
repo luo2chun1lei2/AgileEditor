@@ -3,13 +3,14 @@
 # 通用对话框
 
 from gi.repository import Gtk, Gdk
+from framework.FwBaseComponent import FwBaseComponent
 
-class ViewDialogCommon:
+class ViewDialogCommon(FwBaseComponent):
     # 通用的对话框
     # 可以显示一个Entry或者两个Entry的对话框，然后得到输入的结果。
 
     # from FwBaseComponnet
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'dialog.common.one_entry', 'help':'show command dialog with one entry.'}
         manager.registerService(info, self)
 
@@ -19,7 +20,7 @@ class ViewDialogCommon:
         return True
 
     # from FwBaseComponnet
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.common.one_entry":
             response, text = ViewDialogCommon.show_one_entry(params['transient_for'], params['title'], params['entry_label'])
             return (True, {'response': response, 'text':text})

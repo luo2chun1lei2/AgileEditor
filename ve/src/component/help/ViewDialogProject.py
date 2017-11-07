@@ -23,7 +23,7 @@ class ViewDialogProject(FwBaseComponent):
     def __init__(self):
         pass
     
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'dialog.project.new', 'help':'show dialog for adding new project.'}
         manager.registerService(info, self)
         
@@ -36,7 +36,7 @@ class ViewDialogProject(FwBaseComponent):
         return True
 
     # from FwBaseComponnet
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.project.new":
             prj_name, prj_src_dirs = ViewDialogProjectNew.show(params['parent'])
             return (True, {'prj_name':prj_name, 'prj_src_dirs':prj_src_dirs})

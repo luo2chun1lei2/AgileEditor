@@ -14,14 +14,14 @@ class ViewDialogInfo(FwBaseComponent, Gtk.Dialog):
         pass
 
     # from FwBaseComponnet
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'dialog.info', 'help':'show application information dialog.'}
         manager.registerService(info, self)
 
         return True
 
     # from FwBaseComponnet
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.info":
             ViewDialogInfo.show(None)
             return (True, None)

@@ -11,12 +11,12 @@ class AppView(FwBaseComponent):
     def __init__(self):
         pass
 
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'app.view', 'help':'show the main view of application.'}
         manager.registerService(info, self)
         return True
 
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "app.view":
             logging.debug("show main view and into loop")
             self._show(params)

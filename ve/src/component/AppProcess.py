@@ -10,12 +10,12 @@ class AppProcess(FwBaseComponent):
     def __init__(self):
         pass
 
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'app.run', 'help':'run as main application.'}
         manager.registerService(info, self)
         return True
 
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "app.run":
             logging.debug("run application")
 

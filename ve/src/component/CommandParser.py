@@ -9,7 +9,7 @@ class CommandParser(FwBaseComponent):
     def __init__(self):
         pass
 
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'command.parse', 'help':'parse the command options, and return result.'}
         manager.registerService(info, self)
 
@@ -18,7 +18,7 @@ class CommandParser(FwBaseComponent):
 
         return True
 
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "command.parse":
             logging.debug("parse command")
             argv = params['argv']

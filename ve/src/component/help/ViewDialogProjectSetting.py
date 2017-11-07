@@ -21,14 +21,14 @@ class ViewDialogProjectSetting(FwBaseComponent):
     def __init__(self):
         pass
     
-    def init(self, manager):
+    def onRegistered(self, manager):
         info = {'name':'dialog.project.setting', 'help':'show dialog for project setting.'}
         manager.registerService(info, self)
 
         return True
 
     # from FwBaseComponnet
-    def dispatchService(self, manager, serviceName, params):
+    def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.project.setting":
             setting = DialogPreferences.show(params['parent'], params['setting'])
             return (True, {'setting':setting})
