@@ -7,7 +7,7 @@ import os, string, logging
 import ConfigParser
 
 from framework.FwUtils import *
-from ModelProject import ModelProject
+from model.ModelProject import ModelProject
 
 class ModelWorkshop(object):
     # 管理项目的工作区域。

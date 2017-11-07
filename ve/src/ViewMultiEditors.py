@@ -7,7 +7,7 @@ import os, sys, getopt
 from collections import OrderedDict
 
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Gio
-from ModelFile import ModelFile
+from model.ModelFile import ModelFile
 from ViewMenu import ViewMenu
 
 class ViewEditor:

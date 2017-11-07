@@ -8,9 +8,9 @@ from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
 
 from framework.FwManager import FwManager
 
-from ModelWorkshop import ModelWorkshop
-from ModelProject import ModelProject
-from ModelFile import ModelFile
+from model.ModelWorkshop import ModelWorkshop
+from model.ModelProject import ModelProject
+from model.ModelFile import ModelFile
 from ViewWindow import ViewWindow
 
 from VeEventPipe import VeEventPipe

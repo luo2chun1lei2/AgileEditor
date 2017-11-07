@@ -12,7 +12,7 @@ from gi.repository import Gtk, Gdk, GtkSource
 from framework.FwUtils import *
 from framework.FwComponent import FwComponent
 
-from ModelProject import ModelProject
+from model.ModelProject import ModelProject
 from VeEventPipe import VeEventPipe
 
 ###########################################################

@@ -10,7 +10,7 @@ gi.require_version('GtkSource', '3.0')
 from gi.repository import GObject, Gtk, Gdk, GtkSource
 
 from framework.FwUtils import *
-from ModelTags import ModelGTags
+from model.ModelTags import ModelGTags
 
 # 说明
 # do_get_start_iter 和 GtkSource.CompletionContext.get_iter() 在最新的Ubuntu 16中修改了，

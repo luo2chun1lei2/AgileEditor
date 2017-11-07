@@ -13,7 +13,7 @@ from framework.FwUtils import *
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
-from ModelProject import ModelProject
+from model.ModelProject import ModelProject
 from VeEventPipe import VeEventPipe
 
 ###########################################################

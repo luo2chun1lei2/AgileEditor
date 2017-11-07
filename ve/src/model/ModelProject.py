@@ -8,7 +8,7 @@ import os, logging
 import ConfigParser
 
 from framework.FwUtils import *
-from ModelTags import ModelGTags, ModelTag
+from model.ModelTags import ModelGTags, ModelTag
 from VeWordProvider import VeWordProvider
 
 class ModelProject(object):

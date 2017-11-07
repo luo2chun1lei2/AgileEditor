@@ -5,7 +5,7 @@
 
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
-from ModelTags import ModelTag
+from model.ModelTags import ModelTag
 
 class ViewSearchTagList:
     # 定制一个ListView，内部显示Tag。

@@ -5,7 +5,7 @@
 
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
-from ModelTags import ModelTag
+from model.ModelTags import ModelTag
 from framework.FwUtils import *
 
 class ViewFileTagList:
