@@ -4,9 +4,9 @@
 负责整个app的初始化等流程，有比较复杂的 dispatch 实现。
 '''
 import logging
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 
-class AppProcess(FwBaseComponent):
+class AppProcess(FwComponent):
     def __init__(self):
         pass
 

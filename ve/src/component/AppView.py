@@ -5,9 +5,9 @@
 
 import logging
 
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 
-class AppView(FwBaseComponent):
+class AppView(FwComponent):
     def __init__(self):
         pass
 

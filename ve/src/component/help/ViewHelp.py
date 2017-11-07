@@ -5,9 +5,9 @@
 import os, logging
 
 from gi.repository import Gtk, Gdk, GdkPixbuf
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 
-class ViewDialogInfo(FwBaseComponent, Gtk.Dialog):
+class ViewDialogInfo(FwComponent, Gtk.Dialog):
     # 显示“关于”信息的对话框
 
     def __init__(self):

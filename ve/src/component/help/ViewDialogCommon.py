@@ -3,9 +3,9 @@
 # 通用对话框
 
 from gi.repository import Gtk, Gdk
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 
-class ViewDialogCommon(FwBaseComponent):
+class ViewDialogCommon(FwComponent):
     # 通用的对话框
     # 可以显示一个Entry或者两个Entry的对话框，然后得到输入的结果。
 

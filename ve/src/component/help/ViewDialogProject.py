@@ -10,7 +10,7 @@ import ConfigParser
 from gi.repository import Gtk, Gdk
 
 from framework.FwUtils import *
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
 from ModelProject import ModelProject
@@ -18,7 +18,7 @@ from VeEventPipe import VeEventPipe
 
 ###########################################################
 
-class ViewDialogProject(FwBaseComponent):
+class ViewDialogProject(FwComponent):
     # from FwBaseComponnet
     def __init__(self):
         pass

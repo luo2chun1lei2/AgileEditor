@@ -4,7 +4,7 @@
 TODO 组件是否需要自己知道名字？
 '''
 
-class FwBaseComponent(object):
+class FwComponent(object):
 
     def __init__(self):
         pass

@@ -3,9 +3,9 @@
 分析输入的命令。
 '''
 import getopt, logging
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 
-class CommandParser(FwBaseComponent):
+class CommandParser(FwComponent):
     def __init__(self):
         pass
 

@@ -4,7 +4,7 @@
 比较常见的是需要编辑的文件、项目列表和当前项目信息等。
 '''
 
-from framework import FwBaseComponent
+from framework import FwComponent
 
 class FwData():
     def __init__(self):

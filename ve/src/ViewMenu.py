@@ -4,6 +4,7 @@
 
 import logging
 from gi.repository import Gtk, Gdk, GtkSource
+from framework.FwComponent import FwComponent
 
 class NeedJump:
     def __init__(self, need):
@@ -150,6 +151,22 @@ class ViewMenu(object):
         self.on_menu_func = on_menu_func
 
         self._create_menu(window)
+
+    # from component
+    def onRegistered(self, manager):
+        info = {'name':'menu.add', 'help':'add item in menu.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # from component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "menu.add":
+            # logging.debug("show main view and into loop")
+            # self._show(params)
+            return (True, None)
+        else:
+            return (False, None)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass

@@ -5,7 +5,7 @@
 
 import logging
 
-from framework.FwBaseComponent import FwBaseComponent
+from framework.FwComponent import FwComponent
 
 class FwService:
     def __init__(self, info, component):
@@ -42,7 +42,7 @@ class FwManager():
         # 注意这里实际上保存的是具体的组件实例。
         self.components = {}
 
-        # [服务和组件]: [<map>: <FwBaseComponent>]
+        # [服务和组件]: [<map>: <FwComponent>]
         self.services = []
 
         # 注册已知的组件工厂。

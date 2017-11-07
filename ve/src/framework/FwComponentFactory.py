@@ -3,7 +3,7 @@
 组件的工厂类。
 '''
 
-from framework import FwBaseComponent
+from framework import FwComponent
 
 # TODO 不准备要了！
 class FwComponentFactory123():
@@ -18,12 +18,12 @@ class FwComponentFactory123():
 
     def createComponent(self):
         ''' 创建需要的组件。
-        @return FwBaseComponent: 生成组件
+        @return FwComponent: 生成组件
         '''
         return None
 
     def destroyComponent(self, component):
         ''' 销毁组件 (TODO dialog之类的无法调用这个函数！)
-        @param component: FwBaseComponent: 要被销毁的组件
+        @param component: FwComponent: 要被销毁的组件
         '''
         pass
