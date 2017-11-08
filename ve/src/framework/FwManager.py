@@ -35,11 +35,10 @@ class FwManager():
 
     def __init__(self):
 
-        # {<component type name>:string, <component factory instance>:FwComponentFactory}
-        # 注意这里实际上保存的是具体的组件实例。
+        # {<component name>:string, <component instance>:FwComponent}
         self.components = {}
 
-        # [服务和组件]: [<map>: <FwComponent>]
+        # [服务的信息]: [<FwService>]
         self.services = []
 
         # 注册已知的组件工厂。
@@ -163,3 +162,33 @@ class FwManager():
 
         logging.error("cannot find service %s" % serviceName)
         return (False, None)
+
+    #############################################
+    # for DEBUG
+    def showComponents(self, needStr=False):
+        ''' 显示目前的组件信息
+        '''
+        text = "components:\n"
+        for name, cmpt in self.components.items():
+            text += "\t%s : %s\n" % (name, type(cmpt).__module__)
+
+        if needStr:
+            return text
+        else:
+            print text
+            return None
+
+    def showServices(self, needStr=False):
+        ''' 显示目前注册的服务信息。
+        '''
+
+        text = "services:\n"
+        for service in self.services:
+            info = service.info
+            text += "\t%s : %s\n" % (info['name'], info['help'])
+
+        if needStr:
+            return text
+        else:
+            print text
+            return None

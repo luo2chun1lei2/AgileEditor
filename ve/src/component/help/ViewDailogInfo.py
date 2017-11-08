@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
-# 对与Ide有帮助和支持的功能。
+''' 显示帮助信息。
+'''
 
 import os, logging
 
@@ -8,9 +9,11 @@ from gi.repository import Gtk, GdkPixbuf
 
 from framework.FwComponent import FwComponent
 from ViewMenu import ViewMenu
+from framework.FwManager import FwManager
 
-class ViewDialogInfo(FwComponent, Gtk.Dialog):
-    # 显示“关于”信息的对话框
+class ViewDialogInfo(FwComponent):
+    ''' 显示“关于”信息的对话框
+    '''
 
     def __init__(self):
         pass
@@ -45,26 +48,13 @@ class ViewDialogInfo(FwComponent, Gtk.Dialog):
     @staticmethod
     def show(window):
 
-        authors = ['罗春雷']
+        authors = ['罗春雷', "luo2chun1lei2@icloud.com"]
 
-        documentors = ['罗春雷']
+        componentInfo = FwManager.instance().showComponents(True)
+        serviceInfo = FwManager.instance().showServices(True)
+        documentors = ["------------------------------", componentInfo, serviceInfo]
+        print documentors[0]
 
-        my_license = """
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public License as
-published by the Free Software Foundation; either version 2 of the
-License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public
-License along with the Gnome Library; see the file COPYING.LIB.  If not,
-write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
-"""
         dirname = os.path.abspath(os.path.dirname(__file__))
         filename = os.path.join(dirname, '', '../../ve.png')
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
@@ -72,11 +62,11 @@ Boston, MA 02111-1307, USA.
 
         about = Gtk.AboutDialog(parent=window,
                                 program_name='Agile Editor',
-                                version='0.2',
+                                version='0.3',
                                 copyright='(C) 2017 罗春雷',
-                                license=my_license,
+                                license_type=Gtk.License.GPL_3_0,
                                 website='https://github.com/luo2chun1lei2/AgileEditor',
-                                comments='Agile Editor.',
+                                comments="This editor is used for editing c/c++ program, and source navigator.",
                                 authors=authors,
                                 documenters=documentors,
                                 logo=transparent,
