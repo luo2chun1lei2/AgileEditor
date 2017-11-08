@@ -17,7 +17,7 @@ from VeEventPipe import VeEventPipe
 
 ###########################################################
 
-class ViewDialogProjectSetting(FwComponent):
+class ViewDialogWorkshopSetting(FwComponent):
     def __init__(self):
         pass
 
