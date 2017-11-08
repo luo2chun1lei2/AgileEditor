@@ -534,18 +534,18 @@ class ViewWindow(Gtk.Window):
 
     def ide_preferences_project(self):
         # 配置当前的项目
-        # TODO 应该把设定放在ModelProject
-        setting = {}
-        setting['style'] = 'kate'
+        # TODO 应该把设定放在全局设定中，项目自己有自己的配置，这个配置应该是全局的。
+        # TODO 应该从ViewMultiEditors 中取得此Style的名字，或者从上面的全局配置中获取。
+        setting = {'style': 'cobalt' }
         # preferences = ViewDialogPreferences.show(self, setting)
         isOK, results = FwManager.instance().requestService('dialog.project.setting',
                         {'parent':self, 'setting':setting})
         preferences = results['setting']
         if preferences is None:
             return
-        else:
-            # do something
-            pass
+
+        # 修改系统设定！
+        self.multiEditors.changeEditorStyle(preferences['style'])
 
     def ide_close_project(self):
         ''' 关闭当前的项目 '''
