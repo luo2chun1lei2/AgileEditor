@@ -4,12 +4,13 @@
 # 负责整个工作站的工作，比如项目的添加、删除等，还包括配置文件和设定工作目录。
 
 import os, string, logging
-import ConfigParser
+from ConfigParser import ConfigParser, NoSectionError
 
 from framework.FwUtils import *
+from framework.FwComponent import FwComponent
 from model.ModelProject import ModelProject
 
-class ModelWorkshop(object):
+class ModelWorkshop(FwComponent):
     # 管理项目的工作区域。
     # 以 ws.conf 文件为核心。(ini文件)
     # 属性：
@@ -22,6 +23,9 @@ class ModelWorkshop(object):
     
     SEC_NAME_PRJ = 'projects'
     # Section name of project
+    
+    SEC_NAME_SETTING = 'setting'
+    SEC_NAME_STYLE = 'style'
     
     def __init__(self, ws_path):
         # ws_path:string:workshop的路径。
@@ -48,7 +52,27 @@ class ModelWorkshop(object):
             logging.error('创建了Workshop配置文件:%s' % (self.ws_config_path))
         
         # 读取配置文件。 
-        self.projects =  self._read_conf(self.ws_config_path)
+        self.setting, self.projects =  self._read_conf(self.ws_config_path)
+    
+    # from component
+    def onRegistered(self, manager):
+        info = {'name':'model.workshop.getopt', 'help':'get one option value of workshop.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # from component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "model.workshop.getopt":
+            # get opt value by key.
+            key = params['key']
+            if key is None:
+                logging.error("Need command arguments.")
+                return (False, None)
+            return (True, {'value': self.setting[key]})
+        
+        else:
+            return (False, None)
         
     def get_project(self, project_name):
         # 根据项目名字，得到项目。
@@ -134,7 +158,7 @@ class ModelWorkshop(object):
         # 加入了一个[projects]
         
         # 创建解析器
-        cf = ConfigParser.ConfigParser()
+        cf = ConfigParser()
         
         # 添加一个基本的节点
         cf.add_section(ModelWorkshop.SEC_NAME_PRJ)
@@ -148,14 +172,13 @@ class ModelWorkshop(object):
         # 读取workshop的配置文件 
         
         # 创建解析器
-        cf = ConfigParser.ConfigParser()
+        cf = ConfigParser()
         
         # 读取和分析数据
         cf.read(config_path)
         
         # 清空原来的项目组，然后读取配置文件中的项目组。
         prjs = []
-        
         prj_infoes = cf.items(ModelWorkshop.SEC_NAME_PRJ)
         # print 'projects:', prj_infoes
         for prj_info in prj_infoes:
@@ -163,20 +186,32 @@ class ModelWorkshop(object):
             prj = ModelProject.open(prj_dir)
             prjs.append(prj)
         
-        return prjs
+        setting = {'style':'cobalt'} # 缺省值
+        try:
+            setting[ModelWorkshop.SEC_NAME_STYLE] = cf.get(ModelWorkshop.SEC_NAME_SETTING, ModelWorkshop.SEC_NAME_STYLE)
+        except NoSectionError:
+            pass
+        
+        return setting, prjs
 
     def _write_conf(self, projects):
         # 写入workshop的配置文件
         
         # 创建解析器
-        cf = ConfigParser.ConfigParser()
+        cf = ConfigParser()
         
         # 添加 [projects]
         cf.add_section(ModelWorkshop.SEC_NAME_PRJ)
         # 写入每个项目的路径。
         for n, prj in enumerate(projects):
             # project<no> = basename(dir_path(project.config_path))
-            cf.set(ModelWorkshop.SEC_NAME_PRJ, "project" + str(n), os.path.basename(os.path.dirname(prj.config_path)))
+            cf.set(ModelWorkshop.SEC_NAME_PRJ, 
+                   "project" + str(n), os.path.basename(os.path.dirname(prj.config_path)))
+        
+        # setting的各种设置
+        cf.add_section(ModelWorkshop.SEC_NAME_SETTING)
+        cf.set(ModelWorkshop.SEC_NAME_SETTING, ModelWorkshop.SEC_NAME_STYLE,
+                self.setting[ModelWorkshop.SEC_NAME_STYLE])
         
         # 写入数据
         fo_config = open(self.ws_config_path, 'w')

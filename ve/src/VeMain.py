@@ -42,6 +42,8 @@ class VeMain():
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, self.add_new_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_DEL_PROJECT, self.del_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_CHANGE_PROJECT, self.change_project)
+        
+        FwManager.instance().load('model_workshop', self.workshop)
 
     def find_corresponding_project(self):
         # 根据当前路径，找到合适的项目。

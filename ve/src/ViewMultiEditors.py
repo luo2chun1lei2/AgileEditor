@@ -7,6 +7,7 @@ import os, sys, getopt, logging
 from collections import OrderedDict
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Gio
 
+from framework.FwManager import FwManager
 from model.ModelFile import ModelFile
 from ViewMenu import ViewMenu
 
@@ -300,8 +301,10 @@ class ViewMultiEditors:
             # src_buffer.connect("changed", self.on_src_bufer_changed)
             # 可以利用 styleSchemeManager.get_scheme_ids() 得到所有的id
             # ['cobalt', 'kate', 'oblivion', 'solarized-dark', 'solarized-light', 'tango', 'classic']
+            isOK, results = FwManager.instance().requestService("model.workshop.getopt", {'key':"style"})
+            
             styleSchemeManager = GtkSource.StyleSchemeManager.get_default()
-            styleScheme = styleSchemeManager.get_scheme("cobalt")
+            styleScheme = styleSchemeManager.get_scheme(results['value'])
             if styleScheme is not None:
                 self.styleScheme = styleScheme  # 不能丢弃
                 src_buffer.set_style_scheme(self.styleScheme)
