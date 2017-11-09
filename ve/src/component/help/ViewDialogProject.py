@@ -83,9 +83,9 @@ class ViewDialogProjectNew(Gtk.Dialog):
         lbl_src_path = Gtk.Label("代码路径")
         vbox.pack_start(lbl_src_path, True, True, 0)
 
-        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ',
+        self.btn_font = Gtk.FileChooserButton.new('请选择一个文件夹 ',
                                                          Gtk.FileChooserAction.SELECT_FOLDER)
-        vbox.pack_start(self.picker_src_path, True, True, 1.0)
+        vbox.pack_start(self.btn_font, True, True, 1.0)
 
         ###############################
         box = self.get_content_area()
@@ -107,7 +107,7 @@ class ViewDialogProjectNew(Gtk.Dialog):
             if response == Gtk.ResponseType.OK:
                 # 如果选择OK的话，就创建对应的Project项目。
                 prj_name = dialog.entry_prj_name.get_text()
-                prj_src_path = dialog.picker_src_path.get_filename()
+                prj_src_path = dialog.btn_font.get_filename()
 
                 if is_empty(prj_name):
                     # 项目名字为空，重新回到对话框
@@ -155,9 +155,9 @@ class ViewDialogProjectChange(Gtk.Dialog):
         lbl_src_path = Gtk.Label("代码路径")
         vbox.pack_start(lbl_src_path, True, True, 0)
 
-        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ',
+        self.btn_font = Gtk.FileChooserButton.new('请选择一个文件夹 ',
                                                          Gtk.FileChooserAction.SELECT_FOLDER)
-        vbox.pack_start(self.picker_src_path, True, True, 1.0)
+        vbox.pack_start(self.btn_font, True, True, 1.0)
 
         ###############################
         box = self.get_content_area()
@@ -174,7 +174,7 @@ class ViewDialogProjectChange(Gtk.Dialog):
         prj_src_path = None
 
         dialog.entry_prj_name.set_text(prj.prj_name)
-        dialog.picker_src_path.set_current_folder(prj.src_dirs[0])
+        dialog.btn_font.set_current_folder(prj.src_dirs[0])
 
         need_show = True
         while need_show:
@@ -184,7 +184,7 @@ class ViewDialogProjectChange(Gtk.Dialog):
             if response == Gtk.ResponseType.OK:
                 # 如果选择OK的话，就创建对应的Project项目。
                 prj_name = dialog.entry_prj_name.get_text()
-                prj_src_path = dialog.picker_src_path.get_filename()
+                prj_src_path = dialog.btn_font.get_filename()
                 if is_empty(prj_name):
                     # 重新回到对话框
                     continue

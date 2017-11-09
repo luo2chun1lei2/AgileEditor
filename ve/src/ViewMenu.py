@@ -15,9 +15,10 @@ MENU_CONFIG = """
 <ui>
     <menubar name='MenuBar'>
         <menu action='ProjectMenu'>
+            <menuitem action='WorkshopPreferences' />
+            <separator />
             <menuitem action='ProjectNew' />
             <menuitem action='ProjectOpen' />
-            <menuitem action='ProjectPreferences' />
             <menuitem action='ProjectClose' />
             <separator />
             <menuitem action='ProjectUpdateTags' />
@@ -201,7 +202,7 @@ class ViewMenu(FwComponent):
         if self.menu_status == self.STATUS_PROJECT_NONE:
             self.action_project_new.set_sensitive(True)
             self.action_project_open.set_sensitive(True)
-            self.action_project_preferences.set_sensitive(False)
+            self.action_workshop_preferences.set_sensitive(False)
             self.action_project_close.set_sensitive(False)
 
             self.action_file_new.set_sensitive(False)
@@ -214,7 +215,7 @@ class ViewMenu(FwComponent):
 
             self.action_project_new.set_sensitive(True)
             self.action_project_open.set_sensitive(True)
-            self.action_project_preferences.set_sensitive(True)
+            self.action_workshop_preferences.set_sensitive(True)
             self.action_project_close.set_sensitive(True)
 
             self.action_file_new.set_sensitive(True)
@@ -226,7 +227,7 @@ class ViewMenu(FwComponent):
         elif self.menu_status == self.STATUS_FILE_OPEN_CHANGED:
             self.action_project_new.set_sensitive(True)
             self.action_project_open.set_sensitive(True)
-            self.action_project_preferences.set_sensitive(True)
+            self.action_workshop_preferences.set_sensitive(True)
             self.action_project_close.set_sensitive(True)
 
             self.action_file_new.set_sensitive(True)
@@ -238,7 +239,7 @@ class ViewMenu(FwComponent):
         else:  # STATUS_FILE_NONE:
             self.action_project_new.set_sensitive(True)
             self.action_project_open.set_sensitive(True)
-            self.action_project_preferences.set_sensitive(True)
+            self.action_workshop_preferences.set_sensitive(True)
             self.action_project_close.set_sensitive(True)
 
             self.action_file_new.set_sensitive(True)
@@ -321,10 +322,10 @@ class ViewMenu(FwComponent):
         action_group.add_action(action_project_open)
         self.action_project_open = action_project_open
 
-        action_project_preferences = Gtk.Action("ProjectPreferences", None, "Preferences", Gtk.STOCK_PREFERENCES)
-        action_project_preferences.connect("activate", self.on_menu_project_setting)
-        action_group.add_action(action_project_preferences)
-        self.action_project_preferences = action_project_preferences
+        action_workshop_preferences = Gtk.Action("WorkshopPreferences", None, "Preferences", Gtk.STOCK_PREFERENCES)
+        action_workshop_preferences.connect("activate", self.on_menu_workshop_setting)
+        action_group.add_action(action_workshop_preferences)
+        self.action_workshop_preferences = action_workshop_preferences
 
         action_project_close = Gtk.Action("ProjectClose", None, "Close Current Project", Gtk.STOCK_CLOSE)
         action_project_close.connect("activate", self.on_menu_project_close)
@@ -442,7 +443,7 @@ class ViewMenu(FwComponent):
         logging.debug("A Project|Open menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_OPEN)
 
-    def on_menu_project_setting(self, widget):
+    def on_menu_workshop_setting(self, widget):
         logging.debug("A Project|Preferences menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_PREFERENCES)
 

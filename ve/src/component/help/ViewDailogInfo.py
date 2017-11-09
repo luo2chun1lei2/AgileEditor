@@ -53,7 +53,6 @@ class ViewDialogInfo(FwComponent):
         componentInfo = FwManager.instance().showComponents(True)
         serviceInfo = FwManager.instance().showServices(True)
         documentors = ["------------------------------", componentInfo, serviceInfo]
-        print documentors[0]
 
         dirname = os.path.abspath(os.path.dirname(__file__))
         filename = os.path.join(dirname, '', '../../ve.png')

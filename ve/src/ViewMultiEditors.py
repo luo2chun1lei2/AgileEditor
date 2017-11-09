@@ -252,7 +252,8 @@ class ViewMultiEditors:
         editor.set_tab_width(4)  # tab宽度4
         editor.set_highlight_current_line(True)  # 高亮度显示当前行
 
-        self._ide_set_font(editor, "Ubuntu mono 12")  # 设置字体。
+        isOK, results = FwManager.instance().requestService('model.workshop.getopt', {'key': 'font'})
+        self._ide_set_font(editor, results['value'])  # 设置字体。
 
         # 左边的标记区域
         gutter = editor.get_gutter(Gtk.TextWindowType.LEFT)
@@ -302,7 +303,7 @@ class ViewMultiEditors:
             # 可以利用 styleSchemeManager.get_scheme_ids() 得到所有的id
             # ['cobalt', 'kate', 'oblivion', 'solarized-dark', 'solarized-light', 'tango', 'classic']
             isOK, results = FwManager.instance().requestService("model.workshop.getopt", {'key':"style"})
-            
+
             styleSchemeManager = GtkSource.StyleSchemeManager.get_default()
             styleScheme = styleSchemeManager.get_scheme(results['value'])
             if styleScheme is not None:
@@ -402,5 +403,16 @@ class ViewMultiEditors:
         for viewEditor in self.dic_editors.values():
             srcBuffer = viewEditor.editor.get_buffer()
             srcBuffer.set_style_scheme(self.styleScheme)
+
+        return True
+
+    def changeEditorFont(self, fontName):
+        ''' 修改所有编辑器的 font
+        @param fontName: string: font name
+        @return bool:is ok?
+        '''
+
+        for viewEditor in self.dic_editors.values():
+            self._ide_set_font(viewEditor.editor, fontName)
 
         return True

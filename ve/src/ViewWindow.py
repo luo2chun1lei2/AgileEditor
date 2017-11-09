@@ -535,7 +535,7 @@ class ViewWindow(Gtk.Window):
     def ide_preferences_project(self):
         # 配置当前的项目
         # 设定保存在workshop的数据模型之中。
-        setting = {'style': self.ideWorkshop.setting[ModelWorkshop.SEC_NAME_STYLE] }
+        setting = {'style': self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE] }
         # preferences = ViewDialogPreferences.show(self, setting)
         isOK, results = FwManager.instance().requestService('dialog.project.setting',
                         {'parent':self, 'setting':setting})
@@ -545,8 +545,11 @@ class ViewWindow(Gtk.Window):
 
         # 修改系统设定！
         self.multiEditors.changeEditorStyle(setting['style'])
-        
-        self.ideWorkshop.setting[ModelWorkshop.SEC_NAME_STYLE] = setting['style']
+        self.multiEditors.changeEditorFont(setting['font'])
+
+        self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE] = setting['style']
+        self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_FONT] = setting['font']
+
         self.ideWorkshop.save_conf()
 
     def ide_close_project(self):

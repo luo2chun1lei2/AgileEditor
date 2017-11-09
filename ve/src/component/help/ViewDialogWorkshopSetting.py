@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 
-###########################################################
-# 项目各种选项的对话框。
-# TODO 这个对话框没有完成，只是一个半成品！
+'''
+整个workshop的选项的对话框。
+'''
 
 import os, string, logging
 import ConfigParser
@@ -11,6 +11,7 @@ from gi.repository import Gtk, Gdk, GtkSource
 
 from framework.FwUtils import *
 from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
 
 from model.ModelProject import ModelProject
 from VeEventPipe import VeEventPipe
@@ -44,7 +45,7 @@ class DialogPreferences(Gtk.Dialog):
         self.parent = parent
         self.setting = setting
 
-        Gtk.Dialog.__init__(self, "项目设定", parent, 0,
+        Gtk.Dialog.__init__(self, "Workshop设定", parent, 0,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                              Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
@@ -53,22 +54,23 @@ class DialogPreferences(Gtk.Dialog):
         vbox = Gtk.VBox(spacing=10)
 
         ###############################
-        # # 样式
-        lbl_prj_name = Gtk.Label("样式")
-        lbl_prj_name.set_justify(Gtk.Justification.LEFT)
-        vbox.pack_start(lbl_prj_name, False, True, 0)
+        # 编辑器样式(stylescheme)
+        lbl_style_name = Gtk.Label("样式")
+        lbl_style_name.set_justify(Gtk.Justification.LEFT)
+        vbox.pack_start(lbl_style_name, False, True, 0)
 
         self.cmb_style = self._init_styles()
         vbox.pack_start(self.cmb_style, True, True, 0)
 
         ###############################
-        # # 语言（应该每个文件一个）TODO
-        lbl_src_path = Gtk.Label("代码路径")
-        vbox.pack_start(lbl_src_path, True, True, 0)
+        # 字体名字
+        lbl_font_name = Gtk.Label("字体")
+        vbox.pack_start(lbl_font_name, True, True, 0)
 
-        self.picker_src_path = Gtk.FileChooserButton.new('请选择一个文件夹 ',
-                                                         Gtk.FileChooserAction.SELECT_FOLDER)
-        vbox.pack_start(self.picker_src_path, True, True, 1.0)
+        isOK, results = FwManager.instance().requestService('model.workshop.getopt', {'key':'font'})
+        self.btn_font = Gtk.FontButton.new_with_font(results['value'])
+        self.btn_font.connect('font-set', self.on_font_changed)
+        vbox.pack_start(self.btn_font, True, True, 1.0)
 
         ###############################
         box = self.get_content_area()
@@ -78,10 +80,7 @@ class DialogPreferences(Gtk.Dialog):
 
     def _init_styles(self):
         styles = GtkSource.StyleSchemeManager.get_default().get_scheme_ids()
-        # styleScheme = styleSchemeManager.get_scheme("cobalt")
-        # if styleScheme is not None:
-        #    self.styleScheme = styleScheme # 不能丢弃
-            # src_buffer.set_style_scheme(self.styleScheme)
+
         model = Gtk.ListStore(str)
         found_index = -1
         for i in range(len(styles)):
@@ -98,6 +97,10 @@ class DialogPreferences(Gtk.Dialog):
 
         return cmb
 
+    def on_font_changed(self, btn):
+        self.setting['font'] = btn.get_font_name()
+        return True
+
     def on_style_changed(self, combobox):
         itr = combobox.get_active_iter()
         self.setting['style'] = combobox.get_model().get_value(itr, 0)
@@ -106,9 +109,6 @@ class DialogPreferences(Gtk.Dialog):
     @staticmethod
     def show(parent, setting):
         dialog = DialogPreferences(parent, setting)
-
-        prj_name = None
-        prj_src_path = None
 
         response = dialog.run()
         if response != Gtk.ResponseType.OK:
