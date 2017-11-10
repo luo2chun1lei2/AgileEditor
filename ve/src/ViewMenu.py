@@ -176,22 +176,24 @@ class ViewMenu(FwComponent):
         @param title: string: 菜单显示的名字
         @param accel: string: 快捷键
         '''
+
+        actionGroups = self.uimanager.get_action_groups()
+        actionGroup = actionGroups[0]
+        if actionGroup.get_action(menuItemName) is not None:
+            logging.debug("There is %s in menu." % menuItemName)
+            return
+
         strMenu = """ <ui> <menubar name='MenuBar'>
                     <menu action='%s'>
                         <menuitem action='%s' />
                     </menu>
             </menubar> </ui> """ % (menuName, menuItemName)
-
         self.uimanager.add_ui_from_string(strMenu)
 
-        action_groups = self.uimanager.get_action_groups()
-        action_group = action_groups[0]
-
-        action_help_info = Gtk.Action(menuItemName, None, title, Gtk.STOCK_INFO)
-        action_help_info.connect("activate", self.on_common_menu_item, commandId)
+        action = Gtk.Action(menuItemName, None, title, Gtk.STOCK_INFO)
+        action.connect("activate", self.on_common_menu_item, commandId)
         if not accel is None:
-            action_group.add_action_with_accel(action_help_info, accel)
-        # self.action_help_info = on_common_menu_item
+            actionGroup.add_action_with_accel(action, accel)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass
@@ -578,6 +580,7 @@ class ViewMenu(FwComponent):
         self.on_menu_func(widget, self.ACTION_SEARCH_REMOVE_BOOKMARK)
 
     def on_common_menu_item(self, widget, commandId):
+        ''' 通用的菜单 Active 函数'''
         logging.debug("Common process of one menu item.")
         self.on_menu_func(widget, commandId)
 
