@@ -160,7 +160,8 @@ class FwManager():
             if service.info['name'] == serviceName:
                 return service.component.onRequested(self, serviceName, params)
 
-        logging.error("cannot find service %s" % serviceName)
+        # 也不一定是错误，可能是因为初始化顺序导致的。
+        logging.warn("cannot find service \"%s\"." % serviceName)
         return (False, None)
 
     #############################################

@@ -5,6 +5,7 @@
 import logging
 from gi.repository import Gtk, Gdk, GtkSource
 from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
 
 class NeedJump:
     def __init__(self, need):
@@ -132,14 +133,11 @@ class ViewMenu(FwComponent):
      ACTION_SEARCH_REFERENCE,
      ACTION_SEARCH_BACK_TAG,
 
-     ACTION_SEARCH_ADD_BOOKMARK,
-     ACTION_SEARCH_REMOVE_BOOKMARK,
-
      ACTION_HELP_INFO,
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(35)
+     ) = range(33)
 
     def __init__(self, window, on_menu_func):
 
@@ -573,11 +571,11 @@ class ViewMenu(FwComponent):
 
     def on_menu_search_add_bookmark(self, widget):
         logging.debug("A Search|Add bookmark menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_ADD_BOOKMARK)
+        FwManager.instance().requestService('view.bookmarks.add_bookmark', None)
 
     def on_menu_search_remove_bookmark(self, widget):
         logging.debug("A Search|Remove bookmark menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_REMOVE_BOOKMARK)
+        FwManager.instance().requestService('view.bookmarks.remove_bookmark', None)
 
     def on_common_menu_item(self, widget, commandId):
         ''' 通用的菜单 Active 函数'''

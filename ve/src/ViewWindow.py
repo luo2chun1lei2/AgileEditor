@@ -36,18 +36,22 @@ class ViewWindow(Gtk.Window, FwComponent):
     # cur_prj:ModelProject:当前打开的项目。
 
     ###################################
-    # # 返回值的定义
-
+    # 返回值的定义
     RLT_OK = 0
     RLT_CANCEL = 1  # 取消
     RLT_ERROR = 2  # 错误
 
+    # 主窗口的标题。
     PROGRAM_NAME = 'AgileEditor v2.0 - '
 
     # override component
     def onRegistered(self, manager):
         info = {'name':'view.main.show_bookmark', 'help':'show a bookmark.'}
         manager.registerService(info, self)
+
+        info = {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current pos, and return bookmarks list'}
+        manager.registerService(info, self)
+
         return True
 
     # override component
@@ -57,6 +61,9 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
             self.ide_editor_set_focus()
             return (True, None)
+
+        elif serviceName == "view.main.make_bookmark":
+            return self._svc_add_bookmark()
 
         else:
             return (False, None)
@@ -262,10 +269,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_search_reference()
         elif action == ViewMenu.ACTION_SEARCH_BACK_TAG:
             self.ide_search_back_tag()
-        elif action == ViewMenu.ACTION_SEARCH_ADD_BOOKMARK:
-            self.ide_add_bookmark()
-        elif action == ViewMenu.ACTION_SEARCH_REMOVE_BOOKMARK:
-            self.ide_remove_bookmark()
 
         elif action == ViewMenu.ACTION_HELP_INFO:
             self.ide_help_info()
@@ -1232,22 +1235,12 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 回退到上一个位置。
         self._ide_pop_jumps()
 
-    def ide_add_bookmark(self):
-        # 添加一条书签
+    def _svc_add_bookmark(self):
+        ''' 【服务】根据当前情况加入新的bookmark。
+        '''
         bookmark = self._ide_make_bookmark()
         self.cur_prj.add_bookmark(bookmark)
-
-        self.bookmarks.set_model(self.cur_prj.bookmarks, self.cur_prj)
-
-    def ide_remove_bookmark(self):
-        # 删除一条书签。
-        selected_index = self.bookmarks.get_selected()
-        if selected_index < 0:
-            return
-
-        self.cur_prj.remove_bookmark(selected_index)
-
-        self.bookmarks.set_model(self.cur_prj.bookmarks, self.cur_prj)
+        return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}
 
     def ide_jump_to_line(self, widget):
         # 显示一个对话框，输入需要跳转的行。

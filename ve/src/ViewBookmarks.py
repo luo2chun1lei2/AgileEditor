@@ -20,42 +20,56 @@ class ViewBookmarks(FwComponent):
      COLUMN_TAG_NAME,  # Tag名字
      NUM_COLUMNS) = range(3)
 
-    # override component
-    def onRegistered(self, manager):
-        # info = {'name':'view.bookmarks', 'help':'run as main application.'}
-        # manager.registerService(info, self)
-        return True
-
-    # override component
-    def onRequested(self, manager, serviceName, params):
-        return False
-#         if serviceName == "app.run":
-#             logging.debug("run application")
-#
-#             # 命令分析
-#             (isOK, results) = manager.requestService("command.parse", {'argv':params['argv']})
-#             if not isOK:
-#                 manager.requestService("command.help", None)
-#                 return (False, None)
-#             logging.debug("service's results: \"%s\"" % results)
-#
-#             # 启动主画面。
-#             (isOK, results) = manager.requestService("app.view", results)
-#             if not isOK:
-#                 return (False, None)
-#
-#             return (True, None)
-#         else:
-#             return (False, None)
-
     def __init__(self, editorWindow):
         '''
         @param editorWindow:ViewWindow:主画面
         '''
 
         self.editorWindow = editorWindow
+        self.cur_prj = None
 
         self._init_view()
+
+    # override component
+    def onRegistered(self, manager):
+        info = {'name':'view.bookmarks.add_bookmark', 'help':'add one bookmark by current pos.'}
+        manager.registerService(info, self)
+
+        info = {'name':'view.bookmarks.remove_bookmark', 'help':'remove one bookmark by current pos.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "view.bookmarks.add_bookmark":
+            # 获取根据当前情况而建立的bookmark。
+            isOK, results = manager.requestService("view.main.make_bookmark", None)
+            if not isOK:
+                return (False, None)
+
+            # 更新显示。'
+            self.cur_prj = results['current_project']
+            self.set_model(results['bookmarks'], self.cur_prj)
+
+            return (True, None)
+
+        elif serviceName == "view.bookmarks.remove_bookmark":
+            # 删除一条书签。
+            selected_index = self.get_selected()
+            if selected_index < 0:
+                return (True, None)
+
+            if self.cur_prj is None:
+                return (False, None)
+
+            self.cur_prj.remove_bookmark(selected_index)
+
+            self.set_model(self.cur_prj.bookmarks, self.cur_prj)
+            return (True, None)
+
+        else:
+            return (False, None)
 
     def _init_view(self):
         ''' 初始化画面 '''
@@ -128,8 +142,6 @@ class ViewBookmarks(FwComponent):
 
             # 跳转到对应的行。
             FwManager.instance().requestService('view.main.show_bookmark', {'tag':tag})
-            # self.editorWindow.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-            # self.editorWindow.ide_editor_set_focus()
 
     def get_view(self):
         # 返回容器控件
