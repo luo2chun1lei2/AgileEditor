@@ -9,7 +9,7 @@ from model.ModelTags import ModelTag
 
 class ViewSearchTagList:
     # 定制一个ListView，内部显示Tag。
-    # ideWindow:EditorWindow:总的编辑窗口。
+    # editorWindow:EditorWindow:总的编辑窗口。
     
     # 设定一个栏目的枚举常量。
     (
@@ -17,10 +17,10 @@ class ViewSearchTagList:
      COLUMN_TAG_NAME,  # Tag名字
      NUM_COLUMNS) = range(3)
 
-    def __init__(self, ideWindow):
-        # ideWindow:ViewWindow:主画面
+    def __init__(self, editorWindow):
+        # editorWindow:ViewWindow:主画面
 
-        self.ideWindow = ideWindow
+        self.editorWindow = editorWindow
 
         vbox = Gtk.VBox(spacing = 0)
         
@@ -90,8 +90,8 @@ class ViewSearchTagList:
             tag = self.tags[selected_index]
         
             # 跳转到对应的行。
-            self.ideWindow.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-            self.ideWindow.ide_editor_set_focus()
+            self.editorWindow.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
+            self.editorWindow.ide_editor_set_focus()
         
     def get_view(self):
         # 返回容器控件

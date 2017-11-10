@@ -42,7 +42,7 @@ class VeMain():
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, self.add_new_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_DEL_PROJECT, self.del_project)
         VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_CHANGE_PROJECT, self.change_project)
-        
+
         FwManager.instance().load('model_workshop', self.workshop)
 
     def find_corresponding_project(self):
@@ -53,8 +53,6 @@ class VeMain():
 
     def start(self, want_lazy, want_open_project_name, want_open_file):
         # 开始启动程序。
-
-        from component.help.ViewDialogProject import ViewDialogProjectOpen
 
         # 打开想要打开的项目
         prj = None
@@ -69,6 +67,8 @@ class VeMain():
             # 需要让客户选择一个项目
             isOK, results = FwManager.instance().requestService("dialog.project.open",
                                         {'parent':None, 'workshop':self.workshop})
+            if not isOK:
+                return
             prj = results['project']
 
         if prj is None:
@@ -89,6 +89,8 @@ class VeMain():
 
         # - 显示画面
         editorWin.show_all()
+
+        FwManager.instance().load('view_main', editorWin)
 
         # - 并进入主循环。
         Gtk.main()

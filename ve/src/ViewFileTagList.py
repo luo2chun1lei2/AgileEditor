@@ -10,7 +10,7 @@ from framework.FwUtils import *
 
 class ViewFileTagList:
     # 定制一个ListView，内部显示Tag。
-    # ideWindow:EditorWindow:总的编辑窗口。
+    # editorWindow:EditorWindow:总的编辑窗口。
     
     # 设定一个栏目的枚举常量。
     (
@@ -20,10 +20,10 @@ class ViewFileTagList:
      COLUMN_TAG_SCOPE, # 所在范围
      ) = range(4)
 
-    def __init__(self, ideWindow):
-        # ideWindow:ViewWindow:主画面
+    def __init__(self, editorWindow):
+        # editorWindow:ViewWindow:主画面
 
-        self.ideWindow = ideWindow
+        self.editorWindow = editorWindow
 
         # 总的容器
         vbox = Gtk.VBox(spacing=2)
@@ -167,10 +167,10 @@ class ViewFileTagList:
             return
         
         # 跳转到对应的行。
-        self.ideWindow.ide_goto_line(line_no)
+        self.editorWindow.ide_goto_line(line_no)
         
         # 编辑器获取焦点。
-        self.ideWindow.ide_editor_set_focus()
+        self.editorWindow.ide_editor_set_focus()
         
     def get_view(self):
         # 返回容器控件

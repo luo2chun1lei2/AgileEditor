@@ -28,8 +28,9 @@ from ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
 from ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
+from framework.FwComponent import FwComponent
 
-class ViewWindow(Gtk.Window):
+class ViewWindow(Gtk.Window, FwComponent):
 
     # ideWorkshop:ModelWorkshop:当前的workshop。
     # cur_prj:ModelProject:当前打开的项目。
@@ -43,9 +44,24 @@ class ViewWindow(Gtk.Window):
 
     PROGRAM_NAME = 'AgileEditor v2.0 - '
 
-    '''
-    总窗口。
-    '''
+    # override component
+    def onRegistered(self, manager):
+        info = {'name':'view.main.show_bookmark', 'help':'show a bookmark.'}
+        manager.registerService(info, self)
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "view.main.show_bookmark":  # 显示一个bookmark
+            tag = params['tag']  # ModelTag
+            self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
+            self.ide_editor_set_focus()
+            return (True, None)
+
+        else:
+            return (False, None)
+
+    ''' 主窗口。 '''
     def __init__(self, workshop, prj, want_open_file):
 
         # 跳转的记录。
@@ -148,6 +164,7 @@ class ViewWindow(Gtk.Window):
 
         # 将已经生成好的控件作为组件注册到框架中。
         FwManager.instance().load("view_menu", self.ide_menu)
+        FwManager.instance().load("view_bookmark", self.bookmarks)
 
     def create_fs_tree(self):
         # 创建文件系统树控件。
