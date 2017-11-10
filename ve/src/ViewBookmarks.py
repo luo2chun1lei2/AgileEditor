@@ -31,6 +31,24 @@ class ViewBookmarks(FwComponent):
         self._init_view()
 
     # override component
+    def onSetup(self, manager):
+        params = {'menu_name':'SearchMenu',
+                  'menuItemName':'SearchAddBookmark',
+                  'title':"Add bookmark",
+                  'accel':"<control>B",
+                  'service_name': 'view.bookmarks.add_bookmark'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menuItemName':'SearchRemoveBookmark',
+                  'title':"Remove bookmark",
+                  'accel':"<shift><control>B",
+                  'service_name': 'view.bookmarks.add_bookmark'}
+        manager.requestService("view.menu.add", params)
+
+        return True
+
+    # override component
     def onRegistered(self, manager):
         info = {'name':'view.bookmarks.add_bookmark', 'help':'add one bookmark by current pos.'}
         manager.registerService(info, self)

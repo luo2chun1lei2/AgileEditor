@@ -18,14 +18,14 @@ class ViewDialogInfo(FwComponent):
     def __init__(self):
         pass
 
-    # from component
+    # override component
     def onRegistered(self, manager):
         info = {'name':'dialog.info', 'help':'show application information dialog.'}
         manager.registerService(info, self)
 
         return True
 
-    # from component
+    # override component
     def onSetup(self, manager):
         params = {'menu_name':'HelpMenu',
                   'menuItemName':'HelpInfo',
@@ -36,7 +36,7 @@ class ViewDialogInfo(FwComponent):
 
         return True
 
-    # from component
+    # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.info":
             ViewDialogInfo.show(None)
