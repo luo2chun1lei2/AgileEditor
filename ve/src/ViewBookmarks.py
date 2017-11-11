@@ -33,17 +33,19 @@ class ViewBookmarks(FwComponent):
     # override component
     def onSetup(self, manager):
         params = {'menu_name':'SearchMenu',
-                  'menuItemName':'SearchAddBookmark',
+                  'menu_item_name':'SearchAddBookmark',
                   'title':"Add bookmark",
                   'accel':"<control>B",
+                  'stock_id':Gtk.STOCK_GO_BACK,
                   'service_name': 'view.bookmarks.add_bookmark'}
         manager.requestService("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
-                  'menuItemName':'SearchRemoveBookmark',
+                  'menu_item_name':'SearchRemoveBookmark',
                   'title':"Remove bookmark",
                   'accel':"<shift><control>B",
-                  'service_name': 'view.bookmarks.add_bookmark'}
+                  'stock_id':Gtk.STOCK_GO_BACK,
+                  'service_name': 'view.bookmarks.remove_bookmark'}
         manager.requestService("view.menu.add", params)
 
         return True

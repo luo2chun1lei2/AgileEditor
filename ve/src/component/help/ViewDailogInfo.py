@@ -28,9 +28,10 @@ class ViewDialogInfo(FwComponent):
     # override component
     def onSetup(self, manager):
         params = {'menu_name':'HelpMenu',
-                  'menuItemName':'HelpInfo',
+                  'menu_item_name':'HelpInfo',
                   'title':"Information",
                   'accel':"<Alt>H",
+                  'stock_id':Gtk.STOCK_INFO,
                   'command_id':ViewMenu.ACTION_HELP_INFO}
         manager.requestService("view.menu.add", params)
 

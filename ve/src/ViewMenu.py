@@ -60,6 +60,7 @@ MENU_CONFIG = """
             <menuitem action='SearchDefination' />
             <menuitem action='SearchReference' />
             <menuitem action='SearchBackTag' />
+            <separator />
         </menu>
     </menubar>
 
@@ -140,6 +141,7 @@ class ViewMenu(FwComponent):
 
         # 附件检索的控件
         self.search_entry = None
+        self.actions = []
 
         self.on_menu_func = on_menu_func
 
@@ -157,21 +159,23 @@ class ViewMenu(FwComponent):
         if serviceName == "view.menu.add":
             if 'service_name' in params:
                 self._addMenuItem(params['menu_name'],
-                              params['menuItemName'],
+                              params['menu_item_name'],
                               params['title'],
                               params['accel'],
+                              params['stock_id'],
                               params['service_name'], 0)
             else:
                 self._addMenuItem(params['menu_name'],
-                              params['menuItemName'],
+                              params['menu_item_name'],
                               params['title'],
                               params['accel'],
+                              params['stock_id'],
                               None, params['command_id'])
             return (True, None)
         else:
             return (False, None)
 
-    def _addMenuItem(self, menuName, menuItemName, title, accel, serviceName, commandId):
+    def _addMenuItem(self, menuName, menuItemName, title, accel, stock_id, serviceName, commandId):
         ''' 根据设定，加入一个菜单项目
         @param menuName: string: 菜单栏目的名字
         @param menuItemName: string: 菜单项目的名字
@@ -186,19 +190,19 @@ class ViewMenu(FwComponent):
             return
 
         strMenu = """ <ui> <menubar name='MenuBar'>
-                    <menu action='%s'>
-                        <menuitem action='%s' />
-                    </menu>
+                    <menu action='%s'><menuitem action='%s' /></menu>
             </menubar> </ui> """ % (menuName, menuItemName)
         self.uimanager.add_ui_from_string(strMenu)
 
-        action = Gtk.Action(menuItemName, None, title, Gtk.STOCK_INFO)
+        action = Gtk.Action(menuItemName, title, None, stock_id)
         if serviceName is None:
             action.connect("activate", self.on_common_menu_item, commandId)
         else:
             action.connect("activate", self.on_menuitem_active_send_service, serviceName)
         if not accel is None:
             actionGroup.add_action_with_accel(action, accel)
+            
+        self.actions.append(action)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass
