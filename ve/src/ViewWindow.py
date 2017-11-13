@@ -270,9 +270,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif action == ViewMenu.ACTION_SEARCH_BACK_TAG:
             self.ide_search_back_tag()
 
-        elif action == ViewMenu.ACTION_HELP_INFO:
-            self.ide_help_info()
-
         elif action == ViewMenu.ACTION_EDITOR_SWITCH_PAGE:
             self.ide_switch_page(param)
 
@@ -814,10 +811,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             return result
 
         Gtk.main_quit()
-
-    def ide_help_info(self):
-        # 显示帮助对话框
-        FwManager.instance().requestService("dialog.info", None)
 
     def ide_edit_redo(self, widget):
         ve_editor = self.multiEditors.get_current_ide_editor()

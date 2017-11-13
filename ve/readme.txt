@@ -180,4 +180,4 @@ AE的框架设计
 1，将ViewBookmarks涉及的功能拿到外部，核心的主体是将bookmark的功能从ViewWindow中拿出，
   因为bookmark涉及到Window的一些内部的功能，比如make_book，这个需要了解内部编辑器的细节，
   所以我在这里做了分层，将涉及到window和编辑器的功能还保留在window中，然后将“动作”和“主要处理流程”
-  都迁移到 ViewBookmarks 中。现在还少 menu 。
+  都迁移到 ViewBookmarks 中。

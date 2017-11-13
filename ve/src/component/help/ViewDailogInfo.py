@@ -32,7 +32,7 @@ class ViewDialogInfo(FwComponent):
                   'title':"Information",
                   'accel':"<Alt>H",
                   'stock_id':Gtk.STOCK_INFO,
-                  'command_id':ViewMenu.ACTION_HELP_INFO}
+                  'service_name':'dialog.info'}
         manager.requestService("view.menu.add", params)
 
         return True

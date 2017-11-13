@@ -131,11 +131,9 @@ class ViewMenu(FwComponent):
      ACTION_SEARCH_REFERENCE,
      ACTION_SEARCH_BACK_TAG,
 
-     ACTION_HELP_INFO,
-
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(33)
+     ) = range(32)
 
     def __init__(self, window, on_menu_func):
 
@@ -157,25 +155,17 @@ class ViewMenu(FwComponent):
     # from component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.menu.add":
-            if 'service_name' in params:
-                self._addMenuItem(params['menu_name'],
-                              params['menu_item_name'],
-                              params['title'],
-                              params['accel'],
-                              params['stock_id'],
-                              params['service_name'], 0)
-            else:
-                self._addMenuItem(params['menu_name'],
-                              params['menu_item_name'],
-                              params['title'],
-                              params['accel'],
-                              params['stock_id'],
-                              None, params['command_id'])
+            self._addMenuItem(params['menu_name'],
+                          params['menu_item_name'],
+                          params['title'],
+                          params['accel'],
+                          params['stock_id'],
+                          params['service_name'])
             return (True, None)
         else:
             return (False, None)
 
-    def _addMenuItem(self, menuName, menuItemName, title, accel, stock_id, serviceName, commandId):
+    def _addMenuItem(self, menuName, menuItemName, title, accel, stock_id, serviceName):
         ''' 根据设定，加入一个菜单项目
         @param menuName: string: 菜单栏目的名字
         @param menuItemName: string: 菜单项目的名字
@@ -195,13 +185,10 @@ class ViewMenu(FwComponent):
         self.uimanager.add_ui_from_string(strMenu)
 
         action = Gtk.Action(menuItemName, title, None, stock_id)
-        if serviceName is None:
-            action.connect("activate", self.on_common_menu_item, commandId)
-        else:
-            action.connect("activate", self.on_menuitem_active_send_service, serviceName)
+        action.connect("activate", self.on_menuitem_active_send_service, serviceName)
         if not accel is None:
             actionGroup.add_action_with_accel(action, accel)
-            
+
         self.actions.append(action)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
@@ -587,11 +574,6 @@ class ViewMenu(FwComponent):
     def on_menu_search_remove_bookmark(self, widget):
         logging.debug("A Search|Remove bookmark menu item was selected.")
         FwManager.instance().requestService('view.bookmarks.remove_bookmark', None)
-
-    def on_common_menu_item(self, widget, commandId):
-        ''' 通用的菜单 Active 函数'''
-        logging.debug("Common process of one menu item.")
-        self.on_menu_func(widget, commandId)
 
     def on_menuitem_active_send_service(self, widget, service):
         ''' 通用的菜单 Active 函数，发送service'''
