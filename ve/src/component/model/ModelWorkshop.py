@@ -8,7 +8,7 @@ from ConfigParser import ConfigParser, NoSectionError, NoOptionError
 
 from framework.FwUtils import *
 from framework.FwComponent import FwComponent
-from model.ModelProject import ModelProject
+from component.model.ModelProject import ModelProject
 
 class ModelWorkshop(FwComponent):
     # 管理项目的工作区域。

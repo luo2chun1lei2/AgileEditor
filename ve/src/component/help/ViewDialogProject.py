@@ -13,7 +13,7 @@ from framework.FwUtils import *
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
-from model.ModelProject import ModelProject
+from component.model.ModelProject import ModelProject
 
 ###########################################################
 

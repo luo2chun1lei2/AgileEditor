@@ -8,9 +8,9 @@ from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango
 
 from framework.FwManager import FwManager
 
-from model.ModelWorkshop import ModelWorkshop
-from model.ModelProject import ModelProject
-from model.ModelFile import ModelFile
+from component.model.ModelWorkshop import ModelWorkshop
+from component.model.ModelProject import ModelProject
+from component.model.ModelFile import ModelFile
 
 from component.view.ViewWindow import ViewWindow
 from framework.FwComponent import FwComponent

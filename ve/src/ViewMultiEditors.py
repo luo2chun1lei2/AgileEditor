@@ -8,7 +8,7 @@ from collections import OrderedDict
 from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Gio
 
 from framework.FwManager import FwManager
-from model.ModelFile import ModelFile
+from component.model.ModelFile import ModelFile
 from component.view.ViewMenu import ViewMenu
 
 class ViewEditor:

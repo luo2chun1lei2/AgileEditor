@@ -16,11 +16,11 @@ from gi.overrides.Gtk import TextBuffer
 from framework.FwUtils import *
 from framework.FwManager import FwManager
 
-from model.ModelWorkshop import ModelWorkshop
-from model.ModelProject import ModelProject
-from model.ModelFile import ModelFile
-from model.ModelTask import ModelTask
-from model.ModelTags import *
+from component.model.ModelWorkshop import ModelWorkshop
+from component.model.ModelProject import ModelProject
+from component.model.ModelFile import ModelFile
+from component.model.ModelTask import ModelTask
+from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
