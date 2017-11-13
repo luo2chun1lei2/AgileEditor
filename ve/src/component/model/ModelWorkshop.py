@@ -116,29 +116,6 @@ class ModelWorkshop(FwComponent):
                 return prj.prj_name
         return None
 
-    def create_project(self, prj_name, prj_src_dirs):
-        # 创建一个项目，并没有加入到workshop中。
-        # prj_name:string:项目的名字。
-        # src_dirs:[string]:代码所在的目录。
-        # return:[ModelProject]:如果创建不成功，就返回None
-
-        prj_path = os.path.join(self.ws_path, prj_name)
-        prj = ModelProject.create(prj_path, prj_name, prj_src_dirs)
-
-        return prj
-
-    def add_project(self, project):
-        # 添加一个项目到workshop中，并保存配置。
-        self.projects.append(project)
-
-        # 马上保存。
-        self.save_conf()
-
-    def del_project(self, project):
-        # 从列表中删除一个项目，并保存配置，项目实际的配置没有删除。
-        self.projects.remove(project)
-        self.save_conf()
-
     def save_conf(self):
         # 保存当前的workshop的信息。
         self._write_conf(self.projects)
@@ -248,40 +225,68 @@ class ModelWorkshop(FwComponent):
         cf.write(fo_config)
         fo_config.close()
 
-    #############################################
-    # 来自于 VeMain，后面
+    def create_project(self, prj_name, prj_src_dirs):
+        # 创建一个项目，并没有加入到workshop中。
+        # prj_name:string:项目的名字。
+        # src_dirs:[string]:代码所在的目录。
+        # return:[ModelProject]:如果创建不成功，就返回None
+
+        prj_path = os.path.join(self.ws_path, prj_name)
+        prj = ModelProject.create(prj_path, prj_name, prj_src_dirs)
+
+        return prj
+
+    def add_project(self, project):
+        # 添加一个项目到workshop中，并保存配置。
+        self.projects.append(project)
+
+        # 马上保存。
+        self.save_conf()
+
     def add_new_project(self, prj_name, prj_src_dirs):
-        ''' 添加一个新的项目
+        ''' 建立一个新的项目，然后加入到workshop中。
         @param prj_name: string: project name
         @param prj_src_dirs: [string]: source path of project.
+        @return prj: ModelProject: 添加的project。None: failed。
         '''
         prj = self.create_project(prj_name, prj_src_dirs)
 
         if prj is None:
-            return
+            return None
 
         # 预处理
         prj.prepare()
 
         self.add_project(prj)
 
+        return prj
+
     def delete_project(self, prj):
         ''' 删除一个项目
         @param prj: ModelProject
+        @return bool: is ok?
         '''
+        # prj 本身的配置删除。
         prj.remove()
-        self.del_project(prj)
+
+        # 从列表中删除一个项目，并保存配置，项目实际的配置没有删除。
+        self.projects.remove(prj)
+        self.save_conf()
+
+        return True
 
     def change_project(self, prj, prj_name, prj_src_dirs):
         ''' 将指定的项目变成新的名字和代码路径。
         @param prj: ModelProject: old project
         @param prj_name: string: project name
         @param prj_src_dirs: [string]: source path of project.
+        @return ModelProject: added new project, if failed, return None.
         '''
 
         # - 删除旧的项目
         self.delete_project(prj)
 
         # - 加入新的项目
-        self.add_new_project(prj_name, prj_src_dirs)
+        prj = self.add_new_project(prj_name, prj_src_dirs)
 
+        return prj
