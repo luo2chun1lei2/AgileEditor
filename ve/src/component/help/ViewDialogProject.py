@@ -351,9 +351,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                 prj_src_dirs = results['prj_src_dirs']
                 if not prj_name is None:
                     # 发动“添加一个新的项目”的动作。
-                    FwManager.instance().requestService('project.new',
+                    FwManager.instance().requestService('model.project.new',
                             {'project_name':prj_name, 'source_pathes':prj_src_dirs})
-                    # VeEventPipe.want_add_new_project(prj_name, prj_src_dirs)
 
                 # 更新当前画面。
                 dialog._show_data()
@@ -370,9 +369,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
 
-                    FwManager.instance().requestService('project.delete',
+                    FwManager.instance().requestService('model.project.delete',
                             {'project':prj})
-                    # VeEventPipe.want_del_project(prj)
 
                 # 更新当前画面。
                 dialog._show_data()
@@ -394,8 +392,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     prj_name = results['prj_name']
                     prj_src_dirs = results['prj_src_dirs']
                     if not prj_name is None:
-                        # VeEventPipe.want_change_project(prj, prj_name, prj_src_dirs)
-                        FwManager.instance().requestService('project.change',
+                        FwManager.instance().requestService('model.project.change',
                             {'project':prj, 'project_name':prj_name, 'source_pathes':prj_src_dirs})
 
                 # 更新当前画面。

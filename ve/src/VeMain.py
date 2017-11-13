@@ -42,33 +42,13 @@ class VeMain(FwComponent):
         FwManager.instance().load('model_workshop', self.workshop)
 
     def onRegistered(self, manager):
-        info = {'name':'project.new', 'help':'create a new project in model.'}
-        manager.registerService(info, self)
-
-        info = {'name':'project.delete', 'help':'delete the given project in model.'}
-        manager.registerService(info, self)
-
-        info = {'name':'project.change', 'help':'change the given project in model.'}
-        manager.registerService(info, self)
-
+        # nothing
         return True
 
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "project.new":
-            self.add_new_project(params['project_name'], params['source_pathes'])
-            return (True, None)
-
-        elif serviceName == "project.delete":
-            self.del_project(params['project'])
-            return (True, None)
-
-        elif serviceName == "project.change":
-            self.change_project(params['project'], params['project_name'], params['source_pathes'])
-            return (True, None)
-
-        else:
-            return (False, None)
+        # nothing
+        return (False, None)
 
     def find_corresponding_project(self):
         # 根据当前路径，找到合适的项目。
@@ -119,38 +99,3 @@ class VeMain(FwComponent):
 
         # - 并进入主循环。
         Gtk.main()
-
-    def add_new_project(self, prj_name, prj_src_dirs):
-        ''' 添加一个新的项目
-        @param prj_name: string: project name
-        @param prj_src_dirs: [string]: source path of project.
-        '''
-        prj = self.workshop.create_project(prj_name, prj_src_dirs)
-
-        if prj is None:
-            return
-
-        # 预处理
-        prj.prepare()
-
-        self.workshop.add_project(prj)
-
-    def del_project(self, prj):
-        ''' 删除一个项目
-        @param prj: ModelProject
-        '''
-        prj.remove()
-        self.workshop.del_project(prj)
-
-    def change_project(self, prj, prj_name, prj_src_dirs):
-        ''' 将指定的项目变成新的名字和代码路径。
-        @param prj: ModelProject: old project
-        @param prj_name: string: project name
-        @param prj_src_dirs: [string]: source path of project.
-        '''
-
-        # - 删除旧的项目
-        self.del_project(prj)
-
-        # - 加入新的项目
-        self.add_new_project(prj_name, prj_src_dirs)

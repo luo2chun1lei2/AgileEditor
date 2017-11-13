@@ -55,14 +55,23 @@ class ModelWorkshop(FwComponent):
         # 读取配置文件。
         self.setting, self.projects = self._read_conf(self.ws_config_path)
 
-    # from component
+    # override component
     def onRegistered(self, manager):
         info = {'name':'model.workshop.getopt', 'help':'get one option value of workshop.'}
         manager.registerService(info, self)
 
+        info = {'name':'model.project.new', 'help':'create a new project in model.'}
+        manager.registerService(info, self)
+
+        info = {'name':'model.project.delete', 'help':'delete the given project in model.'}
+        manager.registerService(info, self)
+
+        info = {'name':'model.project.change', 'help':'change the given project in model.'}
+        manager.registerService(info, self)
+
         return True
 
-    # from component
+    # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "model.workshop.getopt":
             # get opt value by key.
@@ -71,6 +80,18 @@ class ModelWorkshop(FwComponent):
                 logging.error("Need command arguments.")
                 return (False, None)
             return (True, {'value': self.setting[key]})
+
+        elif serviceName == "model.project.new":
+            self.add_new_project(params['project_name'], params['source_pathes'])
+            return (True, None)
+
+        elif serviceName == "model.project.delete":
+            self.delete_project(params['project'])
+            return (True, None)
+
+        elif serviceName == "model.project.change":
+            self.change_project(params['project'], params['project_name'], params['source_pathes'])
+            return (True, None)
 
         else:
             return (False, None)
@@ -226,3 +247,41 @@ class ModelWorkshop(FwComponent):
         fo_config = open(self.ws_config_path, 'w')
         cf.write(fo_config)
         fo_config.close()
+
+    #############################################
+    # 来自于 VeMain，后面
+    def add_new_project(self, prj_name, prj_src_dirs):
+        ''' 添加一个新的项目
+        @param prj_name: string: project name
+        @param prj_src_dirs: [string]: source path of project.
+        '''
+        prj = self.create_project(prj_name, prj_src_dirs)
+
+        if prj is None:
+            return
+
+        # 预处理
+        prj.prepare()
+
+        self.add_project(prj)
+
+    def delete_project(self, prj):
+        ''' 删除一个项目
+        @param prj: ModelProject
+        '''
+        prj.remove()
+        self.del_project(prj)
+
+    def change_project(self, prj, prj_name, prj_src_dirs):
+        ''' 将指定的项目变成新的名字和代码路径。
+        @param prj: ModelProject: old project
+        @param prj_name: string: project name
+        @param prj_src_dirs: [string]: source path of project.
+        '''
+
+        # - 删除旧的项目
+        self.delete_project(prj)
+
+        # - 加入新的项目
+        self.add_new_project(prj_name, prj_src_dirs)
+
