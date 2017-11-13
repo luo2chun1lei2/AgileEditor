@@ -41,6 +41,9 @@ class FwManager():
         # [服务的信息]: [<FwService>]
         self.services = []
 
+    def _init_components(self):
+        ''' 建立最开始的组件，然后注册。
+        '''
         # 注册已知的组件工厂。
         # TODO 以后修改成从固定文件夹等搜索组件，然后加载。
         from component.AppProcess import AppProcess
@@ -50,18 +53,22 @@ class FwManager():
         from component.help.ViewDialogCommon import ViewDialogCommon
         from component.help.ViewDialogProject import ViewDialogProject
         from component.help.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
+        from VeMain import VeMain
 
-        self._register("app_process", AppProcess())
-        self._register("command_parser", AppArgs())
-        self._register("app_view", AppView())
-        self._register("dialog_info", ViewDialogInfo())
-        self._register("dialog_common", ViewDialogCommon())
-        self._register("dialog_project", ViewDialogProject())
-        self._register("dialog_project_setting", ViewDialogWorkshopSetting())
+        self.register("app_process", AppProcess())
+        self.register("command_parser", AppArgs())
+        self.register("app_view", AppView())
+        self.register("ae_main", VeMain.get_instance())
+        self.register("dialog_info", ViewDialogInfo())
+        self.register("dialog_common", ViewDialogCommon())
+        self.register("dialog_project", ViewDialogProject())
+        self.register("dialog_project_setting", ViewDialogWorkshopSetting())
 
     def run(self, argv):
         ''' 程序运行，整个系统不关闭，则此函数不关闭
         '''
+
+        self._init_components()
 
         # 前期准备
         for (name, component) in self.components.items():
@@ -83,7 +90,7 @@ class FwManager():
     #######################################################
     # # 组件工厂相关函数
 
-    def _register(self, name, component):
+    def register(self, name, component):
         ''' 注册组件，外部不要调用
         @param name: string: 工厂的名字，必须唯一
         @param componentFactory: FwComponentFactory: 工厂的实例
@@ -95,7 +102,7 @@ class FwManager():
     def load(self, name, component):
         ''' 外部使用的，加载一个组件：注册、初始化、通知其他组件都初始化
         '''
-        if not self._register(name, component):
+        if not self.register(name, component):
             return False
 
         if not component.onSetup(self):

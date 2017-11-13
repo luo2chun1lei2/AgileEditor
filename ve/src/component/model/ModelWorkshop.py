@@ -18,8 +18,7 @@ class ModelWorkshop(FwComponent):
     #    ws_config_path:string:workshop的配置文件的路径。
     #    projects:[ModelProject]:所有项目。
 
-    DEF_WS_PATH = ".ae"
-    # 缺省Workshop的路径
+    DEFAULT_VE_CONFIG_PATH = '~/.ae'
 
     SEC_NAME_PRJ = 'projects'
     # Section name of project
@@ -29,11 +28,11 @@ class ModelWorkshop(FwComponent):
     OPT_NAME_FONT = 'font'
 
     def __init__(self, ws_path):
-        # ws_path:string:workshop的路径。
+        # ws_path: string: workshop的路径。
 
         if is_empty(ws_path):
             logging.error('workshop路径不正确。%s' % (ws_path))
-            ws_path = ModelWorkshop.DEF_WS_PATH
+            os.sys.exit(1)
 
         # 设定Workshop的路径
         self.ws_path = ws_path

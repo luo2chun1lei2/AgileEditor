@@ -19,13 +19,10 @@ class AppView(FwComponent):
     def onRequested(self, manager, serviceName, params):
         if serviceName == "app.view":
             logging.debug("show main view and into loop")
-            self._show(params)
+            manager.requestService('app.select_project',
+                    {'want_lazy':params['want_lazy'],
+                     'want_open_project_name':params['want_open_project_name'],
+                     'want_open_file':params['want_open_file']})
             return (True, None)
         else:
             return (False, None)
-
-    def _show(self, setting):
-        # 进入主管理组件，传入需要的参数。
-        from VeMain import VeMain
-        veMain = VeMain.get_instance()
-        veMain.start(setting['want_lazy'], setting['want_open_project_name'], setting['want_open_file'])

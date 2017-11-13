@@ -46,6 +46,10 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     # override component
     def onRegistered(self, manager):
+        # 将已经生成好的控件作为组件注册到框架中。
+        FwManager.instance().register("view_menu", self.ide_menu)
+        FwManager.instance().register("view_bookmark", self.bookmarks)
+
         info = {'name':'view.main.show_bookmark', 'help':'show a bookmark.'}
         manager.registerService(info, self)
 
@@ -168,10 +172,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         vbox.pack_start(panedFsAndEditor, True, True, 5)
 
         self.add(vbox)
-
-        # 将已经生成好的控件作为组件注册到框架中。
-        FwManager.instance().load("view_menu", self.ide_menu)
-        FwManager.instance().load("view_bookmark", self.bookmarks)
 
     def create_fs_tree(self):
         # 创建文件系统树控件。
