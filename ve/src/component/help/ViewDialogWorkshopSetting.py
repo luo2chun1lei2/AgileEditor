@@ -14,7 +14,6 @@ from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
 from model.ModelProject import ModelProject
-from VeEventPipe import VeEventPipe
 
 ###########################################################
 

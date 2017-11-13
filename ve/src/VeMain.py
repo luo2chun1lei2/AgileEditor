@@ -11,11 +11,11 @@ from framework.FwManager import FwManager
 from model.ModelWorkshop import ModelWorkshop
 from model.ModelProject import ModelProject
 from model.ModelFile import ModelFile
+
 from component.view.ViewWindow import ViewWindow
+from framework.FwComponent import FwComponent
 
-from VeEventPipe import VeEventPipe
-
-class VeMain():
+class VeMain(FwComponent):
     # 数据是 workshop -> project + file，
     # 而画面就可能有各种情况了。
     # ve_path string ve配置的路径
@@ -29,6 +29,7 @@ class VeMain():
     def get_instance():
         if VeMain.ve_main_instance is None:
             VeMain.ve_main_instance = VeMain()
+            FwManager.instance().load("vemain", VeMain.ve_main_instance)
 
         return VeMain.ve_main_instance
 
@@ -38,12 +39,36 @@ class VeMain():
         self.ve_path = os.path.expanduser(VeMain.DEFAULT_VE_CONFIG_PATH)
         self.workshop = ModelWorkshop(self.ve_path)
 
-        # 在EventPipe注册事件处理方法。
-        VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_ADD_NEW_PROJECT, self.add_new_project)
-        VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_DEL_PROJECT, self.del_project)
-        VeEventPipe.register_event_call_back(VeEventPipe.EVENT_WANT_CHANGE_PROJECT, self.change_project)
-
         FwManager.instance().load('model_workshop', self.workshop)
+
+    def onRegistered(self, manager):
+        info = {'name':'project.new', 'help':'create a new project in model.'}
+        manager.registerService(info, self)
+
+        info = {'name':'project.delete', 'help':'delete the given project in model.'}
+        manager.registerService(info, self)
+
+        info = {'name':'project.change', 'help':'change the given project in model.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "project.new":
+            self.add_new_project(params['project_name'], params['source_pathes'])
+            return (True, None)
+
+        elif serviceName == "project.delete":
+            self.del_project(params['project'])
+            return (True, None)
+
+        elif serviceName == "project.change":
+            self.change_project(params['project'], params['project_name'], params['source_pathes'])
+            return (True, None)
+
+        else:
+            return (False, None)
 
     def find_corresponding_project(self):
         # 根据当前路径，找到合适的项目。
@@ -96,7 +121,10 @@ class VeMain():
         Gtk.main()
 
     def add_new_project(self, prj_name, prj_src_dirs):
-        # 添加一个新的项目
+        ''' 添加一个新的项目
+        @param prj_name: string: project name
+        @param prj_src_dirs: [string]: source path of project.
+        '''
         prj = self.workshop.create_project(prj_name, prj_src_dirs)
 
         if prj is None:
@@ -108,12 +136,18 @@ class VeMain():
         self.workshop.add_project(prj)
 
     def del_project(self, prj):
-        # 删除一个项目
+        ''' 删除一个项目
+        @param prj: ModelProject
+        '''
         prj.remove()
         self.workshop.del_project(prj)
 
     def change_project(self, prj, prj_name, prj_src_dirs):
-        # 将指定的项目变成新的名字和代码路径。
+        ''' 将指定的项目变成新的名字和代码路径。
+        @param prj: ModelProject: old project
+        @param prj_name: string: project name
+        @param prj_src_dirs: [string]: source path of project.
+        '''
 
         # - 删除旧的项目
         self.del_project(prj)
