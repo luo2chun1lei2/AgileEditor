@@ -22,11 +22,11 @@ from model.ModelFile import ModelFile
 from model.ModelTask import ModelTask
 from model.ModelTags import *
 
-from ViewMenu import ViewMenu
+from component.view.ViewMenu import ViewMenu
 from ViewFsTree import ViewFsTree, FsTreeModel
 from ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
-from ViewBookmarks import ViewBookmarks
+from component.view.ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
 from framework.FwComponent import FwComponent
 

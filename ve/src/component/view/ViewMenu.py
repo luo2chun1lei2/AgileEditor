@@ -4,6 +4,7 @@
 
 import logging
 from gi.repository import Gtk, Gdk, GtkSource
+
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 

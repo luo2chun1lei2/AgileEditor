@@ -9,7 +9,7 @@ from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Gio
 
 from framework.FwManager import FwManager
 from model.ModelFile import ModelFile
-from ViewMenu import ViewMenu
+from component.view.ViewMenu import ViewMenu
 
 class ViewEditor:
     # 一个编辑器的信息

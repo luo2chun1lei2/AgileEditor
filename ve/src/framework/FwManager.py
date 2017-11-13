@@ -136,18 +136,21 @@ class FwManager():
     # # "help": string: 显示帮助信息。
 
     def registerService(self, info, component):
-        '''
-        @param info: map: 服务的关键字加参数。
+        ''' 注册服务，允许同一个服务名字被多个组件注册。
+        @param info: map/[map]: 服务的关键字加参数。
+        @param component: FwComponent: 组件实例
         '''
         self.services.append(FwService(info, component))
         return True
 
     def unregisterService(self, component):
+        ''' 注销一个组件的所有服务。
+        @param component: FwComponent: 组件实例
+        '''
         for service in self.services:
             if service.component is component:
                 index = service.services.index(component)
                 del self.services[index]
-                break
         return True
 
     def requestService(self, serviceName, params):
@@ -182,7 +185,6 @@ class FwManager():
     def showServices(self, needStr=False):
         ''' 显示目前注册的服务信息。
         '''
-
         text = "services:\n"
         for service in self.services:
             info = service.info

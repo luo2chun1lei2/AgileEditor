@@ -11,7 +11,7 @@ from framework.FwManager import FwManager
 from model.ModelWorkshop import ModelWorkshop
 from model.ModelProject import ModelProject
 from model.ModelFile import ModelFile
-from ViewWindow import ViewWindow
+from component.view.ViewWindow import ViewWindow
 
 from VeEventPipe import VeEventPipe
 

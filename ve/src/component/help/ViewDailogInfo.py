@@ -8,7 +8,7 @@ import os, logging
 from gi.repository import Gtk, GdkPixbuf
 
 from framework.FwComponent import FwComponent
-from ViewMenu import ViewMenu
+from component.view.ViewMenu import ViewMenu
 from framework.FwManager import FwManager
 
 class ViewDialogInfo(FwComponent):
