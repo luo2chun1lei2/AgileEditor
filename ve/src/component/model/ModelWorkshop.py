@@ -18,7 +18,7 @@ class ModelWorkshop(FwComponent):
     #    ws_config_path:string:workshop的配置文件的路径。
     #    projects:[ModelProject]:所有项目。
 
-    DEF_WS_PATH = ".ve"
+    DEF_WS_PATH = ".ae"
     # 缺省Workshop的路径
 
     SEC_NAME_PRJ = 'projects'

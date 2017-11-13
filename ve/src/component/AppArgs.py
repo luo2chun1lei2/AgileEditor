@@ -36,10 +36,10 @@ class AppArgs(FwComponent):
     def _commandHelp(self):
         ''' 显示命令行的帮助信息。
         '''
-        print 've usage:'
+        print 'ae usage:'
         print '-h, --help: print help message.'
         print '-p, --project <project name>: open the project. '
-        print '-z: ve will find the corresponding project by current path.'
+        print '-z: ae will find the corresponding project by current path.'
         print '-f, --file <file path>: open the file.'
         return (True, None)
 

@@ -56,7 +56,7 @@ class ViewDialogInfo(FwComponent):
         documentors = ["------------------------------", componentInfo, serviceInfo]
 
         dirname = os.path.abspath(os.path.dirname(__file__))
-        filename = os.path.join(dirname, '', '../../ve.png')
+        filename = os.path.join(dirname, '', '../../ae.png')
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
         transparent = pixbuf.add_alpha(True, 0xff, 0xff, 0xff)
 

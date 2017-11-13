@@ -20,7 +20,7 @@ class VeMain(FwComponent):
     # 而画面就可能有各种情况了。
     # ve_path string ve配置的路径
 
-    DEFAULT_VE_CONFIG_PATH = '~/.ve'
+    DEFAULT_VE_CONFIG_PATH = '~/.ae'
 
     ve_main_instance = None
     # 静态单实例
@@ -90,7 +90,7 @@ class VeMain(FwComponent):
 
         # - 设定图标。
         base_path = os.path.dirname((os.path.abspath(sys.argv[0])))
-        editorWin.set_icon_from_file(os.path.join(base_path, "ve.png"))
+        editorWin.set_icon_from_file(os.path.join(base_path, "ae.png"))
 
         # - 显示画面
         editorWin.show_all()
