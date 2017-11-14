@@ -23,7 +23,7 @@ from component.model.ModelTask import ModelTask
 from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
-from ViewFsTree import ViewFsTree, FsTreeModel
+from ViewFsTree import FsTreeModel
 from ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
 from component.view.ViewBookmarks import ViewBookmarks
@@ -176,17 +176,20 @@ class ViewWindow(Gtk.Window, FwComponent):
     def create_fs_tree(self):
         # 创建文件系统树控件。
         # return:ViewFsTree:需要外部包含的控件，以及FsTree这个实例。
-        fstree = ViewFsTree()
+        isOK, results = FwManager.instance().requestService('view.fstree.get_treeview', None)
+        treeview = results['view']
 
         # 加入事件。
-        select = fstree.get_treeview().get_selection()
+        select = treeview.get_selection()
         select.connect("changed", self.on_fstree_selection_changed)
 
-        fstree.get_treeview().connect("row-activated", self.on_fstree_row_activated)
+        treeview.connect("row-activated", self.on_fstree_row_activated)
 
         # 鼠标释放事件
-        fstree.get_treeview().connect("button_release_event", self.on_fstree_row_button_release)
+        treeview.connect("button_release_event", self.on_fstree_row_button_release)
 
+        isOK, results = FwManager.instance().requestService('view.fstree.get_self', None)
+        fstree = results['self']
         return fstree
 
     ###################################
@@ -384,7 +387,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         f.close()
 
         # 刷新tree
-        # self.ideFsTree.refresh_line(itr)
         self.ide_update_tags_of_project()
 
     def on_fstree_row_popup_menuitem_new_dir_active(self, widget, tree_view):
@@ -420,7 +422,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         os.mkdir(new_file_path)
 
         # 刷新tree
-        # self.ideFsTree.refresh_line(itr)
         self.ide_update_tags_of_project()
 
     def on_fstree_row_popup_menuitem_delete_active(self, widget, tree_view):
@@ -449,7 +450,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             os.remove(file_path)
 
         # 刷新tree
-        # self.ideFsTree.refresh_line(itr)
         self.ide_update_tags_of_project()
 
     def on_fstree_row_popup_menuitem_change_active(self, widget, tree_view):
@@ -483,7 +483,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         os.rename(file_path, new_file_path)
 
         # 刷新tree
-        # self.ideFsTree.refresh_line(itr)
         self.ide_update_tags_of_project()
 
     ###################################
@@ -574,7 +573,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         self._set_status(ViewMenu.STATUS_PROJECT_NONE)
 
     def ide_update_tags_of_project(self):
-        # 跟新当前项目的TAGS，并且更新文件列表。
+        # 更新当前项目的TAGS，并且更新文件列表。
         if self.cur_prj is None:
             return
 
