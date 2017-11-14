@@ -9,7 +9,7 @@ import ConfigParser
 
 from framework.FwUtils import *
 from component.model.ModelTags import ModelGTags, ModelTag
-from VeWordProvider import VeWordProvider
+from framework.FwManager import FwManager
 
 class ModelProject(object):
     # config_path:string:配置文件的路径 project.conf，这个不写到配置文件中。
@@ -263,4 +263,8 @@ class ModelProject(object):
 
     def get_completion_provider(self):
         # 返回一个单词补全的提供者
-        return VeWordProvider(self)
+        isOK, results = FwManager.instance().requestService("util.word_complete.get_provider", {'project':self})
+        if isOK:
+            return results['provider']
+        else:
+            return None

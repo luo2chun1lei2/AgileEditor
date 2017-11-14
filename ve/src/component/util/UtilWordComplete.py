@@ -10,7 +10,28 @@ gi.require_version('GtkSource', '3.0')
 from gi.repository import GObject, Gtk, Gdk, GtkSource
 
 from framework.FwUtils import *
+from framework.FwComponent import FwComponent
 from component.model.ModelTags import ModelGTags
+
+class UtilWordComplete(FwComponent):
+    def __init__(self):
+        pass
+
+    # override component
+    def onRegistered(self, manager):
+        info = {'name':'util.word_complete.get_provider', 'help':'get a word privder.'}
+        manager.registerService(info, self)
+
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "util.word_complete.get_provider":
+            provider = AeWordProvider(params['project'])
+            return (True, {'provider':provider})
+
+        else:
+            return (False, None)
 
 # 说明
 # do_get_start_iter 和 GtkSource.CompletionContext.get_iter() 在最新的Ubuntu 16中修改了，
@@ -18,7 +39,7 @@ from component.model.ModelTags import ModelGTags
 #     新的是 gir1.2-gtksource-3.0 安装版本 3.18.2-1
 #     旧的是 gir1.2-gtksource-3.0 安装版本 3.10.2-0ubuntu1
 
-class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
+class AeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
     # 继承CompletionProvider
     # 调用方式是 editor.props.completion 's provider add this provider.
     # 快捷键的调用顺序：
@@ -233,4 +254,4 @@ class VeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         return text
 
 # 需要注册这个对象到GObject中。
-GObject.type_register(VeWordProvider)
+GObject.type_register(AeWordProvider)
