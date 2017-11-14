@@ -125,13 +125,9 @@ class AeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         # 如果返回True，会调用do_populate，
         # 返回False，什么都不调用。
 
-        # 版本不同
-        if os.getenv('GTKSOURCE_COMPLETION_PROVIDER') == "2.0":
-            (isproposal, ite) = context.get_iter()
-            if not isproposal:
-                return False
-        else:
-            ite = context.get_iter()
+        (isproposal, ite) = context.get_iter()
+        if not isproposal:
+            return False
 
         completion = context.props.completion
         view = completion.get_view()
