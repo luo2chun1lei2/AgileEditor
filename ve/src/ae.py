@@ -20,12 +20,12 @@ def init_components(manager):
     from component.help.ViewDialogCommon import ViewDialogCommon
     from component.help.ViewDialogProject import ViewDialogProject
     from component.help.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
-    from VeMain import VeMain
+    from AeMain import AeMain
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
     manager.register("app_view", AppView())
-    manager.register("ae_main", VeMain.get_instance())
+    manager.register("ae_main", AeMain.get_instance())
     manager.register("dialog_info", ViewDialogInfo())
     manager.register("dialog_common", ViewDialogCommon())
     manager.register("dialog_project", ViewDialogProject())

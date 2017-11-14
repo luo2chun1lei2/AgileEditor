@@ -11,7 +11,7 @@ from component.model.ModelWorkshop import ModelWorkshop
 from component.view.ViewWindow import ViewWindow
 from framework.FwComponent import FwComponent
 
-class VeMain(FwComponent):
+class AeMain(FwComponent):
     # 数据是 workshop -> project + file，
     # 而画面就可能有各种情况了。
     # ve_path string ve配置的路径
@@ -21,11 +21,11 @@ class VeMain(FwComponent):
 
     @staticmethod
     def get_instance():
-        if VeMain.ve_main_instance is None:
-            VeMain.ve_main_instance = VeMain()
-            FwManager.instance().load("ae_main", VeMain.ve_main_instance)
+        if AeMain.ve_main_instance is None:
+            AeMain.ve_main_instance = AeMain()
+            FwManager.instance().load("ae_main", AeMain.ve_main_instance)
 
-        return VeMain.ve_main_instance
+        return AeMain.ve_main_instance
 
     def __init__(self):
 
