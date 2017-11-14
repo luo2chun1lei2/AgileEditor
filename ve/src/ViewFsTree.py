@@ -15,6 +15,7 @@ from collections import OrderedDict
 from gi.repository import GObject, Gtk, Gdk, GtkSource, GLib, GdkPixbuf
 from bzrlib.tree import Tree
 from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
 
 # 文件夹的图标。
 folderxpm = [
@@ -539,6 +540,11 @@ class ViewFsTree(FwComponent):
 
         # 这个时候还没有设定项目的目录，所以没有必要设定list model.
 
+        # 设置事件
+        select = self.treeview.get_selection()
+        select.connect("changed", self.on_fstree_selection_changed)  # 选择项目变化事件（鼠标单击）
+        self.treeview.connect("row-activated", self.on_fstree_row_activated)  # 项目被激活事件(鼠标双击)
+
     # override component
     def onRegistered(self, manager):
         info = {'name':'view.fstree.get_view', 'help':'get the whole view.'}
@@ -576,6 +582,35 @@ class ViewFsTree(FwComponent):
         # return:TreeView:
         return self.treeview
 
+    # event handle
+    def on_fstree_selection_changed(self, selection):
+        ''' 文件列表选择时，不是双击，只是选择变化时 
+        '''
+        # model, treeiter = selection.get_selected()
+        # if treeiter != None:
+        #    print "You selected", model[treeiter][1]
+        pass  # 目前没有处理。
+
+    # event handle
+    def on_fstree_row_activated(self, treeview, tree_path, column):
+        ''' 双击了文件列表中的项目。
+        如果是文件夹，就将当前文件夹变成这个文件夹。
+        如果是文件，就打开。
+        '''
+        model = treeview.get_model()
+        pathname = model._get_fp_from_tp(tree_path)
+        abs_path = model.get_abs_filepath(pathname)
+
+        if not os.access(abs_path, os.R_OK):
+            logging.error('没有权限进入此目录。')
+            return
+
+        if model.is_folder(tree_path):
+            treeview.expand_row(tree_path, False)
+        else:
+            # 根据绝对路径显示名字。
+            FwManager.instance().requestService('view.main.open_file', {'abs_file_path': abs_path})
+
     def show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。
 
@@ -612,5 +647,3 @@ class ViewFsTree(FwComponent):
         # model:TreeModel:
         # return:Nothing
         self.treeview.set_model(model)
-
-

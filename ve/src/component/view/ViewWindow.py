@@ -50,10 +50,9 @@ class ViewWindow(Gtk.Window, FwComponent):
         FwManager.instance().load("view_menu", self.ide_menu)
         FwManager.instance().load("view_bookmark", self.bookmarks)
 
-        info = {'name':'view.main.show_bookmark', 'help':'show a bookmark.'}
-        manager.registerService(info, self)
-
-        info = {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current pos, and return bookmarks list'}
+        info = [{'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
+            {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current pos, and return bookmarks list'},
+            {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'}]
         manager.registerService(info, self)
 
         return True
@@ -68,6 +67,10 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         elif serviceName == "view.main.make_bookmark":
             return self._svc_add_bookmark()
+
+        elif serviceName == 'view.main.open_file':
+            self.ide_open_file(None, params['abs_file_path'])
+            return True, None
 
         else:
             return (False, None)
@@ -181,11 +184,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         treeview = results['view']
 
         # 加入事件。
-        select = treeview.get_selection()
-        select.connect("changed", self.on_fstree_selection_changed)
-
-        treeview.connect("row-activated", self.on_fstree_row_activated)
-
         # 鼠标释放事件
         treeview.connect("button_release_event", self.on_fstree_row_button_release)
 
@@ -283,37 +281,6 @@ class ViewWindow(Gtk.Window, FwComponent):
     def on_src_bufer_changed(self, widget):
         ''' 当文件发了变化后。'''
         self._set_status(ViewMenu.STATUS_FILE_OPEN_CHANGED)
-
-    def on_fstree_selection_changed(self, selection):
-        ''' 文件列表选择时，不是双击，只是选择变化时 '''
-        # model, treeiter = selection.get_selected()
-        # if treeiter != None:
-        #    print "You selected", model[treeiter][1]
-        pass
-
-    def on_fstree_row_activated(self, treeview, tree_path, column):
-        ''' 双击了文件列表中的项目。
-        如果是文件夹，就将当前文件夹变成这个文件夹。
-        如果是文件，就打开。
-        '''
-        model = treeview.get_model()
-        pathname = model._get_fp_from_tp(tree_path)
-        abs_path = model.get_abs_filepath(pathname)
-
-        if not os.access(abs_path, os.R_OK):
-            logging.error('没有权限进入此目录。')
-            return
-
-        if model.is_folder(tree_path):
-            # new_model = FsTreeModel(abs_path)
-            # treeview.set_model(new_model)
-
-            # self.window.set_title(new_model.dirname)
-
-            treeview.expand_row(tree_path, False)
-        else:
-            # 根据绝对路径显示名字。
-            self.ide_open_file(None, abs_path)
 
     def on_fstree_row_button_release(self, tree_view, event_button):
         # 点击了文件树的鼠标
@@ -624,17 +591,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         if response == Gtk.ResponseType.OK:
             logging.debug("File selected: %s " % file_path)
-
-#             self.multiEditors.show_editor(file_path)
-#
-#             view_editor = self.multiEditors.get_editor_by_path(file_path)
-#             self._ide_search_init(view_editor.editor.get_buffer())
-#
-#             # 分析标记
-#             if self.cur_prj is not None:
-#                 tags = self.cur_prj.query_tags_by_file(file_path)
-#                 self.ide_refresh_file_tag_list(tags)
-            # self.ide_switch_page(file_path)
             self._ide_open_page(file_path)
 
             result = self.RLT_OK

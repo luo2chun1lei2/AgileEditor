@@ -120,7 +120,12 @@ class FwManager():
         @param info: map/[map]: 服务的关键字加参数。
         @param component: FwComponent: 组件实例
         '''
-        self.services.append(FwService(info, component))
+
+        if isinstance(info, list):
+            for i in info:
+                self.services.append(FwService(i, component))
+        else:
+            self.services.append(FwService(info, component))
         return True
 
     def unregisterService(self, component):
