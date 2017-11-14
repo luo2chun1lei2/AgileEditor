@@ -23,7 +23,6 @@ from component.model.ModelTask import ModelTask
 from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
-from ViewFsTree import FsTreeModel
 from ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
 from component.view.ViewBookmarks import ViewBookmarks
@@ -137,9 +136,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 菜单和工具栏
         self.ide_menu = ViewMenu(self, self.on_menu_func)
 
-        # 文件系统树
-        self.ideFsTree = self.create_fs_tree()
-
         # 多个Editor的切换Tab
         self.multiEditors = ViewMultiEditors(self.on_menu_func)
         self.tab_page = self.multiEditors.get_tab_page()
@@ -201,19 +197,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         vbox.pack_start(panedFsAndEditor, True, True, 5)
 
         self.add(vbox)
-
-    def create_fs_tree(self):
-        # 创建文件系统树控件。
-        # return:ViewFsTree:需要外部包含的控件，以及FsTree这个实例。
-        isOK, results = FwManager.instance().requestService('view.fstree.get_treeview', None)
-        treeview = results['view']
-
-        # 加入事件。
-
-
-        isOK, results = FwManager.instance().requestService('view.fstree.get_self', None)
-        fstree = results['self']
-        return fstree
 
     ###################################
     # # 创建画面
@@ -363,8 +346,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 打开代码所在的目录
         # TODO:有多个代码的项目，应该显示哪个目录？
         if len(prj.src_dirs) > 0:
-            treeModel = FsTreeModel(prj.src_dirs[0])
-            self.ideFsTree.set_model(treeModel)
+            FwManager.instance().requestService('view.fstree.set_dir', {'dir':prj.src_dirs[0]})
 
         # 设置窗口标题。
         self.ide_set_title("")
@@ -401,8 +383,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             return
 
         # 更新当前项目的文件列表
-        treeModel = FsTreeModel(self.cur_prj.src_dirs[0])
-        self.ideFsTree.set_model(treeModel)
+        FwManager.instance().requestService('view.fstree.set_dir', {'dir':self.cur_prj.src_dirs[0]})
 
         # 更新右边的TAGS
         self.cur_prj.prepare()
@@ -832,7 +813,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.ide_set_title(abs_file_path)
 
         # 在文件树那里同步
-        self.ideFsTree.show_file(abs_file_path)
+        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
 
     def _ide_query_tags_by_file_and_refresh(self, abs_file_path):
 
@@ -862,7 +843,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.ide_set_title(abs_file_path)
 
         # 在文件树那里同步
-        self.ideFsTree.show_file(abs_file_path)
+        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
 
     ###################################
     # # 更加底层的功能

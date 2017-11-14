@@ -553,10 +553,10 @@ class ViewFsTree(FwComponent):
         info = {'name':'view.fstree.get_view', 'help':'get the whole view.'}
         manager.registerService(info, self)
 
-        info = {'name':'view.fstree.get_treeview', 'help':'get a fs tree view.'}
+        info = {'name':'view.fstree.focus_file', 'help':'set focus to the given file.'}
         manager.registerService(info, self)
-        # TODO 这个服务是临时的，应该在不断的重构后，将此服务取消掉。
-        info = {'name':'view.fstree.get_self', 'help':'get this component.'}
+
+        info = {'name':'view.fstree.set_dir', 'help':'set file-tree path.'}
         manager.registerService(info, self)
 
         return True
@@ -566,11 +566,14 @@ class ViewFsTree(FwComponent):
         if serviceName == "view.fstree.get_view":
             return (True, {'view': self._get_view()})
 
-        elif serviceName == "view.fstree.get_treeview":
-            return (True, {'view': self._get_treeview()})
+        elif serviceName == "view.fstree.focus_file":
+            self._show_file(params['abs_file_path'])
+            return (True, None)
 
-        elif serviceName == "view.fstree.get_self":
-            return (True, {'self': self})
+        elif serviceName == "view.fstree.set_dir":
+            treeModel = FsTreeModel(params['dir'])
+            self._set_model(treeModel)
+            return (True, None)
 
         else:
             return (False, None)
@@ -663,7 +666,7 @@ class ViewFsTree(FwComponent):
             return
 
         # 得到路径
-        file_path = self.get_abs_file_path_by_iter(itr)
+        file_path = self._get_abs_file_path_by_iter(itr)
 
         # 如果不是目录，找到上一级的目录
         # 会不会超出项目的目录？从逻辑上看，不会。
@@ -700,7 +703,7 @@ class ViewFsTree(FwComponent):
             return
 
         # 得到路径
-        file_path = self.get_abs_file_path_by_iter(itr)
+        file_path = self._get_abs_file_path_by_iter(itr)
 
         # 如果不是目录，找到上一级的目录
         # 会不会超出项目的目录？从逻辑上看，不会。
@@ -736,7 +739,7 @@ class ViewFsTree(FwComponent):
             return
 
         # 得到路径
-        file_path = self.get_abs_file_path_by_iter(itr)
+        file_path = self._get_abs_file_path_by_iter(itr)
 
         # 需要确认！
         dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.QUESTION,
@@ -765,7 +768,7 @@ class ViewFsTree(FwComponent):
             return
 
         # 得到路径
-        file_path = self.get_abs_file_path_by_iter(itr)
+        file_path = self._get_abs_file_path_by_iter(itr)
 
         # 实现对话框，得到文件名字
         response, name = self._in_show_dialog_one_entry("修改文件名字", "新文件名字")
@@ -799,7 +802,7 @@ class ViewFsTree(FwComponent):
                                     {'transient_for':None, 'title':title, 'entry_label':label})
         return results['response'], results['text']
 
-    def show_file(self, abs_file_path):
+    def _show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。
 
         model = self.treeview.get_model()
@@ -815,14 +818,14 @@ class ViewFsTree(FwComponent):
         # 选中
         self.treeview.set_cursor(tree_path)
 
-    def get_file_path_by_iter(self, itr):
+    def _get_file_path_by_iter(self, itr):
         # 根据iter得到文件的相对路径
         # iter:Gtk.TreeIter:Iterator
         # return:String:文件的相对路径
         model = self.treeview.get_model()
         return model._get_fp_from_iter(itr)
 
-    def get_abs_file_path_by_iter(self, itr):
+    def _get_abs_file_path_by_iter(self, itr):
         # 根据iter得到文件的绝对路径
         # iter:Gtk.TreeIter:Iterator
         # return:String:文件的绝对路径
@@ -830,7 +833,7 @@ class ViewFsTree(FwComponent):
         fp = model._get_fp_from_iter(itr)
         return model.get_abs_filepath(fp)
 
-    def set_model(self, model):
+    def _set_model(self, model):
         # 设定Tree的Model
         # model:TreeModel:
         # return:Nothing
