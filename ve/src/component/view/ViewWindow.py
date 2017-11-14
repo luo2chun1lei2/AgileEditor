@@ -56,7 +56,8 @@ class ViewWindow(Gtk.Window, FwComponent):
 #             {'name':'view.main.new_dir', 'help': 'create new directory by path.'},
 #             {'name':'view.main.delete_file', 'help': 'delete one file by path.'},
 #             {'name':'view.main.rename_file', 'help': 'rename file path.'},
-            {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags when .'}]
+            {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags.'},
+            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'}]
         manager.registerService(info, self)
 
         return True
@@ -78,6 +79,14 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         elif serviceName == 'view.main.refresh_project':
             self.ide_update_tags_of_project()
+            return True, None
+        
+        elif serviceName == 'view.main.goto_line':
+            # 跳转到对应的行。
+            self.ide_goto_line(params['line_no'])
+
+            # 编辑器获取焦点。
+            self.ide_editor_set_focus()
             return True, None
 
 #         elif serviceName == 'view.main.new_regular_file':
@@ -140,9 +149,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.multiEditors = ViewMultiEditors(self.on_menu_func)
         self.tab_page = self.multiEditors.get_tab_page()
 
-        # 文件Tag列表。
-        self.ideTagList = ViewFileTagList(self)
-
         # 项目搜索Tag列表
         self.searchTagList = ViewSearchTagList(self)
 
@@ -174,7 +180,8 @@ class ViewWindow(Gtk.Window, FwComponent):
         # shrink:子控件是否能够比它需要的大小更小。
         panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
-        panedEdtiorAndTagList.pack2(self.ideTagList.get_view(), resize=False, shrink=True)
+        isOK, results = FwManager.instance().requestService('view.file_taglist.get_view', None)
+        panedEdtiorAndTagList.pack2(results['view'], resize=False, shrink=True)
 
         self.nbPrj.append_page(self.searchTagList.get_view(), Gtk.Label("检索"))
         self.nbPrj.append_page(self.bookmarks.get_view(), Gtk.Label("书签"))
@@ -901,9 +908,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def ide_refresh_file_tag_list(self, tags):
         # 根据Tag的列表，更新文件对应的Tag列表
         # tags:[IdeOneTag]:Tag列表。
-
-        self.ideTagList.set_model(tags)
-        self.ideTagList.expand_all()
+        FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist':tags})
 
     def ide_goto_line(self, line_number):
         # 跳转到当前文件的行。

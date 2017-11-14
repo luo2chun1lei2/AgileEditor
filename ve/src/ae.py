@@ -22,6 +22,7 @@ def init_components(manager):
     from component.dialog.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
     from component.util.UtilWordComplete import UtilWordComplete
     from ViewFsTree import ViewFsTree
+    from ViewFileTagList import ViewFileTagList
     from AeMain import AeMain
 
     manager.register("app_process", AppProcess())
@@ -34,6 +35,7 @@ def init_components(manager):
     manager.register("dialog_project_setting", ViewDialogWorkshopSetting())
     manager.register("word_complete", UtilWordComplete())
     manager.register("fs_treeview", ViewFsTree())
+    manager.register("file_taglist", ViewFileTagList())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

@@ -8,8 +8,10 @@ from gi.repository import Gtk, Gdk, GObject, GLib
 
 from component.model.ModelTags import ModelTag
 from framework.FwUtils import *
+from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
 
-class ViewFileTagList:
+class ViewFileTagList (FwComponent):
     # 定制一个ListView，内部显示Tag。
     # editorWindow:EditorWindow:总的编辑窗口。
 
@@ -21,10 +23,8 @@ class ViewFileTagList:
      COLUMN_TAG_SCOPE,  # 所在范围
      ) = range(4)
 
-    def __init__(self, editorWindow):
+    def __init__(self):
         # editorWindow:ViewWindow:主画面
-
-        self.editorWindow = editorWindow
 
         # 总的容器
         vbox = Gtk.VBox(spacing=2)
@@ -59,6 +59,27 @@ class ViewFileTagList:
         # 设定需要传出的控件。
         self.view = vbox
         self.taglistview = treeview
+        
+    # override component
+    def onRegistered(self, manager):
+        info = [{'name':'view.file_taglist.get_view', 'help':'get view of tag list.'},
+                {'name':'view.file_taglist.show_taglist', 'help':'show tag list in view.'}]
+        manager.registerService(info, self)
+
+        return True
+    
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "view.file_taglist.get_view":
+            return (True, {'view':self.get_view()})
+
+        elif serviceName == "view.file_taglist.show_taglist":
+            self.set_model(params['taglist'])
+            self.expand_all()
+            return (True, None) 
+        
+        else:
+            return (False, None)
 
     def set_model(self, tags):
         # 设置模型
@@ -167,11 +188,9 @@ class ViewFileTagList:
             # 不应该跳转的项目
             return
 
+        
         # 跳转到对应的行。
-        self.editorWindow.ide_goto_line(line_no)
-
-        # 编辑器获取焦点。
-        self.editorWindow.ide_editor_set_focus()
+        FwManager.instance().requestService('view.main.goto_line', {'line_no':line_no})
 
     def get_view(self):
         # 返回容器控件
