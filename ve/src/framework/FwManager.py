@@ -3,7 +3,8 @@
 框架的核心处理类
 '''
 
-import logging
+import logging, sys
+from FwUtils import *
 
 class FwService:
     def __init__(self, info, component):
@@ -144,6 +145,7 @@ class FwManager():
 
         # 也不一定是错误，可能是因为初始化顺序导致的。
         logging.warn("cannot find service \"%s\"." % serviceName)
+        util_print_frame()
         return (False, None)
 
     #############################################

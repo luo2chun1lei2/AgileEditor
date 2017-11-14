@@ -499,8 +499,6 @@ class ViewFsTree(FwComponent):
                                                self.TARGETS,
                                                Gdk.DragAction.DEFAULT | Gdk.DragAction.MOVE)
         self.treeview.enable_model_drag_dest(self.TARGETS, Gdk.DragAction.DEFAULT)
-        self.treeview.connect("drag-data-received", self.on_drag_data_received)
-        self.treeview.connect("drag_data_get", self.on_drag_data_get_data)
 
         # create the TreeViewColumns to display the data
         column_names = self.listmodel.get_column_names()
@@ -540,7 +538,6 @@ class ViewFsTree(FwComponent):
         self.treeview.set_activate_on_single_click(False)
 
         # 这个时候还没有设定项目的目录，所以没有必要设定list model.
-        # self.treeview.set_model(self.listmodel)
 
     # override component
     def onRegistered(self, manager):
@@ -558,10 +555,10 @@ class ViewFsTree(FwComponent):
     # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.fstree.get_view":
-            return (True, {'view': self.get_view()})
+            return (True, {'view': self._get_view()})
 
         elif serviceName == "view.fstree.get_treeview":
-            return (True, {'view': self.get_treeview()})
+            return (True, {'view': self._get_treeview()})
 
         elif serviceName == "view.fstree.get_self":
             return (True, {'self': self})
@@ -569,13 +566,16 @@ class ViewFsTree(FwComponent):
         else:
             return (False, None)
 
-    def on_drag_data_received(self, widget, drag_context, x, y, selection_data, info, timestamp):
-        pass
+    def _get_view(self):
+        # 返回外部需要包含的控件
+        # return:Gtk.Widget:
+        return self.scrolledwindow
 
-    def on_drag_data_get_data(self, treeview, context, selection, target_id, etime):
-        pass
+    def _get_treeview(self):
+        # 返回TreeView控件
+        # return:TreeView:
+        return self.treeview
 
-    # 被外部使用。
     def show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。
 
@@ -599,7 +599,6 @@ class ViewFsTree(FwComponent):
         model = self.treeview.get_model()
         return model._get_fp_from_iter(itr)
 
-    # 被外部使用！
     def get_abs_file_path_by_iter(self, itr):
         # 根据iter得到文件的绝对路径
         # iter:Gtk.TreeIter:Iterator
@@ -608,26 +607,10 @@ class ViewFsTree(FwComponent):
         fp = model._get_fp_from_iter(itr)
         return model.get_abs_filepath(fp)
 
-    # TODO 感觉上不应该这样实现，而应该修改完文件后，刷新Tree
-    def refresh_line(self, itr):
-        # 更新指定itr和之下的所有数据
-        # itr:Gtk.TreeIter:iterator
-        # return:Nothing
-        pass  # TODO 没有实现。
-
-    # 被外部使用
     def set_model(self, model):
         # 设定Tree的Model
         # model:TreeModel:
         # return:Nothing
         self.treeview.set_model(model)
 
-    def get_view(self):
-        # 返回外部需要包含的控件
-        # return:Gtk.Widget:
-        return self.scrolledwindow
 
-    def get_treeview(self):
-        # 返回TreeView控件
-        # return:TreeView:
-        return self.treeview

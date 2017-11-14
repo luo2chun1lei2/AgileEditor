@@ -162,7 +162,8 @@ class ViewWindow(Gtk.Window, FwComponent):
         panedEdtiorAndSearchTag.pack2(self.nbPrj, resize=False, shrink=True)
 
         panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        panedFsAndEditor.pack1(self.ideFsTree.get_view(), resize=False, shrink=True)
+        isOK, results = FwManager.instance().requestService('view.fstree.get_view', None)
+        panedFsAndEditor.pack1(results['view'], resize=False, shrink=True)
         panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
         panedFsAndEditor.set_position(200);
 
