@@ -8,14 +8,17 @@
 # 2, 显示文件的信息。
 # 3, 过滤部分文件。
 # 4, 一旦打开的文件被外部的工具修改，那么此编辑器的文件怎么修改都无法保存到原来的文件，且看不出有问题。
+# 5, 如果打开的文件被删除，再操作原来的文件就会出现错误。
 
-import os, stat, time, collections, logging
+import os, stat, time, collections, logging, shutil
 from collections import OrderedDict
 
 from gi.repository import GObject, Gtk, Gdk, GtkSource, GLib, GdkPixbuf
 from bzrlib.tree import Tree
+
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
+from framework.FwUtils import *
 
 # 文件夹的图标。
 folderxpm = [
@@ -541,9 +544,9 @@ class ViewFsTree(FwComponent):
         # 这个时候还没有设定项目的目录，所以没有必要设定list model.
 
         # 设置事件
-        select = self.treeview.get_selection()
-        select.connect("changed", self.on_fstree_selection_changed)  # 选择项目变化事件（鼠标单击）
+        self.treeview.get_selection().connect("changed", self.on_fstree_selection_changed)  # 选择项目变化事件（鼠标单击）
         self.treeview.connect("row-activated", self.on_fstree_row_activated)  # 项目被激活事件(鼠标双击)
+        self.treeview.connect("button_release_event", self.on_fstree_row_button_release)  # 鼠标释放事件
 
     # override component
     def onRegistered(self, manager):
@@ -610,6 +613,191 @@ class ViewFsTree(FwComponent):
         else:
             # 根据绝对路径显示名字。
             FwManager.instance().requestService('view.main.open_file', {'abs_file_path': abs_path})
+
+    # event handle
+    def on_fstree_row_button_release(self, tree_view, event_button):
+        ''' 点击了文件树的鼠标
+        @param tree_view:GtkTreeView:
+        @param event_button:EventButton:
+        @param return:Bool:True,已经处理了，False,没有处理。
+        '''
+
+        if event_button.type == Gdk.EventType.BUTTON_RELEASE and event_button.button == 3:
+            # 右键，释放，显示 popup 菜单
+
+            self.treemenu = Gtk.Menu()
+
+            menuitem = Gtk.MenuItem.new_with_label("新建文件")
+            menuitem.connect("activate", self.on_fstree_row_popup_menuitem_new_file_active, tree_view)
+            self.treemenu.append(menuitem)
+            menuitem.show()
+
+            menuitem = Gtk.MenuItem.new_with_label("新建目录")
+            menuitem.connect("activate", self.on_fstree_row_popup_menuitem_new_dir_active, tree_view)
+            self.treemenu.append(menuitem)
+            menuitem.show()
+
+            menuitem = Gtk.MenuItem.new_with_label("删除")
+            menuitem.connect("activate", self.on_fstree_row_popup_menuitem_delete_active, tree_view)
+            self.treemenu.append(menuitem)
+            menuitem.show()
+
+            menuitem = Gtk.MenuItem.new_with_label("修改")
+            menuitem.connect("activate", self.on_fstree_row_popup_menuitem_change_active, tree_view)
+            self.treemenu.append(menuitem)
+            menuitem.show()
+
+            self.treemenu.popup(None, None, None, None, 0, event_button.time)
+
+            return True
+
+        else:
+            return False
+
+    # event handle
+    def on_fstree_row_popup_menuitem_new_file_active(self, widget, tree_view):
+
+        # 先取得选中的item
+        tree_model, itr = tree_view.get_selection().get_selected()
+        if itr is None:
+            return
+
+        # 得到路径
+        file_path = self.get_abs_file_path_by_iter(itr)
+
+        # 如果不是目录，找到上一级的目录
+        # 会不会超出项目的目录？从逻辑上看，不会。
+        if not os.path.isdir(file_path):
+            file_path = os.path.dirname(file_path)
+            if not os.path.isdir(file_path) or not os.path.exists(file_path):
+                return
+
+        # 实现对话框，得到文件名字
+        response, name = self._in_show_dialog_one_entry("新建文件", "文件名字")
+        if not response == Gtk.ResponseType.OK or is_empty(name):
+            return
+
+        # 新建文件
+        new_file_path = os.path.join(file_path, name)
+        if os.path.exists(new_file_path):
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+                                       Gtk.ButtonsType.CLOSE, "文件“%s”已经存在。" % new_file_path)
+            dialog.run()
+            dialog.destroy()
+            return
+
+        f = open(new_file_path, 'w')
+        f.close()
+
+        # 刷新tree
+        self._refresh_project()
+
+    # event handle
+    def on_fstree_row_popup_menuitem_new_dir_active(self, widget, tree_view):
+        # 先取得选中的item
+        tree_model, itr = tree_view.get_selection().get_selected()
+        if itr is None:
+            return
+
+        # 得到路径
+        file_path = self.get_abs_file_path_by_iter(itr)
+
+        # 如果不是目录，找到上一级的目录
+        # 会不会超出项目的目录？从逻辑上看，不会。
+        if not os.path.isdir(file_path):
+            file_path = os.path.dirname(file_path)
+            if not os.path.isdir(file_path) or not os.path.exists(file_path):
+                return
+
+        # 实现对话框，得到文件名字
+        response, name = self._in_show_dialog_one_entry("新建目录", "目录名字")
+        if not response == Gtk.ResponseType.OK or is_empty(name):
+            return
+
+        # 新建文件
+        new_file_path = os.path.join(file_path, name)
+        if os.path.exists(new_file_path):
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+                                       Gtk.ButtonsType.CLOSE, "目录“%s”已经存在。" % new_file_path)
+            dialog.run()
+            dialog.destroy()
+            return
+
+        os.mkdir(new_file_path)
+
+        # 刷新tree
+        self._refresh_project()
+
+    # event handle
+    def on_fstree_row_popup_menuitem_delete_active(self, widget, tree_view):
+        # 先取得选中的item
+        tree_model, itr = tree_view.get_selection().get_selected()
+        if itr is None:
+            return
+
+        # 得到路径
+        file_path = self.get_abs_file_path_by_iter(itr)
+
+        # 需要确认！
+        dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.QUESTION,
+                                       Gtk.ButtonsType.YES_NO,
+                                       "删除文件“%s”！" % file_path)
+        reponse = dialog.run()
+        dialog.destroy()
+
+        if not reponse == Gtk.ResponseType.YES:
+            return
+
+        # 删除文件
+        if os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+        else:
+            os.remove(file_path)
+
+        # 刷新tree
+        self._refresh_project()
+
+    # event handle
+    def on_fstree_row_popup_menuitem_change_active(self, widget, tree_view):
+        # 先取得选中的item
+        tree_model, itr = tree_view.get_selection().get_selected()
+        if itr is None:
+            return
+
+        # 得到路径
+        file_path = self.get_abs_file_path_by_iter(itr)
+
+        # 实现对话框，得到文件名字
+        response, name = self._in_show_dialog_one_entry("修改文件名字", "新文件名字")
+        if not response == Gtk.ResponseType.OK or is_empty(name):
+            return
+
+        # 修改文件名字
+        new_file_path = os.path.join(os.path.dirname(file_path), name)
+
+        # 名字相等，不再替换
+        if new_file_path == file_path:
+            return
+
+        if os.path.exists(new_file_path):
+            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+                                       Gtk.ButtonsType.CLOSE, "文件“%s”已经存在。" % new_file_path)
+            dialog.run()
+            dialog.destroy()
+            return
+
+        os.rename(file_path, new_file_path)
+
+        # 刷新tree
+        self._refresh_project()
+
+    def _refresh_project(self):
+        FwManager.instance().requestService('view.main.refresh_project', None)
+
+    def _in_show_dialog_one_entry(self, title, label):
+        isOK, results = FwManager.instance().requestService('dialog.common.one_entry',
+                                    {'transient_for':None, 'title':title, 'entry_label':label})
+        return results['response'], results['text']
 
     def show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。
