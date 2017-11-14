@@ -16,10 +16,10 @@ def init_components(manager):
     from component.AppProcess import AppProcess
     from component.AppView import AppView
     from component.AppArgs import AppArgs
-    from component.help.ViewDailogInfo import ViewDialogInfo
-    from component.help.ViewDialogCommon import ViewDialogCommon
-    from component.help.ViewDialogProject import ViewDialogProject
-    from component.help.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
+    from component.dialog.ViewDailogInfo import ViewDialogInfo
+    from component.dialog.ViewDialogCommon import ViewDialogCommon
+    from component.dialog.ViewDialogProject import ViewDialogProject
+    from component.dialog.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
     from component.util.UtilWordComplete import UtilWordComplete
     from AeMain import AeMain
 
