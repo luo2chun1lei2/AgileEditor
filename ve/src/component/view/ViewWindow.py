@@ -69,7 +69,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             return self._svc_add_bookmark()
 
         elif serviceName == 'view.main.open_file':
-            self.ide_open_file(None, params['abs_file_path'])
+            self.ide_open_file(params['abs_file_path'])
             return True, None
 
         else:
@@ -96,7 +96,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         if want_open_file:
             path = os.path.abspath(want_open_file)
-            self.ide_open_file(None, path)
+            self.ide_open_file(path)
 
     def _create_layout(self):
         # 创建画面。
@@ -218,7 +218,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif action == ViewMenu.ACTION_FILE_NEW:
             self.ide_new_file(widget)
         elif action == ViewMenu.ACTION_FILE_OPEN:
-            self.ide_open_file(widget)
+            self.ide_open_file()
         elif action == ViewMenu.ACTION_FILE_CLOSE:
             self.ide_close_file(widget)
             self.ide_new_file(widget)
@@ -564,12 +564,10 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         self._set_status(ViewMenu.STATUS_FILE_OPEN)
 
-    def ide_open_file(self, widget, path=None):
+    def ide_open_file(self, path=None):
         '''
-        如果已经打开文件，关闭当前文件
-        显示“挑选”文件。
-        然后显示打开的文件。
-        path:string:绝对路径。
+        如果已经打开文件，变为当前文件。如果路径是空，就显示“挑选”文件。然后打开此文件。
+        @param path:string:绝对路径。
         '''
         result = self.RLT_CANCEL
 
@@ -1114,7 +1112,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 先找到对应的文件
         # 然后再滚动到指定的位置
         # print 'jump to path:' + file_path + ', line:' + str(line_number)
-        if self.ide_open_file(None, file_path) == self.RLT_OK:
+        if self.ide_open_file(file_path) == self.RLT_OK:
             # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.ide_goto_line, line_number)
