@@ -41,34 +41,9 @@ class FwManager():
         # [服务的信息]: [<FwService>]
         self.services = []
 
-    def _init_components(self):
-        ''' 建立最开始的组件，然后注册。
-        '''
-        # 注册已知的组件工厂。
-        # TODO 以后修改成从固定文件夹等搜索组件，然后加载。
-        from component.AppProcess import AppProcess
-        from component.AppView import AppView
-        from component.AppArgs import AppArgs
-        from component.help.ViewDailogInfo import ViewDialogInfo
-        from component.help.ViewDialogCommon import ViewDialogCommon
-        from component.help.ViewDialogProject import ViewDialogProject
-        from component.help.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
-        from VeMain import VeMain
-
-        self.register("app_process", AppProcess())
-        self.register("command_parser", AppArgs())
-        self.register("app_view", AppView())
-        self.register("ae_main", VeMain.get_instance())
-        self.register("dialog_info", ViewDialogInfo())
-        self.register("dialog_common", ViewDialogCommon())
-        self.register("dialog_project", ViewDialogProject())
-        self.register("dialog_project_setting", ViewDialogWorkshopSetting())
-
     def run(self, argv):
         ''' 程序运行，整个系统不关闭，则此函数不关闭
         '''
-
-        self._init_components()
 
         # 前期准备
         for (name, component) in self.components.items():
@@ -91,7 +66,7 @@ class FwManager():
     # # 组件工厂相关函数
 
     def register(self, name, component):
-        ''' 注册组件，外部不要调用
+        ''' 注册组件，不会让其他组件再初始化（也就是不会调用onSetup）。
         @param name: string: 工厂的名字，必须唯一
         @param componentFactory: FwComponentFactory: 工厂的实例
         '''
@@ -105,13 +80,10 @@ class FwManager():
         if not self.register(name, component):
             return False
 
-        if not component.onSetup(self):
-            return False
-
         for oneName, oneComponent in self.components.items():
-            if name != oneName:
-                if not oneComponent.onSetup(self):
-                    return False
+            if not oneComponent.onSetup(self):
+                return False
+
         return True
 
     def unregisterByName(self, componentName):

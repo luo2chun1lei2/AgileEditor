@@ -47,8 +47,8 @@ class ViewWindow(Gtk.Window, FwComponent):
     # override component
     def onRegistered(self, manager):
         # 将已经生成好的控件作为组件注册到框架中。
-        FwManager.instance().register("view_menu", self.ide_menu)
-        FwManager.instance().register("view_bookmark", self.bookmarks)
+        FwManager.instance().load("view_menu", self.ide_menu)
+        FwManager.instance().load("view_bookmark", self.bookmarks)
 
         info = {'name':'view.main.show_bookmark', 'help':'show a bookmark.'}
         manager.registerService(info, self)

@@ -34,7 +34,7 @@ class VeMain(FwComponent):
         self.workshop = ModelWorkshop(self.ve_path)
 
     def onRegistered(self, manager):
-        manager.register('model_workshop', self.workshop)
+        manager.load('model_workshop', self.workshop)
 
         info = {'name':'app.select_project', 'help':'select one project to start UI.'}
         manager.registerService(info, self)
