@@ -30,6 +30,7 @@ class ViewDialogWorkshopSetting(FwComponent):
     # from FwBaseComponnet
     def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.project.setting":
+            # setting = {'style':?, 'font':?}
             setting = DialogPreferences.show(params['parent'], params['setting'])
             return (True, {'setting':setting})
 
@@ -66,9 +67,7 @@ class DialogPreferences(Gtk.Dialog):
         lbl_font_name = Gtk.Label("字体")
         vbox.pack_start(lbl_font_name, True, True, 0)
 
-        isOK, results = FwManager.instance().requestService('model.workshop.getopt', {'key':'font'})
-        self.btn_font = Gtk.FontButton.new_with_font(results['value'])
-        self.btn_font.connect('font-set', self.on_font_changed)
+        self.btn_font = Gtk.FontButton.new_with_font(self.setting['font'])
         vbox.pack_start(self.btn_font, True, True, 1.0)
 
         ###############################
@@ -92,25 +91,19 @@ class DialogPreferences(Gtk.Dialog):
         cmb.pack_start(cell_render, True)
         cmb.add_attribute(cell_render, "text", 0)
         cmb.set_active(found_index)
-        cmb.connect("changed", self.on_style_changed)
 
         return cmb
-
-    def on_font_changed(self, btn):
-        self.setting['font'] = btn.get_font_name()
-        return True
-
-    def on_style_changed(self, combobox):
-        itr = combobox.get_active_iter()
-        self.setting['style'] = combobox.get_model().get_value(itr, 0)
-        return True
 
     @staticmethod
     def show(parent, setting):
         dialog = DialogPreferences(parent, setting)
 
         response = dialog.run()
-        if response != Gtk.ResponseType.OK:
+        if response == Gtk.ResponseType.OK:
+            itr = dialog.cmb_style.get_active_iter()
+            setting['style'] = dialog.cmb_style.get_model().get_value(itr, 0)
+            setting['font'] = dialog.btn_font.get_font_name()
+        else:
             setting = None
 
         dialog.destroy()

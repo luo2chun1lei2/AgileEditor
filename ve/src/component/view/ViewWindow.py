@@ -369,8 +369,8 @@ class ViewWindow(Gtk.Window, FwComponent):
     def ide_preferences_project(self):
         # 配置当前的项目
         # 设定保存在workshop的数据模型之中。
-        setting = {'style': self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE] }
-        # preferences = ViewDialogPreferences.show(self, setting)
+        setting = {'style': self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE],
+                   'font': self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_FONT] }
         isOK, results = FwManager.instance().requestService('dialog.project.setting',
                         {'parent':self, 'setting':setting})
         setting = results['setting']
