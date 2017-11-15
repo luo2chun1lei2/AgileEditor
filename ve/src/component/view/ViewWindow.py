@@ -145,10 +145,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 菜单和工具栏
         self.ide_menu = ViewMenu(self, self.on_menu_func)
-
-        # 多个Editor的切换Tab
-        isOK, results = FwManager.instance().requestService('view.multi_editors.get_self')
-        self.multiEditors = results['self']
         
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
@@ -358,8 +354,8 @@ class ViewWindow(Gtk.Window, FwComponent):
             return
 
         # 修改系统设定！
-        self.multiEditors.changeEditorStyle(setting['style'])
-        self.multiEditors.changeEditorFont(setting['font'])
+        FwManager.instance().requestService('view.multi_editors.change_editor_style', {'style': setting['style']})
+        FwManager.instance().requestService('view.multi_editors.change_editor_font', {'font': setting['font']})
 
         self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE] = setting['style']
         self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_FONT] = setting['font']
@@ -783,7 +779,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # abs_file_path string 切换到的文件名字
         FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
 
-        view_editor = self.multiEditors.get_editor_by_path(abs_file_path)
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
         mdl_file = view_editor.ide_file
 
         # 初始化检索。
@@ -814,7 +810,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         '''
         FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
 
-        view_editor = self.multiEditors.get_editor_by_path(abs_file_path)
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
         self._ide_search_init(view_editor.editor.get_buffer())
 
         # 分析标记
