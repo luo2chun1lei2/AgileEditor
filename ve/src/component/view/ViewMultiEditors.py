@@ -52,9 +52,16 @@ class ViewMultiEditors(FwComponent):
 
     # override component
     def onRegistered(self, manager):
+        # TODO get 类型的服务太多，而且重复了，所以应该将属于editors的功能移入到这里类中，然后做一个封装！
         info = [{'name':'view.multi_editors.get_self', 'help':'get self of multiple editors.'},
                 {'name':'view.multi_editors.get_view', 'help':'get view of multiple editors.'},
-                {'name':'view.multi_editors.show_taglist', 'help':'show tag list in view.'}]
+                {'name':'view.multi_editors.show_taglist', 'help':'show tag list in view.'},
+                {'name':'view.multi_editors.open_editor', 'help':'open one editor.'},
+                {'name':'view.multi_editors.close_editor', 'help':'close one editor.'},
+                {'name':'view.multi_editors.get_current_editor', 'help':'get current editor.'},
+                {'name':'view.multi_editors.get_current_ide_editor', 'help':'get current editor.'},
+                {'name':'view.multi_editors.get_current_abs_file_path', 'help':'get absolutive path of current file.'},
+                {'name':'view.multi_editors.get_current_ide_file', 'help':'show model of current file.'}]
         manager.registerService(info, self)
 
         return True
@@ -68,6 +75,20 @@ class ViewMultiEditors(FwComponent):
         elif serviceName == "view.multi_editors.show_taglist":
             self.set_model(params['taglist'], params['project'])
             return True, None
+        elif serviceName == "view.multi_editors.open_editor":
+            self.show_editor(params['abs_file_path'])
+            return True, None
+        elif serviceName == "view.multi_editors.close_editor":
+            self.close_editor(params['abs_file_path'])
+            return True, None
+        elif serviceName == "view.multi_editors.get_current_editor":
+            return (True, {'editor': self.get_current_editor()})
+        elif serviceName == "view.multi_editors.get_current_ide_editor":
+            return (True, {'editor': self.get_current_ide_editor()})
+        elif serviceName == "view.multi_editors.get_current_abs_file_path":
+            return (True, {'abs_file_path': self.get_current_abs_file_path()})
+        elif serviceName == "view.multi_editors.get_current_ide_file":
+            return (True, {'ide_file': self.get_current_ide_file()})
         else:
             return (False, None)
 

@@ -166,6 +166,13 @@ class FwManager():
         logging.warn("cannot find service \"%s\"." % serviceName)
         util_print_frame()
         return (False, None)
+    
+    @staticmethod
+    def requestOneSth(item_name, service_name, params=None):
+        isOK, results = FwManager.instance().requestService(service_name, params)
+        if not isOK:
+            return None
+        return results[item_name]
 
     #############################################
     # for DEBUG

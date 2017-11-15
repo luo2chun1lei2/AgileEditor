@@ -149,9 +149,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 多个Editor的切换Tab
         isOK, results = FwManager.instance().requestService('view.multi_editors.get_self')
         self.multiEditors = results['self']
-        isOK, results = FwManager.instance().requestService('view.multi_editors.get_view')
-        self.tab_page = results['view']
-
+        
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
         self.nbPrj.set_scrollable(True)
@@ -161,7 +159,8 @@ class ViewWindow(Gtk.Window, FwComponent):
         # resize:子控件是否跟着paned的大小而变化。
         # shrink:子控件是否能够比它需要的大小更小。
         panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
+        isOK, results = FwManager.instance().requestService('view.multi_editors.get_view')
+        panedEdtiorAndTagList.pack1(results['view'], resize=True, shrink=True)
         isOK, results = FwManager.instance().requestService('view.file_taglist.get_view')
         panedEdtiorAndTagList.pack2(results['view'], resize=False, shrink=True)
 
@@ -387,11 +386,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         产生一个没有路径的项目文件。
         TODO:还没有决定如何实现！
         '''
-
-        # self.multiEditors.show_editor("")
-#         ide_file = ModelFile()
-#         self.current_idefile = ide_file
-
         self._set_status(ViewMenu.STATUS_FILE_OPEN)
 
     def ide_open_file(self, path=None):
@@ -444,7 +438,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         '''
         logging.debug("close file.")
 
-        ide_editor = self.multiEditors.get_current_ide_editor()
+        ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ide_editor is None or ide_editor.ide_file is None:
             logging.debug('No file is being opened')
             return self.RLT_OK
@@ -467,7 +461,8 @@ class ViewWindow(Gtk.Window, FwComponent):
                 return result
 
         # 关闭文件
-        self.multiEditors.close_editor(self.multiEditors.get_current_abs_file_path())
+        abs_file_path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
+        FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': abs_file_path})
 
         self._set_status(ViewMenu.STATUS_FILE_NONE)
 
@@ -480,7 +475,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         logging.debug('ide save file')
 
-        ide_editor = self.multiEditors.get_current_ide_editor()
+        ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ide_editor is None:
             logging.debug('No file is being opened.')
             return self.RLT_OK
@@ -531,8 +526,8 @@ class ViewWindow(Gtk.Window, FwComponent):
         '''
         logging.debug("ide save as other file.")
 
-        ide_editor = self.multiEditors.get_current_ide_editor()
-        old_file_path = self.multiEditors.get_current_abs_file_path()
+        ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        old_file_path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
 
         if ide_editor.ide_file == None:
             logging.debug('No file is being opened')
@@ -565,20 +560,18 @@ class ViewWindow(Gtk.Window, FwComponent):
         shutil.copy(old_file_path, file_path)
 
         # 关闭原来的文件。
-        # ide_editor.ide_file.close_file()
-        self.multiEditors.close_editor(old_file_path)
+        FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': old_file_path})
 
         # 打开指定的文件，并保存
         # self.current_idefile = ModelFile()
 #         ide_editor.ide_file.open_file(file_path)
 #
-#         ide_editor = self.multiEditors.get_current_ide_editor()
+#         ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
 #         src_buffer = self._ide_get_editor_buffer()
 #         self.current_idefile.save_file(src_buffer)
 #         self._set_src_language(src_buffer, file_path)
 #         src_buffer.set_modified(False)
-
-        self.multiEditors.show_editor(file_path)
+        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': file_path})
 
         # 切换当前的状态
         self._set_status(ViewMenu.STATUS_FILE_OPEN)
@@ -597,7 +590,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         Gtk.main_quit()
 
     def ide_edit_redo(self, widget):
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -606,7 +599,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             src_buffer.redo()
 
     def ide_edit_undo(self, widget):
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -615,7 +608,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             src_buffer.undo()
 
     def ide_edit_cut(self, widget):
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -624,7 +617,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         ve_editor.editor.get_buffer().cut_clipboard(clipboard, True)
 
     def ide_edit_copy(self, widget):
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -633,7 +626,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         ve_editor.editor.get_buffer().copy_clipboard(clipboard)
 
     def ide_edit_paste(self, widget):
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -642,7 +635,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         ve_editor.editor.get_buffer().paste_clipboard(clipboard, None, True)
 
     def ide_edit_select_all(self, widget):
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -652,7 +645,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def ide_edit_delete_line(self):
         # 删除光标所在的行
 
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
         src_buffer = ve_editor.editor.get_buffer()
@@ -679,7 +672,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def ide_edit_comment(self):
         # 将选择的行变成“注释”
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -705,7 +698,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def ide_edit_uncomment(self):
         # 将所在的行从“注释“变成正常代码
         # 将选择的行变成“注释”
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -770,7 +763,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def _ide_replace_in_file(self, replace_from, replace_to):
         # 替换当前文件中的文字
-        ve_editor = self.multiEditors.get_current_ide_editor()
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -788,8 +781,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def ide_switch_page(self, abs_file_path):
         # abs_file_path string 切换到的文件名字
-
-        self.multiEditors.show_editor(abs_file_path)
+        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
 
         view_editor = self.multiEditors.get_editor_by_path(abs_file_path)
         mdl_file = view_editor.ide_file
@@ -820,8 +812,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         '''
         abs_file_path string 切换到的文件名字
         '''
-
-        self.multiEditors.show_editor(abs_file_path)
+        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
 
         view_editor = self.multiEditors.get_editor_by_path(abs_file_path)
         self._ide_search_init(view_editor.editor.get_buffer())
@@ -915,7 +906,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 设定光标的位置，和什么都没有选中
         text_buf.select_range(it, it)
         # 屏幕滚动到这个地方。
-        editor = self.multiEditors.get_current_editor()
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         editor.scroll_to_iter(it, 0.25, False, 0.0, 0.5)
 
         # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
@@ -927,7 +918,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def _ide_editor_set_focus(self):
         ''' 获取焦点 '''
-        editor = self.multiEditors.get_current_editor()
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         editor.grab_focus()
 
     def ide_goto_file_line(self, file_path, line_number, record=True):
@@ -1042,7 +1033,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 如果当前编辑器中有选中的文字，就将此文字放入检索本中。
         # search_text string 需要检索的文字
 
-        view_editor = self.multiEditors.get_current_ide_editor()
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -1120,7 +1111,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             text_buffer.move_mark_by_name("insert", end_iter)
 
     def ide_find_text(self, need_jump, search_text, need_case_sensitive, search_is_word=False):
-        view_editor = self.multiEditors.get_current_ide_editor()
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -1133,7 +1124,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         然后查找定义。 
         search_text string 需要检索的文字
         '''
-        view_editor = self.multiEditors.get_current_ide_editor()
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -1291,7 +1282,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             name = "None"
 
         # 得到文件
-        path = self.multiEditors.get_current_abs_file_path()
+        path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
 
         # 得到行号
         mark = text_buf.get_insert()
@@ -1312,7 +1303,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 单词补齐，使用CompletionWords
 
         # 配置单词自动补齐，使用自定义的CompletionProvider
-        editor = self.multiEditors.get_current_editor()
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         completion = editor.props.completion
 
         # 清除之前的所有provider
@@ -1324,7 +1315,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         completion.add_provider(ideProject.get_completion_provider())
 
     def _ide_get_editor_buffer(self):
-        editor = self.multiEditors.get_current_editor()
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         if editor is None:
             return None
 
@@ -1332,11 +1323,11 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def _ide_push_jumps(self):
         # 记录当前的位置
-        editor = self.multiEditors.get_current_editor()
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         if editor is None:
             return
 
-        ide_file = self.multiEditors.get_current_ide_file()
+        ide_file = FwManager.requestOneSth('ide_file', 'view.multi_editors.get_current_ide_file')
         if ide_file is None:
             return
 
@@ -1349,7 +1340,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def _ide_pop_jumps(self):
         # 恢复到原来的位置
 
-        editor = self.multiEditors.get_current_editor()
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         if editor is None:
             return
 
