@@ -20,12 +20,7 @@ class ViewBookmarks(FwComponent):
      COLUMN_TAG_NAME,  # Tag名字
      NUM_COLUMNS) = range(3)
 
-    def __init__(self, editorWindow):
-        '''
-        @param editorWindow:ViewWindow:主画面
-        '''
-
-        self.editorWindow = editorWindow
+    def __init__(self):
         self.cur_prj = None
 
         self._init_view()
@@ -52,17 +47,19 @@ class ViewBookmarks(FwComponent):
 
     # override component
     def onRegistered(self, manager):
-        info = {'name':'view.bookmarks.add_bookmark', 'help':'add one bookmark by current pos.'}
-        manager.registerService(info, self)
-
-        info = {'name':'view.bookmarks.remove_bookmark', 'help':'remove one bookmark by current pos.'}
+        info = [{'name':'view.bookmarks.add_bookmark', 'help':'add one bookmark by current pos.'},
+                {'name':'view.bookmarks.remove_bookmark', 'help':'remove one bookmark by current pos.'},
+                {'name':'view.bookmarks.get_view', 'help':'get view of bookmark.'}]
         manager.registerService(info, self)
 
         return True
 
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "view.bookmarks.add_bookmark":
+        if serviceName == 'view.bookmarks.get_view':
+            return (True, {'view': self.get_view()})
+        
+        elif serviceName == "view.bookmarks.add_bookmark":
             # 获取根据当前情况而建立的bookmark。
             isOK, results = manager.requestService("view.main.make_bookmark", None)
             if not isOK:

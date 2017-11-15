@@ -18,7 +18,6 @@ from component.model.ModelWorkshop import ModelWorkshop
 from component.model.ModelTask import ModelTask
 
 from component.view.ViewMenu import ViewMenu
-from component.view.ViewBookmarks import ViewBookmarks
 from component.model.ModelTags import ModelTag
 from framework.FwComponent import FwComponent
 
@@ -40,7 +39,6 @@ class ViewWindow(Gtk.Window, FwComponent):
     def onRegistered(self, manager):
         # 将已经生成好的控件作为组件注册到框架中。
         FwManager.instance().load("view_menu", self.ide_menu)
-        FwManager.instance().load("view_bookmark", self.bookmarks)
 
         info = [{'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
             {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
@@ -154,9 +152,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         isOK, results = FwManager.instance().requestService('view.multi_editors.get_view')
         self.tab_page = results['view']
 
-        # 书签列表
-        self.bookmarks = ViewBookmarks(self)
-
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
         self.nbPrj.set_scrollable(True)
@@ -167,14 +162,14 @@ class ViewWindow(Gtk.Window, FwComponent):
         # shrink:子控件是否能够比它需要的大小更小。
         panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         panedEdtiorAndTagList.pack1(self.tab_page, resize=True, shrink=True)
-        isOK, results = FwManager.instance().requestService('view.file_taglist.get_view', None)
+        isOK, results = FwManager.instance().requestService('view.file_taglist.get_view')
         panedEdtiorAndTagList.pack2(results['view'], resize=False, shrink=True)
 
-        isOK, results = FwManager.instance().requestService('view.search_taglist.get_view', None)
+        isOK, results = FwManager.instance().requestService('view.search_taglist.get_view')
         self.nbPrj.append_page(results['view'], Gtk.Label("检索"))
-        # TOOD bookmarks is converted to real component.
-        self.nbPrj.append_page(self.bookmarks.get_view(), Gtk.Label("书签"))
-        isOK, results = FwManager.instance().requestService('view.terminal.get_view', None)
+        isOK, results = FwManager.instance().requestService('view.bookmarks.get_view')
+        self.nbPrj.append_page(results['view'], Gtk.Label("书签"))
+        isOK, results = FwManager.instance().requestService('view.terminal.get_view')
         self.nbPrj.append_page(results['view'], Gtk.Label("控制台"))
 
 
