@@ -106,7 +106,7 @@ class AeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         return False
 
     # 版本不同
-    if os.getenv('GTKSOURCE_COMPLETION_PROVIDER') == "2.0":
+    if os.getenv('GTKSOURCE_COMPLETION_PROVIDER') is None:
         def do_get_start_iter(self, context, proposal):
             return False, None
     else:
