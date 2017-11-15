@@ -17,14 +17,10 @@ from framework.FwUtils import *
 from framework.FwManager import FwManager
 
 from component.model.ModelWorkshop import ModelWorkshop
-from component.model.ModelProject import ModelProject
-from component.model.ModelFile import ModelFile
 from component.model.ModelTask import ModelTask
 from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
-from component.view.ViewFileTagList import ViewFileTagList
-from ViewSearchTagList import ViewSearchTagList
 from component.view.ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
 from framework.FwComponent import FwComponent
@@ -41,7 +37,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     RLT_ERROR = 2  # 错误
 
     # 主窗口的标题。
-    PROGRAM_NAME = 'AgileEditor v2.0 - '
+    PROGRAM_NAME = 'AgileEditor v0.3 - '
 
     # override component
     def onRegistered(self, manager):
@@ -83,9 +79,13 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         elif serviceName == 'view.main.goto_line':
             # 跳转到对应的行。
-            self.ide_goto_line(params['line_no'])
 
-            # 编辑器获取焦点。
+            if 'file_path' in params:
+                self.ide_goto_file_line(params['file_path'], params['line_no'])
+            else:
+                self.ide_goto_line(params['line_no'])
+
+            # 其他控件发送过来此信息后，需要让编辑器获取焦点。
             self.ide_editor_set_focus()
             return True, None
 
@@ -149,9 +149,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.multiEditors = ViewMultiEditors(self.on_menu_func)
         self.tab_page = self.multiEditors.get_tab_page()
 
-        # 项目搜索Tag列表
-        self.searchTagList = ViewSearchTagList(self)
-
         # 书签列表
         self.bookmarks = ViewBookmarks(self)
 
@@ -183,7 +180,8 @@ class ViewWindow(Gtk.Window, FwComponent):
         isOK, results = FwManager.instance().requestService('view.file_taglist.get_view', None)
         panedEdtiorAndTagList.pack2(results['view'], resize=False, shrink=True)
 
-        self.nbPrj.append_page(self.searchTagList.get_view(), Gtk.Label("检索"))
+        isOK, results = FwManager.instance().requestService('view.search_taglist.get_view', None)
+        self.nbPrj.append_page(results['view'], Gtk.Label("检索"))
         self.nbPrj.append_page(self.bookmarks.get_view(), Gtk.Label("书签"))
         self.nbPrj.append_page(scrl_terminal, Gtk.Label("控制台"))
 
@@ -991,7 +989,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             dialog.destroy()
 
         else:
-            self.searchTagList.set_model(tags, self.cur_prj)
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
             if len(tags) == 1:
                 ''' 直接跳转。 '''
                 tag = tags[0]
@@ -1013,7 +1011,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             dialog.run()
             dialog.destroy()
         else:
-            self.searchTagList.set_model(tags, self.cur_prj)
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
             if len(tags) == 1:
                 # 直接跳转。
                 tag = tags[0]
@@ -1173,7 +1171,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             dialog.destroy()
 
         else:
-            self.searchTagList.set_model(tags, self.cur_prj)
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
             if len(tags) == 1:
                 ''' 直接跳转。 '''
                 tag = tags[0]
@@ -1200,7 +1198,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             dialog.destroy()
 
         else:
-            self.searchTagList.set_model(tags, self.cur_prj)
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
             if len(tags) == 1:
                 # 直接跳转。
                 tag = tags[0]

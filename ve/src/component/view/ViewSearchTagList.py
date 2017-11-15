@@ -5,9 +5,12 @@
 
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
-from component.model.ModelTags import ModelTag
 
-class ViewSearchTagList:
+from component.model.ModelTags import ModelTag
+from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
+
+class ViewSearchTagList(FwComponent):
     # 定制一个ListView，内部显示Tag。
     # editorWindow:EditorWindow:总的编辑窗口。
 
@@ -17,11 +20,7 @@ class ViewSearchTagList:
      COLUMN_TAG_NAME,  # Tag名字
      NUM_COLUMNS) = range(3)
 
-    def __init__(self, editorWindow):
-        # editorWindow:ViewWindow:主画面
-
-        self.editorWindow = editorWindow
-
+    def __init__(self):
         vbox = Gtk.VBox(spacing=0)
 
         ###############################
@@ -58,6 +57,24 @@ class ViewSearchTagList:
         self.view = vbox
         self.taglistview = treeview
 
+    # override component
+    def onRegistered(self, manager):
+        info = [{'name':'view.search_taglist.get_view', 'help':'get view of search taglist.'},
+                {'name':'view.search_taglist.show_taglist', 'help':'show tag list in view.'}]
+        manager.registerService(info, self)
+
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "view.search_taglist.get_view":
+            return (True, {'view': self.get_view()})
+        elif serviceName == "view.search_taglist.show_taglist":
+            self.set_model(params['taglist'], params['project'])
+            return True, None
+        else:
+            return (False, None)
+
     def set_model(self, tags, prj):
         # 设置模型
         # tags:[string]:tag信息的数组
@@ -90,8 +107,8 @@ class ViewSearchTagList:
             tag = self.tags[selected_index]
 
             # 跳转到对应的行。
-            self.editorWindow.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-            self.editorWindow.ide_editor_set_focus()
+            # 跳转到对应的行。
+            FwManager.instance().requestService('view.main.goto_line', {'file_path':tag.tag_file_path, 'line_no':tag.tag_line_no})
 
     def get_view(self):
         # 返回容器控件

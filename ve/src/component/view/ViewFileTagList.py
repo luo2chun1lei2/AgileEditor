@@ -59,7 +59,7 @@ class ViewFileTagList (FwComponent):
         # 设定需要传出的控件。
         self.view = vbox
         self.taglistview = treeview
-        
+
     # override component
     def onRegistered(self, manager):
         info = [{'name':'view.file_taglist.get_view', 'help':'get view of tag list.'},
@@ -67,7 +67,7 @@ class ViewFileTagList (FwComponent):
         manager.registerService(info, self)
 
         return True
-    
+
     # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.file_taglist.get_view":
@@ -76,8 +76,8 @@ class ViewFileTagList (FwComponent):
         elif serviceName == "view.file_taglist.show_taglist":
             self.set_model(params['taglist'])
             self.expand_all()
-            return (True, None) 
-        
+            return (True, None)
+
         else:
             return (False, None)
 
@@ -188,7 +188,6 @@ class ViewFileTagList (FwComponent):
             # 不应该跳转的项目
             return
 
-        
         # 跳转到对应的行。
         FwManager.instance().requestService('view.main.goto_line', {'line_no':line_no})
 

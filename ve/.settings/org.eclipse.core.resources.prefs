@@ -1,7 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/AeMain.py=utf-8
 encoding//src/ViewMultiEditors.py=utf-8
-encoding//src/ViewSearchTagList.py=utf-8
 encoding//src/ae.py=utf-8
 encoding//src/component/AppArgs.py=utf-8
 encoding//src/component/AppProcess.py=utf-8
@@ -23,6 +22,7 @@ encoding//src/component/view/ViewBookmarks.py=utf-8
 encoding//src/component/view/ViewFileTagList.py=utf-8
 encoding//src/component/view/ViewFsTree.py=utf-8
 encoding//src/component/view/ViewMenu.py=utf-8
+encoding//src/component/view/ViewSearchTagList.py=utf-8
 encoding//src/component/view/ViewWindow.py=utf-8
 encoding//src/component/view/__init__.py=utf-8
 encoding//src/framework/FwComponent.py=utf-8
