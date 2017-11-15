@@ -2,8 +2,7 @@
 # -*- coding:utf-8 -*-
 
 '''
-2.0版本的ve入口。
-- 能够做成组件的，尽量做成组件。
+0.3版本的ae入口。
 '''
 
 import sys, logging
@@ -24,8 +23,8 @@ def init_components(manager):
     from component.view.ViewFsTree import ViewFsTree
     from component.view.ViewFileTagList import ViewFileTagList
     from component.view.ViewSearchTagList import ViewSearchTagList
-    from AeMain import AeMain
-    from ViewMultiEditors import ViewMultiEditors
+    from component.view.AeMain import AeMain
+    from component.view.ViewMultiEditors import ViewMultiEditors
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())

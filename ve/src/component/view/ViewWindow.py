@@ -22,7 +22,7 @@ from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
 from component.view.ViewBookmarks import ViewBookmarks
-from ViewMultiEditors import ViewMultiEditors
+from component.view.ViewMultiEditors import ViewMultiEditors
 from framework.FwComponent import FwComponent
 
 class ViewWindow(Gtk.Window, FwComponent):
