@@ -23,7 +23,7 @@ from component.model.ModelTask import ModelTask
 from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
-from ViewFileTagList import ViewFileTagList
+from component.view.ViewFileTagList import ViewFileTagList
 from ViewSearchTagList import ViewSearchTagList
 from component.view.ViewBookmarks import ViewBookmarks
 from ViewMultiEditors import ViewMultiEditors
@@ -80,7 +80,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif serviceName == 'view.main.refresh_project':
             self.ide_update_tags_of_project()
             return True, None
-        
+
         elif serviceName == 'view.main.goto_line':
             # 跳转到对应的行。
             self.ide_goto_line(params['line_no'])

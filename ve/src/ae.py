@@ -21,8 +21,8 @@ def init_components(manager):
     from component.dialog.ViewDialogProject import ViewDialogProject
     from component.dialog.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
     from component.util.UtilWordComplete import UtilWordComplete
-    from ViewFsTree import ViewFsTree
-    from ViewFileTagList import ViewFileTagList
+    from component.view.ViewFsTree import ViewFsTree
+    from component.view.ViewFileTagList import ViewFileTagList
     from AeMain import AeMain
 
     manager.register("app_process", AppProcess())
