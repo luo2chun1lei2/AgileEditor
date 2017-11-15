@@ -443,14 +443,11 @@ class ViewMultiEditors(FwComponent):
         @param styleName: string: style name
         @return bool:is ok?
         '''
-
         styleSchemeManager = GtkSource.StyleSchemeManager.get_default()
-        styleScheme = styleSchemeManager.get_scheme(styleName)
-        if styleScheme is None:
+        self.styleScheme = styleSchemeManager.get_scheme(styleName) # 不能丢弃
+        if self.styleScheme is None:
             logging.error("This style(%s) is NOT existed." % styleName)
             return False
-
-        self.styleScheme = styleScheme  # 不能丢弃
 
         for viewEditor in self.dic_editors.values():
             srcBuffer = viewEditor.editor.get_buffer()
