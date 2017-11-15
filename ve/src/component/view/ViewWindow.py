@@ -53,7 +53,9 @@ class ViewWindow(Gtk.Window, FwComponent):
 #             {'name':'view.main.delete_file', 'help': 'delete one file by path.'},
 #             {'name':'view.main.rename_file', 'help': 'rename file path.'},
             {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags.'},
-            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'}]
+            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
+            {'name':'view.main.switch_page', 'help': 'goto the page with the given file path.'}]
+
         manager.registerService(info, self)
 
         return True
@@ -105,6 +107,10 @@ class ViewWindow(Gtk.Window, FwComponent):
 #             self.main_rename_file(params['old_abs_file_path'], params['new_abs_file_path'])
 #             return True, None
 
+        elif serviceName == 'view.main.switch_page':
+            self.ide_switch_page(params['abs_file_path'])
+            return True, None
+
         else:
             return (False, None)
 
@@ -146,8 +152,10 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.ide_menu = ViewMenu(self, self.on_menu_func)
 
         # 多个Editor的切换Tab
-        self.multiEditors = ViewMultiEditors(self.on_menu_func)
-        self.tab_page = self.multiEditors.get_tab_page()
+        isOK, results = FwManager.instance().requestService('view.multi_editors.get_self')
+        self.multiEditors = results['self']
+        isOK, results = FwManager.instance().requestService('view.multi_editors.get_view')
+        self.tab_page = results['view']
 
         # 书签列表
         self.bookmarks = ViewBookmarks(self)

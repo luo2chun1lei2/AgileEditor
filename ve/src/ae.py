@@ -25,6 +25,7 @@ def init_components(manager):
     from component.view.ViewFileTagList import ViewFileTagList
     from component.view.ViewSearchTagList import ViewSearchTagList
     from AeMain import AeMain
+    from ViewMultiEditors import ViewMultiEditors
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -38,6 +39,7 @@ def init_components(manager):
     manager.register("fs_treeview", ViewFsTree())
     manager.register("file_taglist", ViewFileTagList())
     manager.register("search_taglist", ViewSearchTagList())
+    manager.register("multiple_editors", ViewMultiEditors())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

@@ -10,9 +10,11 @@ from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Gio
 from framework.FwManager import FwManager
 from component.model.ModelFile import ModelFile
 from component.view.ViewMenu import ViewMenu
+from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
 
 class ViewEditor:
-    # 一个编辑器的信息
+    # [模块内使用]一个编辑器的信息
     # editor:GtkSource.View:源代码的编辑器控件
     # ide_file:ModelFile:编辑的文件
 
@@ -26,7 +28,7 @@ class ViewEditor:
         self.editor = editor
         self.ide_file = ide_file
 
-class ViewMultiEditors:
+class ViewMultiEditors(FwComponent):
     # 内部管理多个打开文件的编辑器，可以
     # 1, 打开一个文件，如果已经存在，就显示已经打开的。
     # 2, 关闭一个文件。
@@ -36,11 +38,8 @@ class ViewMultiEditors:
     # 文件名字为“”，表明是一个新文件，且所有的新文件都是一个。
     # dic_editors [str, ViewEditor] 数组：文件路径（绝对），编辑器
 
-    def __init__(self, on_process_func):
-        # on_process_func 外部的方法，供调用。
-
+    def __init__(self):
         self.styleScheme = None
-        self.on_process_func = on_process_func
 
         # 生成Tab page 类型的控件。
         self.notebook = Gtk.Notebook()
@@ -50,6 +49,27 @@ class ViewMultiEditors:
 
         # 包含文件信息和编辑器的信息字典，Key是文件绝对路径
         self.dic_editors = OrderedDict()
+
+    # override component
+    def onRegistered(self, manager):
+        info = [{'name':'view.multi_editors.get_self', 'help':'get self of multiple editors.'},
+                {'name':'view.multi_editors.get_view', 'help':'get view of multiple editors.'},
+                {'name':'view.multi_editors.show_taglist', 'help':'show tag list in view.'}]
+        manager.registerService(info, self)
+
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "view.multi_editors.get_view":
+            return (True, {'view': self.get_tab_page()})
+        elif serviceName == "view.multi_editors.get_self":  # TODO 临时使用，以后删除。
+            return (True, {'self': self})
+        elif serviceName == "view.multi_editors.show_taglist":
+            self.set_model(params['taglist'], params['project'])
+            return True, None
+        else:
+            return (False, None)
 
     def set_tab_label_by_state(self, label, abs_file_path, is_modified):
 
@@ -349,7 +369,8 @@ class ViewMultiEditors:
         if page_num > self.dic_editors.keys().count :
             return
         abs_file_path = self.dic_editors.keys()[page_num]
-        self.on_process_func(self.notebook, ViewMenu.ACTION_EDITOR_SWITCH_PAGE, abs_file_path)
+
+        FwManager.instance().requestService('view.main.switch_page', {'abs_file_path':abs_file_path})
 
     def on_page_reordered(self, notebook, child_view, page_num):
         # child_view is vbox, and his first child is ScrollView

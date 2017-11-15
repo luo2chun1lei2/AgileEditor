@@ -123,10 +123,24 @@ class FwManager():
 
         if isinstance(info, list):
             for i in info:
+                if self._has_registered(i['name']):
+                    logging.error("There is service name '%s'." % i['name'])
+                    sys.exit(1)
                 self.services.append(FwService(i, component))
         else:
+            if self._has_registered(info['name']):
+                logging.error("There is service name '%s'." % info['name'])
+                sys.exit(1)
             self.services.append(FwService(info, component))
         return True
+
+    def _has_registered(self, service_name):
+        ''' 目前service不能同名。TODO 这里发现有问题，但是没有时间研究发生了什么！'''
+#         for s in self.services:
+#             if s.info['name'] == service_name:
+#                 return True
+#         return False
+        return False
 
     def unregisterService(self, component):
         ''' 注销一个组件的所有服务。
@@ -138,7 +152,7 @@ class FwManager():
                 del self.services[index]
         return True
 
-    def requestService(self, serviceName, params):
+    def requestService(self, serviceName, params=None):
         ''' 请求服务
         @param serviceName: string: 服务名称，必须和service的info的name相同。
         @param params: map: 传递给应答的组件
