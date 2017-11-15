@@ -23,6 +23,7 @@ encoding//src/component/view/ViewFsTree.py=utf-8
 encoding//src/component/view/ViewMenu.py=utf-8
 encoding//src/component/view/ViewMultiEditors.py=utf-8
 encoding//src/component/view/ViewSearchTagList.py=utf-8
+encoding//src/component/view/ViewTerminal.py=utf-8
 encoding//src/component/view/ViewWindow.py=utf-8
 encoding//src/component/view/__init__.py=utf-8
 encoding//src/framework/FwComponent.py=utf-8

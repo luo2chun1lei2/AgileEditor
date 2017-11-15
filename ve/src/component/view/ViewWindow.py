@@ -9,20 +9,17 @@
 # 5, 编译和调试工具。
 # 6, 命令工具（可以编写任意的命令）
 
-import os, sys, getopt, shutil, re, logging
-from gi.repository import Gtk, Gdk, GtkSource, GLib, Pango, Vte
-from gi.overrides.Gtk import TextBuffer
+import os, shutil, re, logging
+from gi.repository import Gtk, Gdk, GtkSource, GLib
 
-from framework.FwUtils import *
 from framework.FwManager import FwManager
 
 from component.model.ModelWorkshop import ModelWorkshop
 from component.model.ModelTask import ModelTask
-from component.model.ModelTags import *
 
 from component.view.ViewMenu import ViewMenu
 from component.view.ViewBookmarks import ViewBookmarks
-from component.view.ViewMultiEditors import ViewMultiEditors
+from component.model.ModelTags import ModelTag
 from framework.FwComponent import FwComponent
 
 class ViewWindow(Gtk.Window, FwComponent):
@@ -160,21 +157,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 书签列表
         self.bookmarks = ViewBookmarks(self)
 
-        # 控制台
-        self.terminal = Vte.Terminal()
-        # self.terminal.set_cursor_blink_mode(Vte.CursorBlinkMode.SYSTEM) # 2.90
-        self.terminal.set_font(Pango.FontDescription.from_string("Ubuntu mono 12"))
-        # self.terminal.set_scrollback_lines(True) 设置则没有滚动条。
-        self.terminal.set_audible_bell(False)
-        # self.terminal.set_input_enabled(True)    # 2.90
-        self.terminal.set_scroll_on_output(True)
-
-        scrl_terminal = Gtk.ScrolledWindow()
-        scrl_terminal.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        scrl_terminal.set_hexpand(True)
-        scrl_terminal.set_vexpand(True)
-        scrl_terminal.add(self.terminal)
-
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
         self.nbPrj.set_scrollable(True)
@@ -190,8 +172,10 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         isOK, results = FwManager.instance().requestService('view.search_taglist.get_view', None)
         self.nbPrj.append_page(results['view'], Gtk.Label("检索"))
+        # TOOD bookmarks is converted to real component.
         self.nbPrj.append_page(self.bookmarks.get_view(), Gtk.Label("书签"))
-        self.nbPrj.append_page(scrl_terminal, Gtk.Label("控制台"))
+        isOK, results = FwManager.instance().requestService('view.terminal.get_view', None)
+        self.nbPrj.append_page(results['view'], Gtk.Label("控制台"))
 
 
         panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
@@ -363,7 +347,9 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 设置窗口标题。
         self.ide_set_title("")
-        self._ide_init_ternimal()
+        
+        # 设置终端属性。
+        FwManager.instance().requestService('view.terminal.init', {'dir':self.cur_prj.src_dirs[0]})
         return True
 
     def ide_preferences_project(self):
@@ -1377,25 +1363,3 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         file_path, line_no = self.jumps.pop()
         self.ide_goto_file_line(file_path, line_no, record=False)
-
-    def _ide_init_ternimal(self):
-        if hasattr(self.terminal, "spawn_sync"):  # 2.91
-            self.terminal.spawn_sync(
-                Vte.PtyFlags.DEFAULT,  # default is fine
-                self.cur_prj.src_dirs[0],
-                ["/bin/bash"],  # where is the emulator?
-                [],  # it's ok to leave this list empty
-                GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-                None,  # at least None is required
-                None,
-                )
-        else:  # < 2.90
-            self.terminal.fork_command_full(
-                Vte.PtyFlags.DEFAULT,  # default is fine
-                self.cur_prj.src_dirs[0],
-                ["/bin/bash"],  # where is the emulator?
-                [],  # it's ok to leave this list empty
-                GLib.SpawnFlags.DO_NOT_REAP_CHILD,
-                None,  # at least None is required
-                None,
-                )
