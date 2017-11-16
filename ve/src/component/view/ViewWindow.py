@@ -462,6 +462,9 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 关闭文件
         abs_file_path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
         FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': abs_file_path})
+        
+        # 关闭文件的tag列表。
+        FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist': []})
 
         self._set_status(ViewMenu.STATUS_FILE_NONE)
 
@@ -801,9 +804,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
 
     def _ide_query_tags_by_file_and_refresh(self, abs_file_path):
-
-        # ModelTask.execute(self.ide_refresh_file_tag_list,
-        #                  self.cur_prj.query_tags_by_file, abs_file_path)
         ModelTask.execute(self.ide_refresh_file_tag_list,
                           self.cur_prj.query_ctags_of_file, abs_file_path)
 
