@@ -4,7 +4,9 @@
 '''
 from FwEvent import FwListener
 
-class FwComponent(object, FwListener):
+from FwService import FwService
+
+class FwComponent(object, FwListener, FwService):
     ''' 组件的基础类，每个组件都可以注册自己，以及可以监听事件，和注册自己提供的服务。
     '''
 

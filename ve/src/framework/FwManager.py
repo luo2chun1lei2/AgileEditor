@@ -7,13 +7,9 @@ import logging, sys
 
 from FwUtils import *
 from framework.FwEvent import FwEventPipe
+from framework.FwService import FwServiceCenter
 
-class FwService:
-    def __init__(self, info, component):
-        self.info = info
-        self.component = component
-
-class FwManager(FwEventPipe):
+class FwManager(FwEventPipe, FwServiceCenter):
     ''' Framework的核心管理类。
     1，为了防止在加载组件的顺序问题，所以要求注册组件后才能申请服务，后面动态加载也是这样的流程。
       __init__ 中可以注册组件，组件在自己的 onRegistered 函数中注册自己的服务。
@@ -38,12 +34,11 @@ class FwManager(FwEventPipe):
 
     def __init__(self):
         FwEventPipe.__init__(self)
+        FwServiceCenter.__init__(self)
 
         # {<component name>:string, <component instance>:FwComponent}
         self.components = {}
-
-        # [服务的信息]: [<FwService>]
-        self.services = []
+        
 
     def run(self, argv):
         ''' 程序运行，整个系统不关闭，则此函数不关闭
@@ -110,66 +105,10 @@ class FwManager(FwEventPipe):
         @return FwBaseComponnet: 找到的组件，None:没有找到。
         '''
         return self.components[componentName]
-
-    #################################################
-    # # 服务函数
-    # # 服务参数必须包括
-    # # "name": string: 服务的标志名字，建议用“xx.xx” 来表示。
-    # #    如果名字匹配，就会调用此组件。
-    # # "help": string: 显示帮助信息。
-
-    def registerService(self, info, component):
-        ''' 注册服务，允许同一个服务名字被多个组件注册。
-        @param info: map/[map]: 服务的关键字加参数。
-        @param component: FwComponent: 组件实例
-        '''
-
-        if isinstance(info, list):
-            for i in info:
-                if self._has_registered(i['name']):
-                    logging.error("There is service name '%s'." % i['name'])
-                    sys.exit(1)
-                self.services.append(FwService(i, component))
-        else:
-            if self._has_registered(info['name']):
-                logging.error("There is service name '%s'." % info['name'])
-                sys.exit(1)
-            self.services.append(FwService(info, component))
-        return True
-
-    def _has_registered(self, service_name):
-        ''' 目前service不能同名。TODO 这里发现有问题，但是没有时间研究发生了什么！'''
-#         for s in self.services:
-#             if s.info['name'] == service_name:
-#                 return True
-#         return False
-        return False
-
-    def unregisterService(self, component):
-        ''' 注销一个组件的所有服务。
-        @param component: FwComponent: 组件实例
-        '''
-        for service in self.services:
-            if service.component is component:
-                index = service.services.index(component)
-                del self.services[index]
-        return True
-
-    def requestService(self, serviceName, params=None):
-        ''' 请求服务
-        @param serviceName: string: 服务名称，必须和service的info的name相同。
-        @param params: map: 传递给应答的组件
-        @return (bool, map): (请求是否成功，返回数据) 
-        '''
-        for service in self.services:
-            if service.info['name'] == serviceName:
-                return service.component.onRequested(self, serviceName, params)
-
-        # 也不一定是错误，可能是因为初始化顺序导致的。
-        logging.warn("cannot find service \"%s\"." % serviceName)
-        util_print_frame()
-        return (False, None)
-
+    
+    #############################################
+    # Service Extension
+    
     @staticmethod
     def requestOneSth(item_name, service_name, params=None):
         isOK, results = FwManager.instance().requestService(service_name, params)
