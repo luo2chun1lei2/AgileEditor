@@ -2,8 +2,11 @@
 '''
 框架管理的组件的基础类，所有的组件都必须继承实现。
 '''
+from FwEvent import FwListener
 
-class FwComponent(object):
+class FwComponent(object, FwListener):
+    ''' 组件的基础类，每个组件都可以注册自己，以及可以监听事件，和注册自己提供的服务。
+    '''
 
     def __init__(self):
         pass

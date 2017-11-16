@@ -5,15 +5,12 @@
 '''
 
 import os, string, logging
-import ConfigParser
 
 from gi.repository import Gtk, Gdk, GtkSource
 
 from framework.FwUtils import *
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
-
-from component.model.ModelProject import ModelProject
 
 ###########################################################
 

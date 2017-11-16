@@ -6,7 +6,6 @@
 import logging, sys
 
 from FwUtils import *
-import FwEvent
 from framework.FwEvent import FwEventPipe
 
 class FwService:
