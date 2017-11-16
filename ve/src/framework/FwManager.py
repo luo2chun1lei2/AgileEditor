@@ -4,14 +4,17 @@
 '''
 
 import logging, sys
+
 from FwUtils import *
+import FwEvent
+from framework.FwEvent import FwEventPipe
 
 class FwService:
     def __init__(self, info, component):
         self.info = info
         self.component = component
 
-class FwManager():
+class FwManager(FwEventPipe):
     ''' Framework的核心管理类。
     1，为了防止在加载组件的顺序问题，所以要求注册组件后才能申请服务，后面动态加载也是这样的流程。
       __init__ 中可以注册组件，组件在自己的 onRegistered 函数中注册自己的服务。
@@ -35,6 +38,7 @@ class FwManager():
         return FwManager._manager
 
     def __init__(self):
+        FwEventPipe.__init__(self)
 
         # {<component name>:string, <component instance>:FwComponent}
         self.components = {}
@@ -166,7 +170,7 @@ class FwManager():
         logging.warn("cannot find service \"%s\"." % serviceName)
         util_print_frame()
         return (False, None)
-    
+
     @staticmethod
     def requestOneSth(item_name, service_name, params=None):
         isOK, results = FwManager.instance().requestService(service_name, params)
