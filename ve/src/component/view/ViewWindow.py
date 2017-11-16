@@ -116,6 +116,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.jumps = []
         self.cur_prj = None
         self.word_pattern = re.compile("[a-zA-Z0-9_]")
+        self.last_search_pattern = None
 
         # 读取workshop的信息。
 
@@ -254,6 +255,8 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_find_next(param)
         elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES:
             self.ide_find_in_files()
+        elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES_AGAIN:
+            self.ide_find_in_files(self.last_search_pattern)
         elif action == ViewMenu.ACTION_SEARCH_FIND_PATH:
             self.ide_find_path()
 
@@ -1126,12 +1129,14 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         self._ide_search_text_next(view_editor.editor.get_buffer(), search_text)
 
-    def ide_find_in_files(self):
+    def ide_find_in_files(self, pattern = None):
         ''' 在项目的文件中查找，不是寻找定义。 '''
-        response, pattern = self._in_show_dialog_one_entry("在文件中检索", '模式')
-        if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
-            return
+        if pattern is None:
+            response, pattern = self._in_show_dialog_one_entry("在文件中检索", '模式')
+            if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
+                return
 
+        self.last_search_pattern = pattern  # 记录最新的检索
         self._ide_grep_in_files(pattern)
 
     def _ide_grep_in_files(self, pattern):
