@@ -106,17 +106,15 @@ class AeWordProvider(GObject.GObject, GtkSource.CompletionProvider):
         return False
 
     # 版本不同
-    if os.getenv('GTKSOURCE_COMPLETION_PROVIDER') is None:
-        def do_get_start_iter(self, context, proposal):
-            return False, None
-    else:
-        def do_get_start_iter(self, context, a, b):
-            # 计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
-            # 调用非常的频繁，不知道为什么
-            # return:Bool, Gtk.TextIter:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
+    # In ubuntu 16.10 need 3 parameters, but in ubuntu 14.04 need 4 parameters.
 
-            # print 'do_get_start_iter'
-            return False, None
+    def do_get_start_iter(self, context, a, b=None):
+        # 计算proposal的开始位置，设定的位置将在get_start_iter返回，用来在buffer中替换proposal。
+        # 调用非常的频繁，不知道为什么
+        # return:Bool, Gtk.TextIter:如果iter设置成了prosoal开始的位置，就返回True,否则就返回False。
+
+        # print 'do_get_start_iter'
+        return False, None
 
     def do_match(self, context):
         # 看看是否和当前的情况匹配，然后添加自己的Proposal。
