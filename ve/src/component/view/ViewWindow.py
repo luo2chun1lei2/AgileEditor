@@ -146,7 +146,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 菜单和工具栏
         self.ide_menu = ViewMenu(self, self.on_menu_func)
-        
+
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
         self.nbPrj.set_scrollable(True)
@@ -253,6 +253,8 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_find_text(param, param2, param3, param4)
         elif action == ViewMenu.ACTION_SEARCH_FIND_NEXT:
             self.ide_find_next(param)
+        elif action == ViewMenu.ACTION_SEARCH_FIND_PREV:
+            self.ide_find_prev(param)
         elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES:
             self.ide_find_in_files()
         elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES_AGAIN:
@@ -340,7 +342,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 设置窗口标题。
         self.ide_set_title("")
-        
+
         # 设置终端属性。
         FwManager.instance().requestService('view.terminal.init', {'dir':self.cur_prj.src_dirs[0]})
         return True
@@ -462,7 +464,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 关闭文件
         abs_file_path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
         FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': abs_file_path})
-        
+
         # 关闭文件的tag列表。
         FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist': []})
 
@@ -1109,6 +1111,26 @@ class ViewWindow(Gtk.Window, FwComponent):
             text_buffer.move_mark_by_name("selection_bound", start_iter)
             text_buffer.move_mark_by_name("insert", end_iter)
 
+    def _ide_search_text_prev(self, text_buffer, search_text):
+        # search_text 是无用的。
+
+        # -从新位置查找
+        mark = text_buffer.get_insert()
+        ite = text_buffer.get_iter_at_mark(mark)
+        # diff : 如果“insert”就在一个匹配的单词后面，向前找就是这个单词了。
+        # 这样会导致一直就定位这个位置，无法向前找！ 缺点是用鼠标定位，会跳过紧挨着的上一个单词。
+        ite.backward_char()
+
+        found, start_iter, end_iter = self.search_context.backward(ite)  # diff
+
+        # 如果找到，就跳转到下面最近位置
+        if found:
+            line_num = start_iter.get_line()
+            self.ide_jump_to(line_num)
+
+            text_buffer.move_mark_by_name("selection_bound", start_iter)
+            text_buffer.move_mark_by_name("insert", end_iter)
+
     def ide_find_text(self, need_jump, search_text, need_case_sensitive, search_is_word=False):
         view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
@@ -1129,7 +1151,20 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         self._ide_search_text_next(view_editor.editor.get_buffer(), search_text)
 
-    def ide_find_in_files(self, pattern = None):
+    def ide_find_prev(self, search_text):
+        '''
+        如果当前编辑器中有选中的文字，则直接显示对话框。
+        对话框中的文字，缺省被选中，可以被全文粘贴。
+        然后查找定义。 
+        search_text string 需要检索的文字
+        '''
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if view_editor is None:
+            return
+
+        self._ide_search_text_prev(view_editor.editor.get_buffer(), search_text)
+
+    def ide_find_in_files(self, pattern=None):
         ''' 在项目的文件中查找，不是寻找定义。 '''
         if pattern is None:
             response, pattern = self._in_show_dialog_one_entry("在文件中检索", '模式')
