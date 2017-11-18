@@ -66,6 +66,8 @@ class ViewMultiEditors(FwComponent):
                 {'name':'view.multi_editors.change_editor_font', 'help':'change the font of editors.'}]
         manager.registerService(info, self)
 
+
+
         return True
 
     # override component
@@ -91,14 +93,14 @@ class ViewMultiEditors(FwComponent):
             return (True, {'abs_file_path': self.get_current_abs_file_path()})
         elif serviceName == "view.multi_editors.get_current_ide_file":
             return (True, {'ide_file': self.get_current_ide_file()})
-        
+
         elif serviceName == "view.multi_editors.change_editor_style":
             self.changeEditorStyle(params['style'])
             return (True, None)
         elif serviceName == "view.multi_editors.change_editor_font":
             self.changeEditorFont(params['font'])
             return (True, None)
-        
+
         else:
             return (False, None)
 
@@ -394,14 +396,16 @@ class ViewMultiEditors(FwComponent):
         # page Gtk.Widget 切换到的页的控件
         # page_num int 切换到的页的索引
 
-        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._on_switch_page, page_num)
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._idle_on_switch_page, page_num)
 
-    def _on_switch_page(self, page_num):
+    def _idle_on_switch_page(self, page_num):
+        ''' 在IDLE时，执行的函数。
+        '''
         if page_num > self.dic_editors.keys().count :
             return
         abs_file_path = self.dic_editors.keys()[page_num]
 
-        FwManager.instance().requestService('view.main.switch_page', {'abs_file_path':abs_file_path})
+        FwManager.instance().send_event('view.multi_editors.switch_page', {'abs_file_path':abs_file_path})
 
     def on_page_reordered(self, notebook, child_view, page_num):
         # child_view is vbox, and his first child is ScrollView
@@ -444,7 +448,7 @@ class ViewMultiEditors(FwComponent):
         @return bool:is ok?
         '''
         styleSchemeManager = GtkSource.StyleSchemeManager.get_default()
-        self.styleScheme = styleSchemeManager.get_scheme(styleName) # 不能丢弃
+        self.styleScheme = styleSchemeManager.get_scheme(styleName)  # 不能丢弃
         if self.styleScheme is None:
             logging.error("This style(%s) is NOT existed." % styleName)
             return False

@@ -48,10 +48,11 @@ class ViewWindow(Gtk.Window, FwComponent):
 #             {'name':'view.main.delete_file', 'help': 'delete one file by path.'},
 #             {'name':'view.main.rename_file', 'help': 'rename file path.'},
             {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags.'},
-            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
-            {'name':'view.main.switch_page', 'help': 'goto the page with the given file path.'}]
-
+            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'}]
         manager.registerService(info, self)
+
+        # register listening event.
+        manager.register_event_listener('view.multi_editors.switch_page', self)
 
         return True
 
@@ -102,12 +103,16 @@ class ViewWindow(Gtk.Window, FwComponent):
 #             self.main_rename_file(params['old_abs_file_path'], params['new_abs_file_path'])
 #             return True, None
 
-        elif serviceName == 'view.main.switch_page':
-            self.ide_switch_page(params['abs_file_path'])
-            return True, None
-
         else:
             return (False, None)
+
+    # override FwListener
+    def on_listened(self, event_name, params):
+        if event_name == 'view.multi_editors.switch_page':
+            self.ide_switch_page(params['abs_file_path'])
+            return True
+        else:
+            return False
 
     ''' 主窗口。 '''
     def __init__(self, workshop, prj, want_open_file):

@@ -13,8 +13,9 @@ class FwListener:
         ''' When listen one event.
         @param event_name: string: event's name
         @param params: {}: event's parameters.
+        @return bool:is ok?
         '''
-        pass
+        return True
 
 class FwEventPipe:
     ''' 消息管道，可以注册、注销和发送消息。
@@ -62,7 +63,7 @@ class FwEventPipe:
             return True  # this is not a error.
 
         for listener in self.events[event_name]:
-            listener.on_listened(params)
+            listener.on_listened(event_name, params)
 
         return True
 
