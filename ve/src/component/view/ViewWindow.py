@@ -152,30 +152,29 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.nbPrj.set_scrollable(True)
 
         ###################################################
-        # # 布局
+        # 布局
         # resize:子控件是否跟着paned的大小而变化。
         # shrink:子控件是否能够比它需要的大小更小。
         panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        isOK, results = FwManager.instance().requestService('view.multi_editors.get_view')
-        panedEdtiorAndTagList.pack1(results['view'], resize=True, shrink=True)
-        isOK, results = FwManager.instance().requestService('view.file_taglist.get_view')
-        panedEdtiorAndTagList.pack2(results['view'], resize=False, shrink=True)
+        view = FwManager.requestOneSth('view', 'view.multi_editors.get_view')
+        panedEdtiorAndTagList.pack1(view, resize=True, shrink=True)
+        view = FwManager.requestOneSth('view', 'view.file_taglist.get_view')
+        panedEdtiorAndTagList.pack2(view, resize=False, shrink=True)
 
-        isOK, results = FwManager.instance().requestService('view.search_taglist.get_view')
-        self.nbPrj.append_page(results['view'], Gtk.Label("检索"))
-        isOK, results = FwManager.instance().requestService('view.bookmarks.get_view')
-        self.nbPrj.append_page(results['view'], Gtk.Label("书签"))
-        isOK, results = FwManager.instance().requestService('view.terminal.get_view')
-        self.nbPrj.append_page(results['view'], Gtk.Label("控制台"))
-
+        view = FwManager.requestOneSth('view', 'view.search_taglist.get_view')
+        self.nbPrj.append_page(view, Gtk.Label("检索"))
+        view = FwManager.requestOneSth('view', 'view.bookmarks.get_view')
+        self.nbPrj.append_page(view, Gtk.Label("书签"))
+        view = FwManager.requestOneSth('view', 'view.terminal.get_view')
+        self.nbPrj.append_page(view, Gtk.Label("控制台"))
 
         panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
         panedEdtiorAndSearchTag.pack1(panedEdtiorAndTagList, resize=True, shrink=True)
         panedEdtiorAndSearchTag.pack2(self.nbPrj, resize=False, shrink=True)
 
         panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        isOK, results = FwManager.instance().requestService('view.fstree.get_view', None)
-        panedFsAndEditor.pack1(results['view'], resize=False, shrink=True)
+        view = FwManager.requestOneSth('view', 'view.fstree.get_view')
+        panedFsAndEditor.pack1(view, resize=False, shrink=True)
         panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
         panedFsAndEditor.set_position(200);
 
