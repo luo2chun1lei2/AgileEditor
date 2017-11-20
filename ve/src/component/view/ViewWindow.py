@@ -585,33 +585,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         if src_buffer.can_undo():
             src_buffer.undo()
 
-    def ide_edit_cut(self, widget):
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        atom = Gdk.atom_intern('CLIPBOARD', True)
-        clipboard = ve_editor.editor.get_clipboard(atom)
-        ve_editor.editor.get_buffer().cut_clipboard(clipboard, True)
-
-    def ide_edit_copy(self, widget):
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        atom = Gdk.atom_intern('CLIPBOARD', True)
-        clipboard = ve_editor.editor.get_clipboard(atom)
-        ve_editor.editor.get_buffer().copy_clipboard(clipboard)
-
-    def ide_edit_paste(self, widget):
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        atom = Gdk.atom_intern('CLIPBOARD', True)
-        clipboard = ve_editor.editor.get_clipboard(atom)
-        ve_editor.editor.get_buffer().paste_clipboard(clipboard, None, True)
-
     def ide_edit_select_all(self, widget):
         ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:

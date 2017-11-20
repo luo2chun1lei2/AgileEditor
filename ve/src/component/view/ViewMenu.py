@@ -39,9 +39,6 @@ MENU_CONFIG = """
             <menuitem action='EditRedo' />
             <menuitem action='EditUndo' />
             <separator />
-            <menuitem action='EditCut' />
-            <menuitem action='EditCopy' />
-            <menuitem action='EditPaste' />
             <menuitem action='EditDeleteLine' />
             <separator />
             <menuitem action='EditSelectAll' />
@@ -107,10 +104,6 @@ class ViewMenu(FwComponent):
      ACTION_EDIT_UNDO,
      ACTION_EDIT_REDO,
 
-     ACTION_EDIT_CUT,
-     ACTION_EDIT_COPY,
-     ACTION_EDIT_PASTE,
-
      ACTION_EDIT_SELECT_ALL,
 
      ACTION_EDIT_DELETE_LINE,
@@ -131,7 +124,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(31)
+     ) = range(28)
 
     def __init__(self, window, on_menu_func):
 
@@ -374,13 +367,6 @@ class ViewMenu(FwComponent):
             ("EditRedo", Gtk.STOCK_REDO, None, '<shift><control>Z', None, self.on_menu_edit_redo),
             ("EditUndo", Gtk.STOCK_UNDO, None, '<control>Z', None, self.on_menu_edit_undo),
             # 最好不要和控件缺省的快捷键冲突。
-            # ("EditCut", Gtk.STOCK_CUT, None, '<control>X', None, self.on_menu_edit_cut),
-            # ("EditCopy", Gtk.STOCK_COPY, None, '<control>C', None, self.on_menu_edit_copy),
-            # ("EditPaste", Gtk.STOCK_PASTE, None, '<control>V', None, self.on_menu_edit_paste),
-            # ("EditSelectAll", Gtk.STOCK_SELECT_ALL, None, '<control>A', None, self.on_menu_edit_select_all),
-            ("EditCut", Gtk.STOCK_CUT, None, '', None, self.on_menu_edit_cut),
-            ("EditCopy", Gtk.STOCK_COPY, None, '', None, self.on_menu_edit_copy),
-            ("EditPaste", Gtk.STOCK_PASTE, None, '', None, self.on_menu_edit_paste),
             ("EditDeleteLine", Gtk.STOCK_DELETE, "Delete Line", '<control>D', None, self.on_menu_edit_delete_line),
             ("EditSelectAll", Gtk.STOCK_SELECT_ALL, None, '', None, self.on_menu_edit_select_all),
         ])
@@ -474,18 +460,6 @@ class ViewMenu(FwComponent):
     def on_menu_edit_undo(self, widget):
         logging.debug("A Edit|Undo as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_UNDO)
-
-    def on_menu_edit_cut(self, widget):
-        logging.debug("A Edit|Cut as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_CUT)
-
-    def on_menu_edit_copy(self, widget):
-        logging.debug("A Edit|Copy as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_COPY)
-
-    def on_menu_edit_paste(self, widget):
-        logging.debug("A Edit|Paste as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_PASTE)
 
     def on_menu_edit_select_all(self, widget):
         logging.debug("A Edit|Select All as menu item was selected.")

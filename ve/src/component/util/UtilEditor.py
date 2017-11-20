@@ -5,7 +5,7 @@
 '''
 
 import re, logging
-from gi.repository import GtkSource
+from gi.repository import Gtk, Gdk, GtkSource
 
 from framework.FwManager import FwManager
 
@@ -178,3 +178,33 @@ class UtilEditor(object):
         replace_search_context.get_settings().set_search_text(replace_from)
 
         replace_search_context.replace_all(replace_to, -1)
+
+    @staticmethod
+    def edit_cut():
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        atom = Gdk.atom_intern('CLIPBOARD', True)
+        clipboard = ve_editor.editor.get_clipboard(atom)
+        ve_editor.editor.get_buffer().cut_clipboard(clipboard, True)
+
+    @staticmethod
+    def edit_copy():
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        atom = Gdk.atom_intern('CLIPBOARD', True)
+        clipboard = ve_editor.editor.get_clipboard(atom)
+        ve_editor.editor.get_buffer().copy_clipboard(clipboard)
+
+    @staticmethod
+    def edit_paste():
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        atom = Gdk.atom_intern('CLIPBOARD', True)
+        clipboard = ve_editor.editor.get_clipboard(atom)
+        ve_editor.editor.get_buffer().paste_clipboard(clipboard, None, True)

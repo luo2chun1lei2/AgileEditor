@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 组件：编辑
+TODO 实际上copy/cut/paste这三个动作，在GtkSource中都已经实现了，所以Menu中有，没有什么意义！
 '''
 
 from gi.repository import Gtk, GtkSource
@@ -15,7 +16,10 @@ class CtrlEdit(FwComponent):
 
     # override component
     def onRegistered(self, manager):
-        info = [{'name':'ctrl.edit.comment', 'help':'make selected code to comment.'},
+        info = [{'name':'ctrl.edit.cut', 'help':'cut the selected text.'},
+                {'name':'ctrl.edit.copy', 'help':'copy the selected text.'},
+                {'name':'ctrl.edit.paste', 'help':'paste the text in clipboard.'},
+                {'name':'ctrl.edit.comment', 'help':'make selected code to comment.'},
                 {'name':'ctrl.edit.uncomment', 'help':'make selected code to uncomment.'},
                 {'name':'ctrl.edit.replace', 'help':'replace the selected text by other text.'}
                 ]
@@ -34,11 +38,44 @@ class CtrlEdit(FwComponent):
         elif serviceName == 'ctrl.edit.replace':
             self._edit_replace()
             return (True, None)
+        elif serviceName == 'ctrl.edit.cut':
+            UtilEditor.edit_cut()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.copy':
+            UtilEditor.edit_copy()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.paste':
+            UtilEditor.edit_paste()
+            return (True, None)
         else:
             return (False, None)
 
     # override component
     def onSetup(self, manager):
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditCut',
+                  'title':"Cut",
+                  'accel':"",
+                  'stock_id':Gtk.STOCK_CUT,
+                  'service_name':'ctrl.edit.cut'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditCopy',
+                  'title':"Copy",
+                  'accel':"",
+                  'stock_id':Gtk.STOCK_COPY,
+                  'service_name':'ctrl.edit.copy'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditPaste',
+                  'title':"Paste",
+                  'accel':"",
+                  'stock_id':Gtk.STOCK_PASTE,
+                  'service_name':'ctrl.edit.paste'}
+        manager.requestService("view.menu.add", params)
+
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditComment',
                   'title':"Comment",
