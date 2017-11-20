@@ -38,11 +38,6 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
             <menuitem action='EditRedo' />
             <menuitem action='EditUndo' />
-            <separator />
-            <menuitem action='EditDeleteLine' />
-            <separator />
-            <menuitem action='EditSelectAll' />
-            <separator />
         </menu>
         <menu action='SearchMenu'>
             <menuitem action='SearchJumpTo' />
@@ -104,10 +99,6 @@ class ViewMenu(FwComponent):
      ACTION_EDIT_UNDO,
      ACTION_EDIT_REDO,
 
-     ACTION_EDIT_SELECT_ALL,
-
-     ACTION_EDIT_DELETE_LINE,
-
      ACTION_SEARCH_JUMP_TO,
      ACTION_SEARCH_FIND,  # 跳转到检索框
      ACTION_SEARCH_FIND_TEXT,  # 开始检索
@@ -124,7 +115,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(28)
+     ) = range(26)
 
     def __init__(self, window, on_menu_func):
 
@@ -366,9 +357,6 @@ class ViewMenu(FwComponent):
             ("EditMenu", None, "Edit"),
             ("EditRedo", Gtk.STOCK_REDO, None, '<shift><control>Z', None, self.on_menu_edit_redo),
             ("EditUndo", Gtk.STOCK_UNDO, None, '<control>Z', None, self.on_menu_edit_undo),
-            # 最好不要和控件缺省的快捷键冲突。
-            ("EditDeleteLine", Gtk.STOCK_DELETE, "Delete Line", '<control>D', None, self.on_menu_edit_delete_line),
-            ("EditSelectAll", Gtk.STOCK_SELECT_ALL, None, '', None, self.on_menu_edit_select_all),
         ])
 
     def add_search_menu_actions(self, action_group):
@@ -460,14 +448,6 @@ class ViewMenu(FwComponent):
     def on_menu_edit_undo(self, widget):
         logging.debug("A Edit|Undo as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_UNDO)
-
-    def on_menu_edit_select_all(self, widget):
-        logging.debug("A Edit|Select All as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_SELECT_ALL)
-
-    def on_menu_edit_delete_line(self, widget):
-        logging.debug("A Edit|Delete Line All as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_DELETE_LINE)
 
     def on_menu_search_jumpto(self, widget):
         logging.debug("A Search|JumpTo menu item was selected.")

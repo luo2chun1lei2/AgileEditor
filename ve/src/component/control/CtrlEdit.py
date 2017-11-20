@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
 组件：编辑
-TODO 实际上copy/cut/paste这三个动作，在GtkSource中都已经实现了，所以Menu中有，没有什么意义！
+TODO 实际上copy/cut/paste/select all 这几个动作，在GtkSource中都已经实现了，所以Menu中有，没有什么意义！
 '''
 
 from gi.repository import Gtk, GtkSource
@@ -21,7 +21,9 @@ class CtrlEdit(FwComponent):
                 {'name':'ctrl.edit.paste', 'help':'paste the text in clipboard.'},
                 {'name':'ctrl.edit.comment', 'help':'make selected code to comment.'},
                 {'name':'ctrl.edit.uncomment', 'help':'make selected code to uncomment.'},
-                {'name':'ctrl.edit.replace', 'help':'replace the selected text by other text.'}
+                {'name':'ctrl.edit.replace', 'help':'replace the selected text by other text.'},
+                {'name':'ctrl.edit.delete_line', 'help':'delete the line allocated by cursor.'},
+                {'name':'ctrl.edit.select_all', 'help':'select all test in current edit file.'}
                 ]
         manager.registerService(info, self)
 
@@ -46,6 +48,12 @@ class CtrlEdit(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.edit.paste':
             UtilEditor.edit_paste()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.delete_line':
+            UtilEditor.edit_delete_line()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.select_all':
+            UtilEditor.edit_select_all()
             return (True, None)
         else:
             return (False, None)
@@ -74,6 +82,22 @@ class CtrlEdit(FwComponent):
                   'accel':"",
                   'stock_id':Gtk.STOCK_PASTE,
                   'service_name':'ctrl.edit.paste'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditDeleteLine',
+                  'title':"Delete Line",
+                  'accel':"<control>D",
+                  'stock_id':Gtk.STOCK_DELETE,
+                  'service_name':'ctrl.edit.delete_line'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditSelectAll',
+                  'title':"Select All",
+                  'accel':"",
+                  'stock_id':Gtk.STOCK_SELECT_ALL,
+                  'service_name':'ctrl.edit.select_all'}
         manager.requestService("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',

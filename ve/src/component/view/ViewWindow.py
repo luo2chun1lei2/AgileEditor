@@ -585,28 +585,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         if src_buffer.can_undo():
             src_buffer.undo()
 
-    def ide_edit_select_all(self, widget):
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        src_buffer = ve_editor.editor.get_buffer()
-        src_buffer.select_range(src_buffer.get_start_iter(), src_buffer.get_end_iter())
-
-    def ide_edit_delete_line(self):
-        # 删除光标所在的行
-
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-        src_buffer = ve_editor.editor.get_buffer()
-
-        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
-        if start is None or end is None:
-            return
-
-        src_buffer.delete(start, end)
-
     def ide_edit_comment(self):
         # 将选择的行变成“注释”
         ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')

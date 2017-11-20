@@ -208,3 +208,27 @@ class UtilEditor(object):
         atom = Gdk.atom_intern('CLIPBOARD', True)
         clipboard = ve_editor.editor.get_clipboard(atom)
         ve_editor.editor.get_buffer().paste_clipboard(clipboard, None, True)
+
+    @staticmethod
+    def edit_select_all():
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        src_buffer = ve_editor.editor.get_buffer()
+        src_buffer.select_range(src_buffer.get_start_iter(), src_buffer.get_end_iter())
+
+    @staticmethod
+    def edit_delete_line():
+        # 删除光标所在的行
+
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+        src_buffer = ve_editor.editor.get_buffer()
+
+        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
+        if start is None or end is None:
+            return
+
+        src_buffer.delete(start, end)
