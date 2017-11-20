@@ -4,6 +4,7 @@
 
 from gi.repository import Gtk, Gdk
 from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
 
 class ViewDialogCommon(FwComponent):
     # 通用的对话框
@@ -26,8 +27,12 @@ class ViewDialogCommon(FwComponent):
             return (True, {'response': response, 'text':text})
 
         elif serviceName == "dialog.common.two_entry":
+            if 'transient_for' in params:
+                window = params['transient_for']
+            else:
+                window = FwManager.requestOneSth('window', 'view.main.get_window')
             response, text1, text2 = ViewDialogCommon.show_two_entry(
-                                params['transient_for'], params['title'],
+                                window, params['title'],
                                 params['entry1_label'], params['text1'],
                                 params['entry2_label'], params['text2'])
             return (True, {'response': response, 'text1':text1, 'text2':text2})

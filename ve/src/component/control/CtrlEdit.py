@@ -16,7 +16,9 @@ class CtrlEdit(FwComponent):
     # override component
     def onRegistered(self, manager):
         info = [{'name':'ctrl.edit.comment', 'help':'make selected code to comment.'},
-                {'name':'ctrl.edit.uncomment', 'help':'make selected code to uncomment.'}]
+                {'name':'ctrl.edit.uncomment', 'help':'make selected code to uncomment.'},
+                {'name':'ctrl.edit.replace', 'help':'replace the selected text by other text.'}
+                ]
         manager.registerService(info, self)
 
         return True
@@ -28,6 +30,9 @@ class CtrlEdit(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.edit.uncomment':
             self._edit_uncomment()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.replace':
+            self._edit_replace()
             return (True, None)
         else:
             return (False, None)
@@ -48,6 +53,14 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>question",
                   'stock_id':None,
                   'service_name':'ctrl.edit.uncomment'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditReplace',
+                  'title':"Replace",
+                  'accel':"<control>R",
+                  'stock_id':None,
+                  'service_name':'ctrl.edit.replace'}
         manager.requestService("view.menu.add", params)
 
         return True
@@ -123,3 +136,22 @@ class CtrlEdit(FwComponent):
 
         src_buffer.delete_mark(mark)
         src_buffer.delete_mark(end_mark)
+
+    def _edit_replace(self):
+        # 在项目的文件中查找，不是寻找定义。
+
+        # 看看是否已经选中了单词
+        tag_name = UtilEditor.get_selected_text_or_word()
+
+        isOK, results = FwManager.instance().requestService('dialog.common.two_entry',
+                                    {'title':"替换", 'entry1_label':"从", 'text1':tag_name,
+                                     'entry2_label':"到", 'text2':""})
+        response = results['response']
+        replace_from = results['text1']
+        replace_to = results['text2']
+
+        if response != Gtk.ResponseType.OK or replace_from is None or replace_from == '' or \
+            replace_to is None or replace_to == '':
+            return
+
+        UtilEditor.replace_in_file(replace_from, replace_to)

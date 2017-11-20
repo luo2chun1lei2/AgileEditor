@@ -41,13 +41,11 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 将已经生成好的控件作为组件注册到框架中。
         FwManager.instance().load("view_menu", self.ide_menu)
 
-        info = [{'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
+        info = [
+            {'name':'view.main.get_window', 'help':'get the main window.'},
+            {'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
             {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},
-#             {'name':'view.main.new_regular_file', 'help': 'create new regular file by path.'},
-#             {'name':'view.main.new_dir', 'help': 'create new directory by path.'},
-#             {'name':'view.main.delete_file', 'help': 'delete one file by path.'},
-#             {'name':'view.main.rename_file', 'help': 'rename file path.'},
             {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags.'},
             {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'}]
         manager.registerService(info, self)
@@ -88,22 +86,8 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_editor_set_focus()
             return True, None
 
-#         elif serviceName == 'view.main.new_regular_file':
-#             self.main_new_regular_file(params['abs_file_path'])
-#             return True, None
-#
-#         elif serviceName == 'view.main.new_dir':
-#             self.main_new_directory(params['abs_file_path'])
-#             return True, None
-#
-#         elif serviceName == 'view.main.delete_file':
-#             self.main_delete_file(params['abs_file_path'])
-#             return True, None
-#
-#         elif serviceName == 'view.main.rename_file':
-#             self.main_rename_file(params['old_abs_file_path'], params['new_abs_file_path'])
-#             return True, None
-
+        elif serviceName == 'view.main.get_window':
+            return (True, {'window': self})
         else:
             return (False, None)
 
@@ -121,7 +105,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 跳转的记录。
         self.jumps = []
         self.cur_prj = None
-        self.word_pattern = re.compile("[a-zA-Z0-9_]")
         self.last_search_pattern = None
 
         # 读取workshop的信息。
@@ -243,8 +226,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif action == ViewMenu.ACTION_EDIT_DELETE_LINE:
             self.ide_edit_delete_line()
 
-        elif action == ViewMenu.ACTION_EDIT_REPLACE:
-            self.ide_edit_replace()
         # 检索
         elif action == ViewMenu.ACTION_SEARCH_JUMP_TO:
             self.ide_jump_to_line(widget)
@@ -509,7 +490,7 @@ class ViewWindow(Gtk.Window, FwComponent):
                     return self.RLT_CANCEL
 
             # 将内容保存到文件中。
-            ide_editor.ide_file.save_file(self._ide_get_editor_buffer())
+            ide_editor.ide_file.save_file(UtilEditor.get_editor_buffer())
             src_buffer.set_modified(False)
             logging.debug('ide save file to disk file.')
 
@@ -539,7 +520,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             return self.RLT_OK
 
         # 如果是新文件，则按照Save的逻辑进行
-        src_buffer = self._ide_get_editor_buffer()
+        src_buffer = UtilEditor.get_editor_buffer()
         if src_buffer.get_modified():
             if ide_editor.ide_file.file_path is None:
                 return self.ide_save_file(widget)
@@ -568,14 +549,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': old_file_path})
 
         # 打开指定的文件，并保存
-        # self.current_idefile = ModelFile()
-#         ide_editor.ide_file.open_file(file_path)
-#
-#         ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-#         src_buffer = self._ide_get_editor_buffer()
-#         self.current_idefile.save_file(src_buffer)
-#         self._set_src_language(src_buffer, file_path)
-#         src_buffer.set_modified(False)
         FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': file_path})
 
         # 切换当前的状态
@@ -685,43 +658,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         for line in range(start_line, end_line):
             iter_ = src_buffer.get_iter_at_line(line)
             src_buffer.insert(iter_, commend_chars)
-
-    def ide_edit_replace(self):
-        # 在项目的文件中查找，不是寻找定义。
-
-        # 看看是否已经选中了单词
-        tag_name = self._ide_get_selected_text_or_word()
-
-        isOK, results = FwManager.instance().requestService('dialog.common.two_entry',
-                                    {'transient_for':self, 'title':"替换", 'entry1_label':"从", 'text1':tag_name,
-                                     'entry2_label':"到", 'text2':""})
-        response = results['response']
-        replace_from = results['text1']
-        replace_to = results['text2']
-
-        if response != Gtk.ResponseType.OK or replace_from is None or replace_from == '' or \
-            replace_to is None or replace_to == '':
-            return
-
-        self._ide_replace_in_file(replace_from, replace_to)
-
-    def _ide_replace_in_file(self, replace_from, replace_to):
-        # 替换当前文件中的文字
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        src_buffer = ve_editor.editor.get_buffer()
-
-        replace_search_setting = GtkSource.SearchSettings.new()
-        replace_search_setting.set_regex_enabled(True)
-        replace_search_setting.set_case_sensitive(True)
-        replace_search_setting.set_wrap_around(True)
-
-        replace_search_context = GtkSource.SearchContext.new(src_buffer, replace_search_setting)
-        replace_search_context.get_settings().set_search_text(replace_from)
-
-        replace_search_context.replace_all(replace_to, -1)
 
     def ide_switch_page(self, abs_file_path):
         # abs_file_path string 切换到的文件名字
@@ -839,7 +775,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             return False
 
         # print 'goto line number:', line_number
-        text_buf = self._ide_get_editor_buffer()
+        text_buf = UtilEditor.get_editor_buffer()
         it = text_buf.get_iter_at_line(line_number - 1)
 
         text_buf.place_cursor(it)
@@ -892,7 +828,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def ide_search_defination(self):
         ''' 查找定义 '''
-        tag_name = self._ide_get_selected_text_or_word()
+        tag_name = UtilEditor.get_selected_text_or_word()
         self._ide_search_defination(tag_name)
 
     def _ide_search_defination(self, tag_name):
@@ -919,7 +855,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def ide_search_reference(self):
         ''' 查找引用
         '''
-        tag_name = self._ide_get_selected_text_or_word()
+        tag_name = UtilEditor.get_selected_text_or_word()
 
         ModelTask.execute(self._after_ide_search_reference,
                           self.cur_prj.query_reference_tags, tag_name)
@@ -945,7 +881,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def _svc_add_bookmark(self):
         ''' 【服务】根据当前情况加入新的bookmark。
         '''
-        bookmark = self._ide_make_bookmark()
+        bookmark = UtilEditor.make_bookmark()
         self.cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}
 
@@ -1160,86 +1096,6 @@ class ViewWindow(Gtk.Window, FwComponent):
                 tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
 
-    def _ide_is_not_word(self, txt):
-        return not self.word_pattern.match(txt)
-
-    def _ide_get_selected_text_or_word(self):
-        ''' 从编辑器中得到当前被选中的文字，
-        如果没有就返回光标所在的单词，
-        如果都无法达到，就返回None 
-        '''
-        text_buf = self._ide_get_editor_buffer()
-        selection = text_buf.get_selection_bounds()
-
-        text = None
-        if len(selection) > 0:
-            # 已经有选中的文字。
-            start, end = selection
-            text = text_buf.get_text(start, end, False)
-        else:
-
-            # 没有选中任何的文字
-            mark = text_buf.get_insert()
-            word_start = text_buf.get_iter_at_mark(mark)
-            word_end = text_buf.get_iter_at_mark(mark)
-
-            # 得到以空格为区分的单词开头。
-            while True:
-                # 获得前一个字符，如果是“_”就前移。
-                n = word_start.copy()
-                if not n.backward_char():
-                    break
-                txt = text_buf.get_text(n, word_start, False)
-                if self._ide_is_not_word(txt):
-                    break
-
-                word_start.backward_char()
-
-            # 得到以空格为区分的单词结尾。
-            while True:
-                n = word_end.copy()
-                if not n.forward_char():
-                    break
-                txt = text_buf.get_text(word_end, n, False)
-                if self._ide_is_not_word(txt):
-                    break
-
-                word_end.forward_char()
-
-            text = text_buf.get_text(word_start, word_end, False)
-
-        logging.debug('selected text or word is "%s"' % text)
-
-        return text
-
-    def _ide_make_bookmark(self):
-        # 根据当前编辑器的当前光标位置，生成一个bookmark
-        # return:ModelTag:书签
-
-        text_buf = self._ide_get_editor_buffer()
-
-        # 得到书签名字
-        name = self._ide_get_selected_text_or_word()
-        if name is None:
-            # 就用
-            name = "None"
-
-        # 得到文件
-        path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
-
-        # 得到行号
-        mark = text_buf.get_insert()
-        location = text_buf.get_iter_at_mark(mark)
-        line_no = location.get_line() + 1
-
-        # 得到内容
-        line_start = text_buf.get_iter_at_line(line_no - 1)
-        line_end = line_start.copy()
-        line_end.forward_to_line_end()
-        content = text_buf.get_text(line_start, line_end, False)
-
-        return ModelTag(name, path, line_no, content)
-
     def _ide_set_completion(self, ideProject):
         ''' 设定当前的编辑器的单词补足，当切换不同的Project时，才有必要 '''
 
@@ -1256,13 +1112,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 加入新的Provider
         completion.add_provider(ideProject.get_completion_provider())
-
-    def _ide_get_editor_buffer(self):
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
-        if editor is None:
-            return None
-
-        return editor.get_buffer()
 
     def _ide_push_jumps(self):
         # 记录当前的位置

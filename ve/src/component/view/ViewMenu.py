@@ -46,7 +46,6 @@ MENU_CONFIG = """
             <separator />
             <menuitem action='EditSelectAll' />
             <separator />
-            <menuitem action='EditReplace' />
         </menu>
         <menu action='SearchMenu'>
             <menuitem action='SearchJumpTo' />
@@ -116,8 +115,6 @@ class ViewMenu(FwComponent):
 
      ACTION_EDIT_DELETE_LINE,
 
-     ACTION_EDIT_REPLACE,
-
      ACTION_SEARCH_JUMP_TO,
      ACTION_SEARCH_FIND,  # 跳转到检索框
      ACTION_SEARCH_FIND_TEXT,  # 开始检索
@@ -134,7 +131,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(32)
+     ) = range(31)
 
     def __init__(self, window, on_menu_func):
 
@@ -386,7 +383,6 @@ class ViewMenu(FwComponent):
             ("EditPaste", Gtk.STOCK_PASTE, None, '', None, self.on_menu_edit_paste),
             ("EditDeleteLine", Gtk.STOCK_DELETE, "Delete Line", '<control>D', None, self.on_menu_edit_delete_line),
             ("EditSelectAll", Gtk.STOCK_SELECT_ALL, None, '', None, self.on_menu_edit_select_all),
-            ("EditReplace", None, 'Replace', '<control>R', None, self.on_menu_edit_replace),
         ])
 
     def add_search_menu_actions(self, action_group):
@@ -407,19 +403,12 @@ class ViewMenu(FwComponent):
             ("SearchDefination", None, 'Definition', 'F3', None, self.on_menu_search_defination),
             ("SearchReference", None, 'Reference', 'F4', None, self.on_menu_search_reference),
             ("SearchBackTag", Gtk.STOCK_GO_BACK, 'Back Tag', '<shift><control>Left', None, self.on_menu_search_back_tag),
-#             ("SearchAddBookmark", Gtk.STOCK_GO_BACK, 'Add bookmark', '<control>B', None, self.on_menu_search_add_bookmark),
-#             ("SearchRemoveBookmark", Gtk.STOCK_GO_BACK, 'Remove bookmark', '<shift><control>B', None, self.on_menu_search_remove_bookmark),
         ])
 
     def add_help_menu_actions(self, action_group):
         # Help菜单设定。
         action_helptmenu = Gtk.Action("HelpMenu", "Help", None, None)
         action_group.add_action(action_helptmenu)
-
-        # action_help_info = Gtk.Action("HelpInfo", None, "Information", Gtk.STOCK_INFO)
-        # action_help_info.connect("activate", self.on_menu_help_info)
-        # action_group.add_action_with_accel(action_help_info, "<Alt>H")
-        # self.action_help_info = action_help_info
 
     def create_ui_manager(self):
 
@@ -505,10 +494,6 @@ class ViewMenu(FwComponent):
     def on_menu_edit_delete_line(self, widget):
         logging.debug("A Edit|Delete Line All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_DELETE_LINE)
-
-    def on_menu_edit_replace(self, widget):
-        logging.debug("A Edit|replace Line All as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_REPLACE)
 
     def on_menu_search_jumpto(self, widget):
         logging.debug("A Search|JumpTo menu item was selected.")

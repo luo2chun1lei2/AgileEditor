@@ -267,11 +267,6 @@ class ViewMultiEditors(FwComponent):
         # 关闭文件
         oneEditor.ide_file.close_file()
 
-        #
-#         src_buffer = self._ide_get_editor_buffer()
-#         src_buffer.delete(src_buffer.get_start_iter(), src_buffer.get_end_iter())
-#         src_buffer.set_modified(False)
-
     def freeze_editor(self, editor):
         # 冻结编辑器，暂时将completion禁止。
         completion = editor.props.completion

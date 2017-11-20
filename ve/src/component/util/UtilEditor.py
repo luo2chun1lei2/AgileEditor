@@ -4,6 +4,11 @@
 目前不是组件！
 '''
 
+import re, logging
+from gi.repository import GtkSource
+
+from framework.FwManager import FwManager
+
 class UtilEditor(object):
 
     @staticmethod
@@ -54,3 +59,122 @@ class UtilEditor(object):
             commend_chars = "#"
 
         return commend_chars
+
+    @staticmethod
+    def is_not_word(txt):
+        ''' 此项目判断是否一个单词的依据。
+        @param txt: string: 需要判断的文本
+        @return bool: is ?
+        '''
+        word_pattern = re.compile("[a-zA-Z0-9_]")
+        return not word_pattern.match(txt)
+
+    @staticmethod
+    def get_editor_buffer():
+        ''' 获得当前的编辑器！
+        '''
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        if editor is None:
+            return None
+
+        return editor.get_buffer()
+
+    @staticmethod
+    def get_selected_text_or_word():
+        ''' 从编辑器中得到当前被选中的文字，
+        如果没有就返回光标所在的单词，
+        如果都无法达到，就返回None 
+        '''
+        text_buf = UtilEditor.get_editor_buffer()
+        selection = text_buf.get_selection_bounds()
+
+        text = None
+        if len(selection) > 0:
+            # 已经有选中的文字。
+            start, end = selection
+            text = text_buf.get_text(start, end, False)
+        else:
+
+            # 没有选中任何的文字
+            mark = text_buf.get_insert()
+            word_start = text_buf.get_iter_at_mark(mark)
+            word_end = text_buf.get_iter_at_mark(mark)
+
+            # 得到以空格为区分的单词开头。
+            while True:
+                # 获得前一个字符，如果是“_”就前移。
+                n = word_start.copy()
+                if not n.backward_char():
+                    break
+                txt = text_buf.get_text(n, word_start, False)
+                if UtilEditor.is_not_word(txt):
+                    break
+
+                word_start.backward_char()
+
+            # 得到以空格为区分的单词结尾。
+            while True:
+                n = word_end.copy()
+                if not n.forward_char():
+                    break
+                txt = text_buf.get_text(word_end, n, False)
+                if UtilEditor.is_not_word(txt):
+                    break
+
+                word_end.forward_char()
+
+            text = text_buf.get_text(word_start, word_end, False)
+
+        logging.debug('selected text or word is "%s"' % text)
+
+        return text
+
+    @staticmethod
+    def make_bookmark():
+        # 根据当前编辑器的当前光标位置，生成一个bookmark
+        # return:ModelTag:书签
+
+        from component.model.ModelTags import ModelTag
+
+        text_buf = UtilEditor.get_editor_buffer()
+
+        # 得到书签名字
+        name = UtilEditor.get_selected_text_or_word()
+        if name is None:
+            # 就用
+            name = "None"
+
+        # 得到文件
+        path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
+
+        # 得到行号
+        mark = text_buf.get_insert()
+        location = text_buf.get_iter_at_mark(mark)
+        line_no = location.get_line() + 1
+
+        # 得到内容
+        line_start = text_buf.get_iter_at_line(line_no - 1)
+        line_end = line_start.copy()
+        line_end.forward_to_line_end()
+        content = text_buf.get_text(line_start, line_end, False)
+
+        return ModelTag(name, path, line_no, content)
+
+    @staticmethod
+    def replace_in_file(replace_from, replace_to):
+        # 替换当前文件中的文字
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        src_buffer = ve_editor.editor.get_buffer()
+
+        replace_search_setting = GtkSource.SearchSettings.new()
+        replace_search_setting.set_regex_enabled(True)
+        replace_search_setting.set_case_sensitive(True)
+        replace_search_setting.set_wrap_around(True)
+
+        replace_search_context = GtkSource.SearchContext.new(src_buffer, replace_search_setting)
+        replace_search_context.get_settings().set_search_text(replace_from)
+
+        replace_search_context.replace_all(replace_to, -1)
