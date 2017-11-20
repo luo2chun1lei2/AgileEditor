@@ -210,22 +210,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif action == ViewMenu.ACTION_FILE_SAVE_AS:
             self.ide_save_as_file(widget)
 
-        # 编辑
-        elif action == ViewMenu.ACTION_EDIT_REDO:
-            self.ide_edit_redo(widget)
-        elif action == ViewMenu.ACTION_EDIT_UNDO:
-            self.ide_edit_undo(widget)
-        elif action == ViewMenu.ACTION_EDIT_CUT:
-            self.ide_edit_cut(widget)
-        elif action == ViewMenu.ACTION_EDIT_COPY:
-            self.ide_edit_copy(widget)
-        elif action == ViewMenu.ACTION_EDIT_PASTE:
-            self.ide_edit_paste(widget)
-        elif action == ViewMenu.ACTION_EDIT_SELECT_ALL:
-            self.ide_edit_select_all(widget)
-        elif action == ViewMenu.ACTION_EDIT_DELETE_LINE:
-            self.ide_edit_delete_line()
-
         # 检索
         elif action == ViewMenu.ACTION_SEARCH_JUMP_TO:
             self.ide_jump_to_line(widget)
@@ -566,49 +550,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             return result
 
         Gtk.main_quit()
-
-    def ide_edit_redo(self, widget):
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        src_buffer = ve_editor.editor.get_buffer()
-        if src_buffer.can_redo():
-            src_buffer.redo()
-
-    def ide_edit_undo(self, widget):
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        src_buffer = ve_editor.editor.get_buffer()
-        if src_buffer.can_undo():
-            src_buffer.undo()
-
-    def ide_edit_comment(self):
-        # 将选择的行变成“注释”
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        src_buffer = ve_editor.editor.get_buffer()
-
-        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
-        if start is None or end is None:
-            return
-
-        commend_chars = UtilEditor.get_command_chars(src_buffer.get_language())
-        if commend_chars is None:
-            # 目前只能处理部分程序的comment。
-            return
-
-        # 在每行的开始，加入“//”，因为要修改不止一个地方，所以不能用iter。
-        start_line = start.get_line()
-        end_line = end.get_line()
-
-        for line in range(start_line, end_line):
-            iter_ = src_buffer.get_iter_at_line(line)
-            src_buffer.insert(iter_, commend_chars)
 
     def ide_switch_page(self, abs_file_path):
         # abs_file_path string 切换到的文件名字

@@ -36,8 +36,6 @@ MENU_CONFIG = """
             <menuitem action='FileSaveAs' />
         </menu>
         <menu action='EditMenu'>
-            <menuitem action='EditRedo' />
-            <menuitem action='EditUndo' />
         </menu>
         <menu action='SearchMenu'>
             <menuitem action='SearchJumpTo' />
@@ -96,9 +94,6 @@ class ViewMenu(FwComponent):
      ACTION_FILE_SAVE,
      ACTION_FILE_SAVE_AS,
 
-     ACTION_EDIT_UNDO,
-     ACTION_EDIT_REDO,
-
      ACTION_SEARCH_JUMP_TO,
      ACTION_SEARCH_FIND,  # 跳转到检索框
      ACTION_SEARCH_FIND_TEXT,  # 开始检索
@@ -115,7 +110,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(26)
+     ) = range(24)
 
     def __init__(self, window, on_menu_func):
 
@@ -355,8 +350,6 @@ class ViewMenu(FwComponent):
     def add_edit_menu_actions(self, action_group):
         action_group.add_actions([
             ("EditMenu", None, "Edit"),
-            ("EditRedo", Gtk.STOCK_REDO, None, '<shift><control>Z', None, self.on_menu_edit_redo),
-            ("EditUndo", Gtk.STOCK_UNDO, None, '<control>Z', None, self.on_menu_edit_undo),
         ])
 
     def add_search_menu_actions(self, action_group):
@@ -440,14 +433,6 @@ class ViewMenu(FwComponent):
     def on_menu_file_save_as(self, widget):
         logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
-
-    def on_menu_edit_redo(self, widget):
-        logging.debug("A Edit|Redo as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_REDO)
-
-    def on_menu_edit_undo(self, widget):
-        logging.debug("A Edit|Undo as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_UNDO)
 
     def on_menu_search_jumpto(self, widget):
         logging.debug("A Search|JumpTo menu item was selected.")

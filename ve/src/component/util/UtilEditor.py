@@ -232,3 +232,23 @@ class UtilEditor(object):
             return
 
         src_buffer.delete(start, end)
+
+    @staticmethod
+    def edit_redo():
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        src_buffer = ve_editor.editor.get_buffer()
+        if src_buffer.can_redo():
+            src_buffer.redo()
+
+    @staticmethod
+    def edit_undo():
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        src_buffer = ve_editor.editor.get_buffer()
+        if src_buffer.can_undo():
+            src_buffer.undo()

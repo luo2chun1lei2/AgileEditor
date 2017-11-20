@@ -16,7 +16,9 @@ class CtrlEdit(FwComponent):
 
     # override component
     def onRegistered(self, manager):
-        info = [{'name':'ctrl.edit.cut', 'help':'cut the selected text.'},
+        info = [{'name':'ctrl.edit.redo', 'help':'redo.'},
+                {'name':'ctrl.edit.undo', 'help':'undo.'},
+                {'name':'ctrl.edit.cut', 'help':'cut the selected text.'},
                 {'name':'ctrl.edit.copy', 'help':'copy the selected text.'},
                 {'name':'ctrl.edit.paste', 'help':'paste the text in clipboard.'},
                 {'name':'ctrl.edit.comment', 'help':'make selected code to comment.'},
@@ -55,11 +57,33 @@ class CtrlEdit(FwComponent):
         elif serviceName == 'ctrl.edit.select_all':
             UtilEditor.edit_select_all()
             return (True, None)
+        elif serviceName == 'ctrl.edit.redo':
+            UtilEditor.edit_redo()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.undo':
+            UtilEditor.edit_undo()
+            return (True, None)
         else:
             return (False, None)
 
     # override component
     def onSetup(self, manager):
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditRedo',
+                  'title':None,
+                  'accel':"<shift><control>Z",
+                  'stock_id':Gtk.STOCK_REDO,
+                  'service_name':'ctrl.edit.redo'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditUndo',
+                  'title':None,
+                  'accel':"<control>Z",
+                  'stock_id':Gtk.STOCK_UNDO,
+                  'service_name':'ctrl.edit.undo'}
+        manager.requestService("view.menu.add", params)
+
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditCut',
                   'title':"Cut",
