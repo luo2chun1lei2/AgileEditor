@@ -16,9 +16,10 @@ from framework.FwManager import FwManager
 
 from component.model.ModelWorkshop import ModelWorkshop
 from component.model.ModelTask import ModelTask
-
 from component.view.ViewMenu import ViewMenu
 from component.model.ModelTags import ModelTag
+from component.util.UtilEditor import UtilEditor
+
 from framework.FwComponent import FwComponent
 
 class ViewWindow(Gtk.Window, FwComponent):
@@ -242,10 +243,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif action == ViewMenu.ACTION_EDIT_DELETE_LINE:
             self.ide_edit_delete_line()
 
-        elif action == ViewMenu.ACTION_EDIT_COMMENT:
-            self.ide_edit_comment()
-        elif action == ViewMenu.ACTION_EDIT_UNCOMMENT:
-            self.ide_edit_uncomment()
         elif action == ViewMenu.ACTION_EDIT_REPLACE:
             self.ide_edit_replace()
         # 检索
@@ -658,25 +655,11 @@ class ViewWindow(Gtk.Window, FwComponent):
             return
         src_buffer = ve_editor.editor.get_buffer()
 
-        (start, end) = self._ide_get_selected_line(ve_editor.editor)
+        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
         if start is None or end is None:
             return
 
         src_buffer.delete(start, end)
-
-    def _ide_get_command_chars(self, language):
-        lang_id = language.get_id()
-        if  lang_id == "cpp" or lang_id == "hpp":
-            commend_chars = "//"
-        elif  lang_id == "c" or lang_id == "chdr":  # h文件为什么是chdr?
-            commend_chars = "//"
-        elif lang_id == "makefile" or lang_id == "sh":
-            commend_chars = "#"
-        else:
-            # 缺省使用#
-            commend_chars = "#"
-
-        return commend_chars
 
     def ide_edit_comment(self):
         # 将选择的行变成“注释”
@@ -686,11 +669,11 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         src_buffer = ve_editor.editor.get_buffer()
 
-        (start, end) = self._ide_get_selected_line(ve_editor.editor)
+        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
         if start is None or end is None:
             return
 
-        commend_chars = self._ide_get_command_chars(src_buffer.get_language())
+        commend_chars = UtilEditor.get_command_chars(src_buffer.get_language())
         if commend_chars is None:
             # 目前只能处理部分程序的comment。
             return
@@ -702,53 +685,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         for line in range(start_line, end_line):
             iter_ = src_buffer.get_iter_at_line(line)
             src_buffer.insert(iter_, commend_chars)
-
-    def ide_edit_uncomment(self):
-        # 将所在的行从“注释“变成正常代码
-        # 将选择的行变成“注释”
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if ve_editor is None:
-            return
-
-        src_buffer = ve_editor.editor.get_buffer()
-
-        (start, end) = self._ide_get_selected_line(ve_editor.editor)
-        if start is None or end is None:
-            return
-
-        commend_chars = self._ide_get_command_chars(src_buffer.get_language())
-        if commend_chars is None:
-            # 目前只能处理部分程序的comment。
-            return
-
-        # 需要检索指定行的开始“//”
-        comment_search_setting = GtkSource.SearchSettings.new()
-        comment_search_setting.set_regex_enabled(True)
-        comment_search_setting.set_case_sensitive(True)
-        comment_search_setting.set_wrap_around(False)
-
-        comment_search_context = GtkSource.SearchContext.new(src_buffer, comment_search_setting)
-        # 注意：不能使用\s，因为这个包括\n\r。
-        comment_search_pattern = '(^[\t\v\f]*)(' + commend_chars + ')'
-        comment_search_context.get_settings().set_search_text(comment_search_pattern)
-
-        start_iter = start
-        mark = src_buffer.create_mark("comment_start", start)
-        end_mark = src_buffer.create_mark("comment_end", end)
-        while True:
-            found, march_start, march_end = comment_search_context.forward(start_iter)
-            if (not found) or march_end.compare(src_buffer.get_iter_at_mark(end_mark)) > 0:
-                break
-
-            src_buffer.move_mark(mark, march_end)
-            # replace 方法的两个Iter必须是匹配文字的开始和结束，不是指定一个搜索范围。
-            comment_search_context.replace(march_start, march_end, '\g<1>', -1)
-
-            start_iter = src_buffer.get_iter_at_mark(mark)
-            start_iter.forward_line()
-
-        src_buffer.delete_mark(mark)
-        src_buffer.delete_mark(end_mark)
 
     def ide_edit_replace(self):
         # 在项目的文件中查找，不是寻找定义。
@@ -1223,39 +1159,6 @@ class ViewWindow(Gtk.Window, FwComponent):
                 # 直接跳转。
                 tag = tags[0]
                 self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-
-    def _ide_get_selected_line(self, textview):
-        # 得到当前光标所在的行/或者选择的多行的 行范围
-
-        src_buffer = textview.get_buffer()
-        selection = src_buffer.get_selection_bounds()
-
-        if len(selection) > 0:
-            # 已经有选中的文字。
-            start, end = selection
-
-            textview.backward_display_line_start(start)
-            if not textview.forward_display_line(end):
-                textview.forward_display_line_end(end)
-
-            return (start, end)
-        else:
-
-            # 没有选中任何的文字
-            mark = src_buffer.get_insert()
-            start = src_buffer.get_iter_at_mark(mark)
-            end = start.copy()
-
-            # textview.backward_display_line(start)        # 到上一行的结尾
-            # textview.backward_display_line_start(start) # 到所在行的行首
-            # textview.forward_display_line(end)          # 到下一行的开始
-            # textview.forward_display_line_end(end)     # 到所在行的结尾
-            if textview.forward_display_line(end):
-                textview.backward_display_line_start(start)
-            else:
-                textview.backward_display_line(start)
-
-            return (start, end)
 
     def _ide_is_not_word(self, txt):
         return not self.word_pattern.match(txt)
