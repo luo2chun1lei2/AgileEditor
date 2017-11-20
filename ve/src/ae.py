@@ -27,6 +27,8 @@ def init_components(manager):
     from component.view.AeMain import AeMain
     from component.view.ViewMultiEditors import ViewMultiEditors
     from component.view.ViewBookmarks import ViewBookmarks
+    from component.control.CtrlEdit import CtrlEdit
+    from component.control.CtrlSearch import CtrlSearch
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -43,6 +45,8 @@ def init_components(manager):
     manager.register("multiple_editors", ViewMultiEditors())
     manager.register("terminal", ViewTerminal())
     manager.register("bookmarks", ViewBookmarks())
+    manager.register("ctrl_edit", CtrlEdit())
+    manager.register("ctrl_search", CtrlSearch())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

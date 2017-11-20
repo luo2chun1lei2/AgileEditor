@@ -46,8 +46,6 @@ MENU_CONFIG = """
             <separator />
             <menuitem action='EditSelectAll' />
             <separator />
-            <menuitem action='EditComment' />
-            <menuitem action='EditUncomment' />
             <menuitem action='EditReplace' />
         </menu>
         <menu action='SearchMenu'>
@@ -118,8 +116,6 @@ class ViewMenu(FwComponent):
 
      ACTION_EDIT_DELETE_LINE,
 
-     ACTION_EDIT_COMMENT,
-     ACTION_EDIT_UNCOMMENT,
      ACTION_EDIT_REPLACE,
 
      ACTION_SEARCH_JUMP_TO,
@@ -138,7 +134,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(34)
+     ) = range(32)
 
     def __init__(self, window, on_menu_func):
 
@@ -390,8 +386,6 @@ class ViewMenu(FwComponent):
             ("EditPaste", Gtk.STOCK_PASTE, None, '', None, self.on_menu_edit_paste),
             ("EditDeleteLine", Gtk.STOCK_DELETE, "Delete Line", '<control>D', None, self.on_menu_edit_delete_line),
             ("EditSelectAll", Gtk.STOCK_SELECT_ALL, None, '', None, self.on_menu_edit_select_all),
-            ("EditComment", None, 'Comment', '<control>slash', None, self.on_menu_edit_comment),
-            ("EditUncomment", None, 'Uncomment', '<control>question', None, self.on_menu_edit_uncomment),
             ("EditReplace", None, 'Replace', '<control>R', None, self.on_menu_edit_replace),
         ])
 
@@ -511,14 +505,6 @@ class ViewMenu(FwComponent):
     def on_menu_edit_delete_line(self, widget):
         logging.debug("A Edit|Delete Line All as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_EDIT_DELETE_LINE)
-
-    def on_menu_edit_comment(self, widget):
-        logging.debug("A Edit|comment Line All as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_COMMENT)
-
-    def on_menu_edit_uncomment(self, widget):
-        logging.debug("A Edit|uncomment Line All as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_EDIT_UNCOMMENT)
 
     def on_menu_edit_replace(self, widget):
         logging.debug("A Edit|replace Line All as menu item was selected.")

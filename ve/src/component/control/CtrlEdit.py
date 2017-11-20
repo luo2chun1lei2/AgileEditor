@@ -1,0 +1,125 @@
+# -*- coding:utf-8 -*-
+'''
+组件：编辑
+'''
+
+from gi.repository import Gtk, GtkSource
+
+from framework.FwComponent import FwComponent
+from framework.FwManager import FwManager
+from component.util.UtilEditor import UtilEditor
+
+class CtrlEdit(FwComponent):
+    def __init__(self):
+        super(CtrlEdit, self).__init__()
+
+    # override component
+    def onRegistered(self, manager):
+        info = [{'name':'ctrl.edit.comment', 'help':'make selected code to comment.'},
+                {'name':'ctrl.edit.uncomment', 'help':'make selected code to uncomment.'}]
+        manager.registerService(info, self)
+
+        return True
+
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "ctrl.edit.comment":
+            self._edit_comment()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.uncomment':
+            self._edit_uncomment()
+            return (True, None)
+        else:
+            return (False, None)
+
+    # override component
+    def onSetup(self, manager):
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditComment',
+                  'title':"Comment",
+                  'accel':"<control>slash",
+                  'stock_id':None,
+                  'service_name':'ctrl.edit.comment'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditUncomment',
+                  'title':"Uncomment",
+                  'accel':"<control>question",
+                  'stock_id':None,
+                  'service_name':'ctrl.edit.uncomment'}
+        manager.requestService("view.menu.add", params)
+
+        return True
+
+    def _edit_comment(self):
+        # 将选择的行变成“注释”
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        src_buffer = ve_editor.editor.get_buffer()
+
+        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
+        if start is None or end is None:
+            return
+
+        commend_chars = UtilEditor.get_command_chars(src_buffer.get_language())
+        if commend_chars is None:
+            # 目前只能处理部分程序的comment。
+            return
+
+        # 在每行的开始，加入“//”，因为要修改不止一个地方，所以不能用iter。
+        start_line = start.get_line()
+        end_line = end.get_line()
+
+        for line in range(start_line, end_line):
+            iter_ = src_buffer.get_iter_at_line(line)
+            src_buffer.insert(iter_, commend_chars)
+
+    def _edit_uncomment(self):
+        # 将所在的行从“注释“变成正常代码
+        # 将选择的行变成“注释”
+        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        if ve_editor is None:
+            return
+
+        src_buffer = ve_editor.editor.get_buffer()
+
+        (start, end) = UtilEditor.get_selected_line(ve_editor.editor)
+        if start is None or end is None:
+            return
+
+        commend_chars = UtilEditor.get_command_chars(src_buffer.get_language())
+        if commend_chars is None:
+            # 目前只能处理部分程序的comment。
+            return
+
+        # 需要检索指定行的开始“//”
+        comment_search_setting = GtkSource.SearchSettings.new()
+        comment_search_setting.set_regex_enabled(True)
+        comment_search_setting.set_case_sensitive(True)
+        comment_search_setting.set_wrap_around(False)
+
+        comment_search_context = GtkSource.SearchContext.new(src_buffer, comment_search_setting)
+        # 注意：不能使用\s，因为这个包括\n\r。
+        comment_search_pattern = '(^[\t\v\f]*)(' + commend_chars + ')'
+        comment_search_context.get_settings().set_search_text(comment_search_pattern)
+
+        start_iter = start
+        mark = src_buffer.create_mark("comment_start", start)
+        end_mark = src_buffer.create_mark("comment_end", end)
+        while True:
+            found, march_start, march_end = comment_search_context.forward(start_iter)
+            if (not found) or march_end.compare(src_buffer.get_iter_at_mark(end_mark)) > 0:
+                break
+
+            src_buffer.move_mark(mark, march_end)
+            # replace 方法的两个Iter必须是匹配文字的开始和结束，不是指定一个搜索范围。
+            comment_search_context.replace(march_start, march_end, '\g<1>', -1)
+
+            start_iter = src_buffer.get_iter_at_mark(mark)
+            start_iter.forward_line()
+
+        src_buffer.delete_mark(mark)
+        src_buffer.delete_mark(end_mark)
