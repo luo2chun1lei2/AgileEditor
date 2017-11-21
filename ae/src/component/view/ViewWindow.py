@@ -47,7 +47,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             {'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
             {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
-            {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags.'},
             {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
             ]
@@ -72,10 +71,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         elif serviceName == 'view.main.open_file':
             rlt = self.ide_open_file(params['abs_file_path'])
             return True, {'result': rlt}
-
-        elif serviceName == 'view.main.refresh_project':
-            self.ide_update_tags_of_project()
-            return True, None
 
         elif serviceName == 'view.main.get_current_project':
             return True, {'project':self.cur_prj}
@@ -196,8 +191,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_preferences_project()
         elif action == ViewMenu.ACTION_PROJECT_CLOSE:
             self.ide_close_project()
-        elif action == ViewMenu.ACTION_PROJECT_UPDATE_TAGS:
-            self.ide_update_tags_of_project()
 
         elif action == ViewMenu.ACTION_APP_QUIT:
             self.ide_quit(widget)
@@ -213,10 +206,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_save_file(widget)
         elif action == ViewMenu.ACTION_FILE_SAVE_AS:
             self.ide_save_as_file(widget)
-
-        # 检索
-        elif action == ViewMenu.ACTION_SEARCH_BACK_TAG:
-            self.ide_search_back_tag()
 
         elif action == ViewMenu.ACTION_EDITOR_SWITCH_PAGE:
             self.ide_switch_page(param)
@@ -316,17 +305,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         ''' 关闭当前的项目 '''
         self._set_status(ViewMenu.STATUS_PROJECT_NONE)
 
-    def ide_update_tags_of_project(self):
-        # 更新当前项目的TAGS，并且更新文件列表。
-        if self.cur_prj is None:
-            return
-
-        # 更新当前项目的文件列表
-        FwManager.instance().requestService('view.fstree.set_dir', {'dir':self.cur_prj.src_dirs[0]})
-
-        # 更新右边的TAGS
-        self.cur_prj.prepare()
-
     def ide_new_file(self, widget):
         '''
         产生一个没有路径的项目文件。
@@ -418,8 +396,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         return self.RLT_OK
 
     def ide_save_file(self, widget):
-        '''
-        如果当前文件已经打开，并且已经修改了，就保存文件。
+        ''' 如果当前文件已经打开，并且已经修改了，就保存文件。
         '''
 
         logging.debug('ide save file')

@@ -23,8 +23,6 @@ MENU_CONFIG = """
             <menuitem action='ProjectOpen' />
             <menuitem action='ProjectClose' />
             <separator />
-            <menuitem action='ProjectUpdateTags' />
-            <separator />
             <menuitem action='AppQuit' />
         </menu>
         <menu action='FileMenu'>
@@ -71,7 +69,6 @@ class ViewMenu(FwComponent):
      ACTION_PROJECT_OPEN,
      ACTION_PROJECT_PREFERENCES,
      ACTION_PROJECT_CLOSE,
-     ACTION_PROJECT_UPDATE_TAGS,
      ACTION_APP_QUIT,
 
      ACTION_FILE_NEW,
@@ -82,7 +79,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(12)
+     ) = range(11)
 
     def __init__(self, window, on_menu_func):
 
@@ -298,11 +295,6 @@ class ViewMenu(FwComponent):
         action_group.add_action(action_project_close)
         self.action_project_close = action_project_close
 
-        action_project_update_tags = Gtk.Action("ProjectUpdateTags", None, "Update tags of Current Project", Gtk.STOCK_REFRESH)
-        action_project_update_tags.connect("activate", self.on_menu_project_update_tags)
-        action_group.add_action_with_accel(action_project_update_tags, "F5")
-        self.action_project_update_tags = action_project_update_tags
-
         action_app_quit = Gtk.Action("AppQuit", None, None, Gtk.STOCK_QUIT)
         action_app_quit.connect("activate", self.on_menu_app_quit)
         action_group.add_action(action_app_quit)
@@ -390,10 +382,6 @@ class ViewMenu(FwComponent):
     def on_menu_project_close(self, widget):
         logging.debug("A Project|Close menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_CLOSE)
-
-    def on_menu_project_update_tags(self, widget):
-        logging.debug("A Project|Update Tags menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_PROJECT_UPDATE_TAGS)
 
     def on_menu_app_quit(self, widget):
         logging.debug("A App|Quit as menu item was selected.")

@@ -796,9 +796,7 @@ class ViewFsTree(FwComponent):
         self._refresh_project()
 
     def _refresh_project(self):
-        FwManager.instance().requestService('view.main.refresh_project', None)
-
-
+        FwManager.instance().requestService('ctrl.search.update_tags')
 
     def _show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。

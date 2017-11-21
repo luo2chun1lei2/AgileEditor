@@ -34,7 +34,8 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find_definition_input_by_dialog', 'help':'show dialog to get the symbol, and then find the definition.'},
                 {'name':'ctrl.search.find_definition', 'help':'find the definition of symbol.'},
                 {'name':'ctrl.search.find_reference', 'help':'find the reference of symbol.'},
-                {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'}
+                {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'},
+                {'name':'ctrl.search.update_tags', 'help':'go back to the previous tag.'}
                 ]
         manager.registerService(info, self)
 
@@ -80,6 +81,9 @@ class CtrlSearch(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.search.go_back_tag':
             self._go_back_tag()
+            return (True, None)
+        elif serviceName == 'ctrl.search.update_tags':
+            self._update_tags_of_project()
             return (True, None)
         else:
             return (False, None)
@@ -167,13 +171,21 @@ class CtrlSearch(FwComponent):
                   'service_name':'ctrl.search.find_reference'}
         manager.requestService("view.menu.add", params)
 
-        # TODO 需要将此menuitem添加到 toolbar上。
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchBackTag',
                   'title':'Back Tag',
                   'accel':"<shift><control>Left",
                   'stock_id':Gtk.STOCK_GO_BACK,
                   'service_name':'ctrl.search.go_back_tag',
+                  'in_toolbar':True}
+        manager.requestService("view.menu.add", params)
+        
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchUpdateTags',
+                  'title':'Update Tags',
+                  'accel':"F5",
+                  'stock_id':Gtk.STOCK_REFRESH,
+                  'service_name':'ctrl.search.update_tags',
                   'in_toolbar':True}
         manager.requestService("view.menu.add", params)
 
@@ -464,3 +476,18 @@ class CtrlSearch(FwComponent):
         if results is None:
             return
         self._goto_file_line(results['file_path'], results['line_no'], record=False)
+        
+    def _update_tags_of_project(self):
+        ''' 更新当前项目的TAGS，并且更新文件列表。
+        TODO: 以后应该改成监听“事件”
+        '''
+        
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        if cur_prj is None:
+            return
+
+        # 更新当前项目的文件列表
+        FwManager.instance().requestService('view.fstree.set_dir', {'dir':cur_prj.src_dirs[0]})
+
+        # 更新右边的TAGS
+        cur_prj.prepare()
