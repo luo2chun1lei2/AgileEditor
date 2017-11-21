@@ -38,8 +38,6 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
         </menu>
         <menu action='SearchMenu'>
-            <menuitem action='SearchFindInFiles' />
-            <menuitem action='SearchAgainFindInFiles' />
             <menuitem action='SearchFindPath' />
             <separator />
             <menuitem action='SearchDialogDefination' />
@@ -90,8 +88,6 @@ class ViewMenu(FwComponent):
      ACTION_FILE_SAVE,
      ACTION_FILE_SAVE_AS,
 
-     ACTION_SEARCH_FIND_IN_FILES,  # 在多个文件中检索等
-     ACTION_SEARCH_FIND_IN_FILES_AGAIN,
      ACTION_SEARCH_FIND_PATH,  # 检索需要的文件路径
 
      ACTION_SEARCH_DIALOG_DEFINATION,
@@ -101,7 +97,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(19)
+     ) = range(17)
 
     def __init__(self, window, on_menu_func):
 
@@ -358,8 +354,6 @@ class ViewMenu(FwComponent):
         # Find's accelerator is Ctrl+F
         action_group.add_actions([
             ("SearchMenu", None, "Search"),
-            ("SearchFindInFiles", Gtk.STOCK_FIND, "Find in files", "<control>H", None, self.on_menu_search_find_in_files),
-            ("SearchAgainFindInFiles", Gtk.STOCK_FIND, "Find in files Again", "<shift><control>H", None, self.on_menu_search_find_in_files_again),
             ("SearchFindPath", Gtk.STOCK_FIND, "Find path", "<control>P", None, self.on_menu_search_find_path),
             ("SearchDialogDefination", None, 'Find definition by dialog', '<control>F3', None, self.on_menu_search_defination_by_dialog),
             ("SearchDefination", None, 'Definition', 'F3', None, self.on_menu_search_defination),
@@ -437,14 +431,6 @@ class ViewMenu(FwComponent):
     def on_menu_file_save_as(self, widget):
         logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
-
-    def on_menu_search_find_in_files(self, widget):
-        logging.debug("A Search|find in files menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_FIND_IN_FILES)
-
-    def on_menu_search_find_in_files_again(self, widget):
-        logging.debug("A Search|find again in files menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_FIND_IN_FILES_AGAIN)
 
     def on_menu_search_find_path(self, widget):
         logging.debug("A Search|find path menu item was selected.")

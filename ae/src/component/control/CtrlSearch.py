@@ -4,16 +4,21 @@
 负责检索和跳转用的。
 '''
 import logging
-from gi.repository import Gtk, GtkSource
+from gi.repository import Gdk, GLib, Gtk, GtkSource
 
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
+
+from component.model.ModelTask import ModelTask
 from component.util.UtilEditor import UtilEditor
+from component.util.UtilDialog import UtilDialog
+from component.view.ViewWindow import ViewWindow
 
 class CtrlSearch(FwComponent):
     def __init__(self):
         super(CtrlSearch, self).__init__()
         self.search_setting = None
+        self.last_search_pattern = None
 
     # override component
     def onRegistered(self, manager):
@@ -22,7 +27,9 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find', 'help':'get the selected word and focus on search textbox.'},  # This is NOT direct finding function.
                 {'name':'ctrl.search.find_text', 'help':'begin to find text.'},
                 {'name':'ctrl.search.find_next', 'help':'find the next matched word.'},
-                {'name':'ctrl.search.find_prev', 'help':'find the previous matched word.'}
+                {'name':'ctrl.search.find_prev', 'help':'find the previous matched word.'},
+                {'name':'ctrl.search.find_in_files', 'help':'find the matched word in files.'},
+                {'name':'ctrl.search.find_in_files_again', 'help':'find the matched word in files again.'}
                 ]
         manager.registerService(info, self)
 
@@ -47,6 +54,12 @@ class CtrlSearch(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.search.init':
             self._search_init(params['text_buffer'])
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_in_files':
+            self._find_in_files()
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_in_files_again':
+            self._find_in_files(self.last_search_pattern)
             return (True, None)
         else:
             return (False, None)
@@ -84,6 +97,22 @@ class CtrlSearch(FwComponent):
                   'accel':"<shift><control>G",
                   'stock_id':None,
                   'service_name':'ctrl.search.find_prev'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchFindInFiles',
+                  'title':'Find in files',
+                  'accel':"<control>H",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_in_files'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchAgainFindInFiles',
+                  'title':'Find in files Again',
+                  'accel':"<shift><control>H",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_in_files_again'}
         manager.requestService("view.menu.add", params)
 
         return True
@@ -233,3 +262,50 @@ class CtrlSearch(FwComponent):
         if found:
             line_num = start_iter.get_line()
             UtilEditor.jump_to(line_num)
+
+    def _find_in_files(self, pattern=None):
+        ''' 在项目的文件中查找，不是寻找定义。 '''
+        if pattern is None:
+            response, pattern = UtilDialog.show_dialog_one_entry("在文件中检索", '模式')
+            if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
+                return
+
+        self.last_search_pattern = pattern  # 记录最新的检索
+        self._grep_in_files(pattern)
+
+    def _grep_in_files(self, pattern):
+        # 执行检索
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        ModelTask.execute_with_spinner(None, self._after_grep_in_files,
+                          cur_prj.query_grep_tags, pattern, False)
+
+    def _after_grep_in_files(self, tags):
+        if len(tags) == 0:
+            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, "没有找到对应的定义。")
+            dialog.run()
+            dialog.destroy()
+
+        else:
+            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            if len(tags) == 1:
+                ''' 直接跳转。 '''
+                tag = tags[0]
+                self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+
+    # TODO is same with VieWindow.ide_goto_file_line
+    def _goto_file_line(self, file_path, line_number, record=True):
+
+        # 记录的当前的位置
+        if record:
+            UtilEditor.push_jumps()
+
+        ''' 跳转到指定文件的行。 '''
+        # 先找到对应的文件，然后再滚动到指定的位置
+        logging.debug('jump to path:' + file_path + ', line:' + str(line_number))
+        isOK, results = FwManager.instance().requestService('view.main.open_file', {'abs_file_path', file_path})
+        if isOK and results['result'] == ViewWindow.RLT_OK:  # TODO 这里需要知道ViewWindow的常亮
+            # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
+            # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
+            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)

@@ -46,9 +46,11 @@ class ViewWindow(Gtk.Window, FwComponent):
             {'name':'view.main.get_window', 'help':'get the main window.'},
             {'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
             {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
-            {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},
+            {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
             {'name':'view.main.refresh_project', 'help': 'refresh the project file-tree and tags.'},
-            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'}]
+            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
+            {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
+            ]
         manager.registerService(info, self)
 
         # register listening event.
@@ -68,12 +70,15 @@ class ViewWindow(Gtk.Window, FwComponent):
             return self._svc_add_bookmark()
 
         elif serviceName == 'view.main.open_file':
-            self.ide_open_file(params['abs_file_path'])
-            return True, None
+            rlt = self.ide_open_file(params['abs_file_path'])
+            return True, {'result': rlt}
 
         elif serviceName == 'view.main.refresh_project':
             self.ide_update_tags_of_project()
             return True, None
+
+        elif serviceName == 'view.main.get_current_project':
+            return True, {'project':self.cur_prj}
 
         elif serviceName == 'view.main.goto_line':
             # 跳转到对应的行。
@@ -210,10 +215,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_save_as_file(widget)
 
         # 检索
-        elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES:
-            self.ide_find_in_files()
-        elif action == ViewMenu.ACTION_SEARCH_FIND_IN_FILES_AGAIN:
-            self.ide_find_in_files(self.last_search_pattern)
         elif action == ViewMenu.ACTION_SEARCH_FIND_PATH:
             self.ide_find_path()
 
@@ -653,6 +654,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
         editor.grab_focus()
 
+    # TODO same with CtrlSearch's goto_file_line, should be removed.
     def ide_goto_file_line(self, file_path, line_number, record=True):
 
         # 记录的当前的位置
@@ -736,35 +738,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}
 
 
-
-    def ide_find_in_files(self, pattern=None):
-        ''' 在项目的文件中查找，不是寻找定义。 '''
-        if pattern is None:
-            response, pattern = UtilDialog.show_dialog_one_entry("在文件中检索", '模式')
-            if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
-                return
-
-        self.last_search_pattern = pattern  # 记录最新的检索
-        self._ide_grep_in_files(pattern)
-
-    def _ide_grep_in_files(self, pattern):
-        # 执行检索
-        ModelTask.execute_with_spinner(None, self._after_ide_grep_in_files,
-                          self.cur_prj.query_grep_tags, pattern, False)
-
-    def _after_ide_grep_in_files(self, tags):
-        if len(tags) == 0:
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, "没有找到对应的定义。")
-            dialog.run()
-            dialog.destroy()
-
-        else:
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
-            if len(tags) == 1:
-                ''' 直接跳转。 '''
-                tag = tags[0]
-                self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
 
     def ide_find_path(self):
         # 检索需要的文件路径
