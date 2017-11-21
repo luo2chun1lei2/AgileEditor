@@ -30,6 +30,7 @@ def init_components(manager):
     from component.control.CtrlEdit import CtrlEdit
     from component.control.CtrlSearch import CtrlSearch
     from component.model.ModelJumpHistory import ModelJumpHistory
+    from component.control.CtrlWorshop import CtrlWorkshop
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -49,6 +50,7 @@ def init_components(manager):
     manager.register("ctrl_edit", CtrlEdit())
     manager.register("ctrl_search", CtrlSearch())
     manager.register("jump_history", ModelJumpHistory())
+    manager.register("ctrl_workshop", CtrlWorkshop())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

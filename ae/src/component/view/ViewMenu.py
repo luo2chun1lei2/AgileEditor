@@ -17,8 +17,6 @@ MENU_CONFIG = """
 <ui>
     <menubar name='MenuBar'>
         <menu action='ProjectMenu'>
-            <menuitem action='WorkshopPreferences' />
-            <separator />
             <menuitem action='ProjectNew' />
             <menuitem action='ProjectOpen' />
             <menuitem action='ProjectClose' />
@@ -67,7 +65,6 @@ class ViewMenu(FwComponent):
     (
      ACTION_PROJECT_NEW,
      ACTION_PROJECT_OPEN,
-     ACTION_PROJECT_PREFERENCES,
      ACTION_PROJECT_CLOSE,
      ACTION_APP_QUIT,
 
@@ -79,7 +76,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(11)
+     ) = range(10)
 
     def __init__(self, window, on_menu_func):
 
@@ -120,7 +117,7 @@ class ViewMenu(FwComponent):
         '''
         menuName = params['menu_name']
         menuItemName = params['menu_item_name']
-        title =params['title']
+        title = params['title']
         accel = params['accel'] 
         stock_id = params['stock_id']
         serviceName = params['service_name']
@@ -160,6 +157,10 @@ class ViewMenu(FwComponent):
         pass
 
     def set_status(self, status):
+        ''' 目前无法实现此status的切换，所以暂时不再使用
+        '''
+        if True:
+            return
         self.menu_status = status
 
         if self.menu_status == self.STATUS_PROJECT_NONE:
@@ -285,11 +286,6 @@ class ViewMenu(FwComponent):
         action_group.add_action(action_project_open)
         self.action_project_open = action_project_open
 
-        action_workshop_preferences = Gtk.Action("WorkshopPreferences", None, "Preferences", Gtk.STOCK_PREFERENCES)
-        action_workshop_preferences.connect("activate", self.on_menu_workshop_setting)
-        action_group.add_action(action_workshop_preferences)
-        self.action_workshop_preferences = action_workshop_preferences
-
         action_project_close = Gtk.Action("ProjectClose", None, "Close Current Project", Gtk.STOCK_CLOSE)
         action_project_close.connect("activate", self.on_menu_project_close)
         action_group.add_action(action_project_close)
@@ -374,10 +370,6 @@ class ViewMenu(FwComponent):
     def on_menu_project_open(self, widget):
         logging.debug("A Project|Open menu item was selected.")
         self.on_menu_func(widget, self.ACTION_PROJECT_OPEN)
-
-    def on_menu_workshop_setting(self, widget):
-        logging.debug("A Project|Preferences menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_PROJECT_PREFERENCES)
 
     def on_menu_project_close(self, widget):
         logging.debug("A Project|Close menu item was selected.")

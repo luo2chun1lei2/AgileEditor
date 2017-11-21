@@ -49,6 +49,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
             {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
+            {'name':'view.main.get_current_workshop', 'help': 'get current workshop.'},  # TODO
             ]
         manager.registerService(info, self)
 
@@ -74,6 +75,8 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         elif serviceName == 'view.main.get_current_project':
             return True, {'project':self.cur_prj}
+        elif serviceName == 'view.main.get_current_workshop':
+            return True, {'workshop':self.ideWorkshop}
 
         elif serviceName == 'view.main.goto_line':
             # 跳转到对应的行。
@@ -187,8 +190,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_new_project()
         elif action == ViewMenu.ACTION_PROJECT_OPEN:
             self.ide_open_project()
-        elif action == ViewMenu.ACTION_PROJECT_PREFERENCES:
-            self.ide_preferences_project()
         elif action == ViewMenu.ACTION_PROJECT_CLOSE:
             self.ide_close_project()
 
@@ -280,26 +281,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 设置终端属性。
         FwManager.instance().requestService('view.terminal.init', {'dir':self.cur_prj.src_dirs[0]})
         return True
-
-    def ide_preferences_project(self):
-        # 配置当前的项目
-        # 设定保存在workshop的数据模型之中。
-        setting = {'style': self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE],
-                   'font': self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_FONT] }
-        isOK, results = FwManager.instance().requestService('dialog.project.setting',
-                        {'parent':self, 'setting':setting})
-        setting = results['setting']
-        if setting is None:
-            return
-
-        # 修改系统设定！
-        FwManager.instance().requestService('view.multi_editors.change_editor_style', {'style': setting['style']})
-        FwManager.instance().requestService('view.multi_editors.change_editor_font', {'font': setting['font']})
-
-        self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_STYLE] = setting['style']
-        self.ideWorkshop.setting[ModelWorkshop.OPT_NAME_FONT] = setting['font']
-
-        self.ideWorkshop.save_conf()
 
     def ide_close_project(self):
         ''' 关闭当前的项目 '''
