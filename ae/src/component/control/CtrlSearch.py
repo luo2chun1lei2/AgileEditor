@@ -29,7 +29,12 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find_next', 'help':'find the next matched word.'},
                 {'name':'ctrl.search.find_prev', 'help':'find the previous matched word.'},
                 {'name':'ctrl.search.find_in_files', 'help':'find the matched word in files.'},
-                {'name':'ctrl.search.find_in_files_again', 'help':'find the matched word in files again.'}
+                {'name':'ctrl.search.find_in_files_again', 'help':'find the matched word in files again.'},
+                {'name':'ctrl.search.find_path', 'help':'find the match path.'},
+                {'name':'ctrl.search.find_definition_input_by_dialog', 'help':'show dialog to get the symbol, and then find the definition.'},
+                {'name':'ctrl.search.find_definition', 'help':'find the definition of symbol.'},
+                {'name':'ctrl.search.find_reference', 'help':'find the reference of symbol.'},
+                {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'}
                 ]
         manager.registerService(info, self)
 
@@ -60,6 +65,21 @@ class CtrlSearch(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.search.find_in_files_again':
             self._find_in_files(self.last_search_pattern)
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_path':
+            self._find_path_with_dialog()
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_definition_input_by_dialog':
+            self._find_defination_by_dialog()
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_definition':
+            self._find_defination()
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_reference':
+            self._find_reference()
+            return (True, None)
+        elif serviceName == 'ctrl.search.go_back_tag':
+            self._go_back_tag()
             return (True, None)
         else:
             return (False, None)
@@ -113,6 +133,47 @@ class CtrlSearch(FwComponent):
                   'accel':"<shift><control>H",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_in_files_again'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchFindPath',
+                  'title':'Find path',
+                  'accel':"<control>P",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_path'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchDialogDefinition',
+                  'title':'Find definition by dialog',
+                  'accel':"<control>F3",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_definition_input_by_dialog'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchDefinition',
+                  'title':'Definition',
+                  'accel':"F3",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_definition'}
+        manager.requestService("view.menu.add", params)
+
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchReference',
+                  'title':'Reference',
+                  'accel':"F4",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_reference'}
+        manager.requestService("view.menu.add", params)
+
+        # TODO 需要将此menuitem添加到 toolbar上。
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchBackTag',
+                  'title':'Back Tag',
+                  'accel':"<shift><control>Left",
+                  'stock_id':Gtk.STOCK_GO_BACK,
+                  'service_name':'ctrl.search.go_back_tag'}
         manager.requestService("view.menu.add", params)
 
         return True
@@ -304,8 +365,101 @@ class CtrlSearch(FwComponent):
         ''' 跳转到指定文件的行。 '''
         # 先找到对应的文件，然后再滚动到指定的位置
         logging.debug('jump to path:' + file_path + ', line:' + str(line_number))
-        isOK, results = FwManager.instance().requestService('view.main.open_file', {'abs_file_path', file_path})
+        isOK, results = FwManager.instance().requestService('view.main.open_file', {'abs_file_path': file_path})
         if isOK and results['result'] == ViewWindow.RLT_OK:  # TODO 这里需要知道ViewWindow的常亮
             # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)
+
+    def _find_path_with_dialog(self):
+        # 检索需要的文件路径
+        response, pattern = UtilDialog.show_dialog_one_entry("检索文件路径", '模式')
+        if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
+            return
+
+        self._find_path(pattern)
+
+    def _find_path(self, pattern):
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        ModelTask.execute(self._after_find_path,
+                          cur_prj.query_grep_filepath, pattern, False)
+
+    def _after_find_path(self, tags):
+        if len(tags) == 0:
+            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO,
+                                       Gtk.ButtonsType.OK, "没有找到对应的定义。")
+            dialog.run()
+            dialog.destroy()
+
+        else:
+            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            if len(tags) == 1:
+                # 直接跳转。
+                tag = tags[0]
+                self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+
+    def _find_defination_by_dialog(self):
+        ''' 查找定义 '''
+        response, tag_name = UtilDialog.show_dialog_one_entry("检索一个TAG", '名字')
+        if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
+            return
+
+        self._search_defination(tag_name)
+
+    def _find_defination(self):
+        ''' 查找定义 '''
+        tag_name = UtilEditor.get_selected_text_or_word()
+        self._search_defination(tag_name)
+
+    def _search_defination(self, tag_name):
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        ModelTask.execute(self._after_search_defination,
+                          cur_prj.query_defination_tags, tag_name)
+
+    def _after_search_defination(self, tag_name, tags):
+
+        if len(tags) == 0:
+            info = "没有找到对应\"" + tag_name + "\"的定义。"
+            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, info)
+            dialog.run()
+            dialog.destroy()
+
+        else:
+            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            if len(tags) == 1:
+                ''' 直接跳转。 '''
+                tag = tags[0]
+                self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+
+    def _find_reference(self):
+        ''' 查找引用
+        '''
+        tag_name = UtilEditor.get_selected_text_or_word()
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        ModelTask.execute(self._after_search_reference,
+                          cur_prj.query_reference_tags, tag_name)
+
+    def _after_search_reference(self, tag_name, tags):
+        if len(tags) == 0:
+            info = "没有找到对应\"" + tag_name + "\"的引用。"
+            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO, \
+                                       Gtk.ButtonsType.OK, info)
+            dialog.run()
+            dialog.destroy()
+        else:
+            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            if len(tags) == 1:
+                # 直接跳转。
+                tag = tags[0]
+                self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+
+    def _go_back_tag(self):
+        # 回退到上一个位置。
+        # 恢复到原来的位置
+        isOK, results = FwManager.instance().requestService('model.jump_history.pop')
+        if results is None:
+            return
+        self._goto_file_line(results['file_path'], results['line_no'], record=False)

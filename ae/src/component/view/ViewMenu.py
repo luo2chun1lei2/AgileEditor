@@ -38,13 +38,7 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
         </menu>
         <menu action='SearchMenu'>
-            <menuitem action='SearchFindPath' />
-            <separator />
-            <menuitem action='SearchDialogDefination' />
-            <menuitem action='SearchDefination' />
-            <menuitem action='SearchReference' />
             <menuitem action='SearchBackTag' />
-            <separator />
         </menu>
     </menubar>
 
@@ -88,16 +82,9 @@ class ViewMenu(FwComponent):
      ACTION_FILE_SAVE,
      ACTION_FILE_SAVE_AS,
 
-     ACTION_SEARCH_FIND_PATH,  # 检索需要的文件路径
-
-     ACTION_SEARCH_DIALOG_DEFINATION,
-     ACTION_SEARCH_DEFINATION,
-     ACTION_SEARCH_REFERENCE,
-     ACTION_SEARCH_BACK_TAG,
-
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(17)
+     ) = range(12)
 
     def __init__(self, window, on_menu_func):
 
@@ -349,16 +336,8 @@ class ViewMenu(FwComponent):
         ])
 
     def add_search_menu_actions(self, action_group):
-
-        # JumpTo's accelerator is Ctrl+L
-        # Find's accelerator is Ctrl+F
         action_group.add_actions([
             ("SearchMenu", None, "Search"),
-            ("SearchFindPath", Gtk.STOCK_FIND, "Find path", "<control>P", None, self.on_menu_search_find_path),
-            ("SearchDialogDefination", None, 'Find definition by dialog', '<control>F3', None, self.on_menu_search_defination_by_dialog),
-            ("SearchDefination", None, 'Definition', 'F3', None, self.on_menu_search_defination),
-            ("SearchReference", None, 'Reference', 'F4', None, self.on_menu_search_reference),
-            ("SearchBackTag", Gtk.STOCK_GO_BACK, 'Back Tag', '<shift><control>Left', None, self.on_menu_search_back_tag),
         ])
 
     def add_help_menu_actions(self, action_group):
@@ -431,26 +410,6 @@ class ViewMenu(FwComponent):
     def on_menu_file_save_as(self, widget):
         logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
-
-    def on_menu_search_find_path(self, widget):
-        logging.debug("A Search|find path menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_FIND_PATH)
-
-    def on_menu_search_defination_by_dialog(self, widget):
-        logging.debug("A Search|find defination by dialog menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_DIALOG_DEFINATION)
-
-    def on_menu_search_defination(self, widget):
-        logging.debug("A Search|defination menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_DEFINATION)
-
-    def on_menu_search_reference(self, widget):
-        logging.debug("A Search|reference menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_REFERENCE)
-
-    def on_menu_search_back_tag(self, widget):
-        logging.debug("A Search|back tag menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_BACK_TAG)
 
     def on_menuitem_active_send_service(self, widget, service):
         ''' 通用的菜单 Active 函数，发送service'''

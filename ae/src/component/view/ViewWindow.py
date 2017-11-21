@@ -215,15 +215,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_save_as_file(widget)
 
         # 检索
-        elif action == ViewMenu.ACTION_SEARCH_FIND_PATH:
-            self.ide_find_path()
-
-        elif action == ViewMenu.ACTION_SEARCH_DIALOG_DEFINATION:
-            self.ide_find_defination_by_dialog()
-        elif action == ViewMenu.ACTION_SEARCH_DEFINATION:
-            self.ide_search_defination()
-        elif action == ViewMenu.ACTION_SEARCH_REFERENCE:
-            self.ide_search_reference()
         elif action == ViewMenu.ACTION_SEARCH_BACK_TAG:
             self.ide_search_back_tag()
 
@@ -670,101 +661,12 @@ class ViewWindow(Gtk.Window, FwComponent):
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)
 
-    def ide_find_defination_by_dialog(self):
-        ''' 查找定义 '''
-        response, tag_name = UtilDialog.show_dialog_one_entry("检索一个TAG", '名字')
-        if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
-            return
-
-        self._ide_search_defination(tag_name)
-
-    def ide_search_defination(self):
-        ''' 查找定义 '''
-        tag_name = UtilEditor.get_selected_text_or_word()
-        self._ide_search_defination(tag_name)
-
-    def _ide_search_defination(self, tag_name):
-
-        ModelTask.execute(self._after_ide_search_defination,
-                          self.cur_prj.query_defination_tags, tag_name)
-
-    def _after_ide_search_defination(self, tag_name, tags):
-
-        if len(tags) == 0:
-            info = "没有找到对应\"" + tag_name + "\"的定义。"
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, \
-                                       Gtk.ButtonsType.OK, info)
-            dialog.run()
-            dialog.destroy()
-
-        else:
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
-            if len(tags) == 1:
-                ''' 直接跳转。 '''
-                tag = tags[0]
-                self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-
-    def ide_search_reference(self):
-        ''' 查找引用
-        '''
-        tag_name = UtilEditor.get_selected_text_or_word()
-
-        ModelTask.execute(self._after_ide_search_reference,
-                          self.cur_prj.query_reference_tags, tag_name)
-
-    def _after_ide_search_reference(self, tag_name, tags):
-        if len(tags) == 0:
-            info = "没有找到对应\"" + tag_name + "\"的引用。"
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, \
-                                       Gtk.ButtonsType.OK, info)
-            dialog.run()
-            dialog.destroy()
-        else:
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
-            if len(tags) == 1:
-                # 直接跳转。
-                tag = tags[0]
-                self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-
-    def ide_search_back_tag(self):
-        # 回退到上一个位置。
-        self._ide_pop_jumps()
-
     def _svc_add_bookmark(self):
         ''' 【服务】根据当前情况加入新的bookmark。
         '''
         bookmark = UtilEditor.make_bookmark()
         self.cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}
-
-
-
-    def ide_find_path(self):
-        # 检索需要的文件路径
-        response, pattern = UtilDialog.show_dialog_one_entry("检索文件路径", '模式')
-        if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
-            return
-
-        self._ide_find_path(pattern)
-
-    def _ide_find_path(self, pattern):
-
-        ModelTask.execute(self._after_ide_find_path,
-                          self.cur_prj.query_grep_filepath, pattern, False)
-
-    def _after_ide_find_path(self, tags):
-        if len(tags) == 0:
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, "没有找到对应的定义。")
-            dialog.run()
-            dialog.destroy()
-
-        else:
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':self.cur_prj})
-            if len(tags) == 1:
-                # 直接跳转。
-                tag = tags[0]
-                self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
 
     def _ide_set_completion(self, ideProject):
         ''' 设定当前的编辑器的单词补足，当切换不同的Project时，才有必要 '''
@@ -782,12 +684,3 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 加入新的Provider
         completion.add_provider(ideProject.get_completion_provider())
-
-
-
-    def _ide_pop_jumps(self):
-        # 恢复到原来的位置
-        isOK, results = FwManager.instance().requestService('model.jump_history.pop')
-        if results is None:
-            return
-        self.ide_goto_file_line(results['file_path'], results['line_no'], record=False)
