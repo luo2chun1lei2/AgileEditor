@@ -210,8 +210,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_save_as_file(widget)
 
         # 检索
-        elif action == ViewMenu.ACTION_SEARCH_JUMP_TO:
-            self.ide_jump_to_line(widget)
         elif action == ViewMenu.ACTION_SEARCH_FIND:
             self.ide_find(param)
         elif action == ViewMenu.ACTION_SEARCH_FIND_TEXT:
@@ -667,7 +665,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 记录的当前的位置
         if record:
-            self._ide_push_jumps()
+            UtilEditor.push_jumps()
 
         ''' 跳转到指定文件的行。 '''
         # 先找到对应的文件
@@ -745,27 +743,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}
 
-    def ide_jump_to_line(self, widget):
-        # 显示一个对话框，输入需要跳转的行。
-        response, text = UtilDialog.show_dialog_one_entry("跳转到行", '行')
-        if response != Gtk.ResponseType.OK or text is None or text == '':
-            return
-
-        if text.isdigit():
-            line_number = int(text)
-        else:
-            line_number = -1
-
-        if line_number != -1:
-            self.ide_jump_to(line_number)
-
-    def ide_jump_to(self, line_number):
-
-        # 记录当前的位置
-        self._ide_push_jumps()
-
-        UtilEditor.goto_line(line_number)
-
     def ide_find(self, search_entry):
         # 如果当前编辑器中有选中的文字，就将此文字放入检索本中。
         # search_text string 需要检索的文字
@@ -828,7 +805,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 如果找到，就跳转到下面最近位置
         if found:
             line_num = start_iter.get_line()
-            self.ide_jump_to(line_num)
+            UtilEditor.jump_to(line_num)
 
     def _ide_search_text_next(self, text_buffer, search_text):
         # search_text 是无用的。
@@ -842,7 +819,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 如果找到，就跳转到下面最近位置
         if found:
             line_num = start_iter.get_line()
-            self.ide_jump_to(line_num)
+            UtilEditor.jump_to(line_num)
 
             text_buffer.move_mark_by_name("selection_bound", start_iter)
             text_buffer.move_mark_by_name("insert", end_iter)
@@ -862,7 +839,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 如果找到，就跳转到下面最近位置
         if found:
             line_num = start_iter.get_line()
-            self.ide_jump_to(line_num)
+            UtilEditor.jump_to(line_num)
 
             text_buffer.move_mark_by_name("selection_bound", start_iter)
             text_buffer.move_mark_by_name("insert", end_iter)
@@ -973,9 +950,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 加入新的Provider
         completion.add_provider(ideProject.get_completion_provider())
 
-    def _ide_push_jumps(self):
-        # 记录当前的位置
-        FwManager.instance().requestService("model.jump_history.push")
+
 
     def _ide_pop_jumps(self):
         # 恢复到原来的位置

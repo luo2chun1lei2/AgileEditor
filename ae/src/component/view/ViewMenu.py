@@ -38,7 +38,6 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
         </menu>
         <menu action='SearchMenu'>
-            <menuitem action='SearchJumpTo' />
             <menuitem action='SearchFind' />
             <menuitem action='SearchFindNext' />
             <menuitem action='SearchFindPrev' />
@@ -359,7 +358,6 @@ class ViewMenu(FwComponent):
 
         action_group.add_actions([
             ("SearchMenu", None, "Search"),
-            ("SearchJumpTo", Gtk.STOCK_JUMP_TO, None, '<control>L', None, self.on_menu_search_jumpto),
             ("SearchFind", Gtk.STOCK_FIND, None, "<control>F", None, self.on_menu_search_find),
             ("SearchFindNext", None, "Find Next", "<control>G", None, self.on_menu_search_find_next),
             ("SearchFindPrev", None, "Find Prev", "<shift><control>G", None, self.on_menu_search_find_prev),
@@ -433,10 +431,6 @@ class ViewMenu(FwComponent):
     def on_menu_file_save_as(self, widget):
         logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
-
-    def on_menu_search_jumpto(self, widget):
-        logging.debug("A Search|JumpTo menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_SEARCH_JUMP_TO)
 
     def on_menu_search_find(self, widget):
         logging.debug("A Search|find menu item was selected.")

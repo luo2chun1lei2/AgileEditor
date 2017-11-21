@@ -277,3 +277,16 @@ class UtilEditor(object):
 
         # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
         return False
+
+    @staticmethod
+    def jump_to(line_number):
+
+        # 记录当前的位置
+        UtilEditor.push_jumps()
+
+        UtilEditor.goto_line(line_number)
+
+    @staticmethod
+    def push_jumps():
+        # 记录当前的位置
+        FwManager.instance().requestService("model.jump_history.push")

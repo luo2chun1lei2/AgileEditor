@@ -48,7 +48,7 @@ def init_components(manager):
     manager.register("bookmarks", ViewBookmarks())
     manager.register("ctrl_edit", CtrlEdit())
     manager.register("ctrl_search", CtrlSearch())
-    manager.register("ctrl_search", ModelJumpHistory())
+    manager.register("jump_history", ModelJumpHistory())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 
