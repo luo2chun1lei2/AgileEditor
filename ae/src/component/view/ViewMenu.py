@@ -49,7 +49,6 @@ MENU_CONFIG = """
         <toolitem action='FileSave' />
         <toolitem action='FileClose' />
         <separator/>
-        <toolitem action='SearchBackTag' />
     </toolbar>
 </ui>
 """
@@ -107,12 +106,7 @@ class ViewMenu(FwComponent):
     # from component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.menu.add":
-            self._addMenuItem(params['menu_name'],
-                          params['menu_item_name'],
-                          params['title'],
-                          params['accel'],
-                          params['stock_id'],
-                          params['service_name'])
+            self._add_menu_item(params)
             return (True, None)
         elif serviceName == "view.menu.set_and_jump_to_search_textbox":
             self._jump_to_search_textbox_and_set_text(params['text'])
@@ -120,14 +114,21 @@ class ViewMenu(FwComponent):
         else:
             return (False, None)
 
-    def _addMenuItem(self, menuName, menuItemName, title, accel, stock_id, serviceName):
+    def _add_menu_item(self, params):
         ''' 根据设定，加入一个菜单项目
         @param menuName: string: 菜单栏目的名字
         @param menuItemName: string: 菜单项目的名字
         @param title: string: 菜单显示的名字
         @param accel: string: 快捷键
         '''
+        menuName = params['menu_name']
+        menuItemName = params['menu_item_name']
+        title =params['title']
+        accel = params['accel'] 
+        stock_id = params['stock_id']
+        serviceName = params['service_name']
 
+        # 添加到menu上。
         actionGroups = self.uimanager.get_action_groups()
         actionGroup = actionGroups[0]
         if actionGroup.get_action(menuItemName) is not None:
@@ -149,6 +150,14 @@ class ViewMenu(FwComponent):
             actionGroup.add_action_with_accel(action, accel)
 
         self.actions.append(action)
+        
+        # 添加到Toolbar上
+        if 'in_toolbar' in params:
+            #tool_item = Gtk.ToolItem()
+            #self.toolbar.insert(tool_item, -1)
+            strMenu = """ <toolbar name='ToolBar'>
+                        <toolitem action='%s' /></toolbar>""" % (menuItemName)
+        self.uimanager.add_ui_from_string(strMenu)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass

@@ -173,7 +173,8 @@ class CtrlSearch(FwComponent):
                   'title':'Back Tag',
                   'accel':"<shift><control>Left",
                   'stock_id':Gtk.STOCK_GO_BACK,
-                  'service_name':'ctrl.search.go_back_tag'}
+                  'service_name':'ctrl.search.go_back_tag',
+                  'in_toolbar':True}
         manager.requestService("view.menu.add", params)
 
         return True
