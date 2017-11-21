@@ -210,8 +210,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_save_as_file(widget)
 
         # 检索
-        elif action == ViewMenu.ACTION_SEARCH_FIND:
-            self.ide_find(param)
         elif action == ViewMenu.ACTION_SEARCH_FIND_TEXT:
             self.ide_find_text(param, param2, param3, param4)
         elif action == ViewMenu.ACTION_SEARCH_FIND_NEXT:
@@ -742,27 +740,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         bookmark = UtilEditor.make_bookmark()
         self.cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}
-
-    def ide_find(self, search_entry):
-        # 如果当前编辑器中有选中的文字，就将此文字放入检索本中。
-        # search_text string 需要检索的文字
-
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        if view_editor is None:
-            return
-
-        buf = view_editor.editor.get_buffer()
-
-        if not buf.get_has_selection():
-            return
-
-        (start, end) = buf.get_selection_bounds()
-
-        text = buf.get_text(start, end, False)
-
-        # TODO 算是临时方案，首先设定为“”，然后再设定为需要的检索文字，这样就可以100%引发text_changed事件。
-        search_entry.set_text("")
-        search_entry.set_text(text)
 
     def _ide_search_init(self, text_buffer):
 

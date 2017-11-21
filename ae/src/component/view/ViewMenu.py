@@ -38,7 +38,6 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
         </menu>
         <menu action='SearchMenu'>
-            <menuitem action='SearchFind' />
             <menuitem action='SearchFindNext' />
             <menuitem action='SearchFindPrev' />
             <menuitem action='SearchFindInFiles' />
@@ -123,7 +122,9 @@ class ViewMenu(FwComponent):
 
     # from component
     def onRegistered(self, manager):
-        info = {'name':'view.menu.add', 'help':'add item in menu.'}
+        info = [{'name':'view.menu.add', 'help':'add item in menu.'},
+                {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'}
+                ]
         manager.registerService(info, self)
 
         return True
@@ -137,6 +138,9 @@ class ViewMenu(FwComponent):
                           params['accel'],
                           params['stock_id'],
                           params['service_name'])
+            return (True, None)
+        elif serviceName == "view.menu.set_and_jump_to_search_textbox":
+            self._jump_to_search_textbox_and_set_text(params['text'])
             return (True, None)
         else:
             return (False, None)
@@ -358,7 +362,6 @@ class ViewMenu(FwComponent):
 
         action_group.add_actions([
             ("SearchMenu", None, "Search"),
-            ("SearchFind", Gtk.STOCK_FIND, None, "<control>F", None, self.on_menu_search_find),
             ("SearchFindNext", None, "Find Next", "<control>G", None, self.on_menu_search_find_next),
             ("SearchFindPrev", None, "Find Prev", "<shift><control>G", None, self.on_menu_search_find_prev),
             ("SearchFindInFiles", Gtk.STOCK_FIND, "Find in files", "<control>H", None, self.on_menu_search_find_in_files),
@@ -387,6 +390,14 @@ class ViewMenu(FwComponent):
         # self.add_accel_group(accelgroup)
 
         return uimanager
+
+    def _jump_to_search_textbox_and_set_text(self, text):
+        # 跳转到 SearchEntry中。
+        # TODO 算是临时方案，首先设定为“”，然后再设定为需要的检索文字，这样就可以100%引发text_changed事件。
+        self.search_entry.set_text("")
+        self.search_entry.set_text(text)
+
+        self.search_entry.grab_focus()
 
     def on_menu_project_new(self, widget):
         logging.debug("A Project|New menu item was selected.")
@@ -432,11 +443,7 @@ class ViewMenu(FwComponent):
         logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
 
-    def on_menu_search_find(self, widget):
-        logging.debug("A Search|find menu item was selected.")
-        # 跳转到 SearchEntry中。
-        self.on_menu_func(widget, self.ACTION_SEARCH_FIND, self.search_entry)
-        self.search_entry.grab_focus()
+
 
     def on_search_options_changed(self, widget, need_jump):
         search_text = self.search_entry.get_text()
