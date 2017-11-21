@@ -19,6 +19,7 @@ from component.model.ModelTask import ModelTask
 from component.view.ViewMenu import ViewMenu
 from component.model.ModelTags import ModelTag
 from component.util.UtilEditor import UtilEditor
+from component.util.UtilDialog import UtilDialog
 
 from framework.FwComponent import FwComponent
 
@@ -80,7 +81,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             if 'file_path' in params:
                 self.ide_goto_file_line(params['file_path'], params['line_no'])
             else:
-                self.ide_goto_line(params['line_no'])
+                UtilEditor.goto_line(params['line_no'])
 
             # 其他控件发送过来此信息后，需要让编辑器获取焦点。
             self.ide_editor_set_focus()
@@ -657,30 +658,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         # tags:[IdeOneTag]:Tag列表。
         FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist':tags})
 
-    def ide_goto_line(self, line_number):
-        # 跳转到当前文件的行。
-        # line_number:int:行号（从1开始）
-        # return:Bool:False，以后不再调用，True，以后还会调用。
-
-        if line_number < 1:
-            logging.error("Error line number %d" % line_number)
-            return False
-
-        # print 'goto line number:', line_number
-        text_buf = UtilEditor.get_editor_buffer()
-        it = text_buf.get_iter_at_line(line_number - 1)
-
-        text_buf.place_cursor(it)
-
-        # 设定光标的位置，和什么都没有选中
-        text_buf.select_range(it, it)
-        # 屏幕滚动到这个地方。
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
-        editor.scroll_to_iter(it, 0.25, False, 0.0, 0.5)
-
-        # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
-        return False
-
     def ide_editor_set_focus(self):
         ''' 获取焦点(延迟调用) '''
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._ide_editor_set_focus)
@@ -703,16 +680,11 @@ class ViewWindow(Gtk.Window, FwComponent):
         if self.ide_open_file(file_path) == self.RLT_OK:
             # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
-            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self.ide_goto_line, line_number)
-
-    def _in_show_dialog_one_entry(self, title, label):
-        isOK, results = FwManager.instance().requestService('dialog.common.one_entry',
-                                    {'transient_for':self, 'title':title, 'entry_label':label})
-        return results['response'], results['text']
+            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)
 
     def ide_find_defination_by_dialog(self):
         ''' 查找定义 '''
-        response, tag_name = self._in_show_dialog_one_entry("检索一个TAG", '名字')
+        response, tag_name = UtilDialog.show_dialog_one_entry("检索一个TAG", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 
@@ -779,7 +751,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def ide_jump_to_line(self, widget):
         # 显示一个对话框，输入需要跳转的行。
-        response, text = self._in_show_dialog_one_entry("跳转到行", '行')
+        response, text = UtilDialog.show_dialog_one_entry("跳转到行", '行')
         if response != Gtk.ResponseType.OK or text is None or text == '':
             return
 
@@ -796,7 +768,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 记录当前的位置
         self._ide_push_jumps()
 
-        self.ide_goto_line(line_number)
+        UtilEditor.goto_line(line_number)
 
     def ide_find(self, search_entry):
         # 如果当前编辑器中有选中的文字，就将此文字放入检索本中。
@@ -935,7 +907,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def ide_find_in_files(self, pattern=None):
         ''' 在项目的文件中查找，不是寻找定义。 '''
         if pattern is None:
-            response, pattern = self._in_show_dialog_one_entry("在文件中检索", '模式')
+            response, pattern = UtilDialog.show_dialog_one_entry("在文件中检索", '模式')
             if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
                 return
 
@@ -963,7 +935,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def ide_find_path(self):
         # 检索需要的文件路径
-        response, pattern = self._in_show_dialog_one_entry("检索文件路径", '模式')
+        response, pattern = UtilDialog.show_dialog_one_entry("检索文件路径", '模式')
         if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
             return
 

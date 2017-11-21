@@ -252,3 +252,28 @@ class UtilEditor(object):
         src_buffer = ve_editor.editor.get_buffer()
         if src_buffer.can_undo():
             src_buffer.undo()
+
+    @staticmethod
+    def goto_line(line_number):
+        # 跳转到当前文件的行。
+        # line_number:int:行号（从1开始）
+        # return:Bool:False，以后不再调用，True，以后还会调用。
+
+        if line_number < 1:
+            logging.error("Error line number %d" % line_number)
+            return False
+
+        # print 'goto line number:', line_number
+        text_buf = UtilEditor.get_editor_buffer()
+        it = text_buf.get_iter_at_line(line_number - 1)
+
+        text_buf.place_cursor(it)
+
+        # 设定光标的位置，和什么都没有选中
+        text_buf.select_range(it, it)
+        # 屏幕滚动到这个地方。
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor.scroll_to_iter(it, 0.25, False, 0.0, 0.5)
+
+        # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
+        return False

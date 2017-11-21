@@ -19,6 +19,7 @@ from bzrlib.tree import Tree
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 from framework.FwUtils import *
+from component.util.UtilDialog import UtilDialog
 
 # 文件夹的图标。
 folderxpm = [
@@ -676,7 +677,7 @@ class ViewFsTree(FwComponent):
                 return
 
         # 实现对话框，得到文件名字
-        response, name = self._in_show_dialog_one_entry("新建文件", "文件名字")
+        response, name = UtilDialog.show_dialog_one_entry("新建文件", "文件名字")
         if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
@@ -713,7 +714,7 @@ class ViewFsTree(FwComponent):
                 return
 
         # 实现对话框，得到文件名字
-        response, name = self._in_show_dialog_one_entry("新建目录", "目录名字")
+        response, name = UtilDialog.show_dialog_one_entry("新建目录", "目录名字")
         if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
@@ -771,7 +772,7 @@ class ViewFsTree(FwComponent):
         file_path = self._get_abs_file_path_by_iter(itr)
 
         # 实现对话框，得到文件名字
-        response, name = self._in_show_dialog_one_entry("修改文件名字", "新文件名字")
+        response, name = UtilDialog.show_dialog_one_entry("修改文件名字", "新文件名字")
         if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
@@ -797,10 +798,7 @@ class ViewFsTree(FwComponent):
     def _refresh_project(self):
         FwManager.instance().requestService('view.main.refresh_project', None)
 
-    def _in_show_dialog_one_entry(self, title, label):
-        isOK, results = FwManager.instance().requestService('dialog.common.one_entry',
-                                    {'transient_for':None, 'title':title, 'entry_label':label})
-        return results['response'], results['text']
+
 
     def _show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。

@@ -20,17 +20,24 @@ class ViewDialogCommon(FwComponent):
 
         return True
 
+    def _get_window(self, params):
+        window = None
+        if 'transient_for' in params:
+            window = params['transient_for']
+        if window is None:
+            window = FwManager.requestOneSth('window', 'view.main.get_window')
+        return window
+
     # from FwBaseComponnet
     def onRequested(self, manager, serviceName, params):
+
         if serviceName == "dialog.common.one_entry":
-            response, text = ViewDialogCommon.show_one_entry(params['transient_for'], params['title'], params['entry_label'])
+            window = self._get_window(params)
+            response, text = ViewDialogCommon.show_one_entry(window, params['title'], params['entry_label'])
             return (True, {'response': response, 'text':text})
 
         elif serviceName == "dialog.common.two_entry":
-            if 'transient_for' in params:
-                window = params['transient_for']
-            else:
-                window = FwManager.requestOneSth('window', 'view.main.get_window')
+            window = self._get_window(params)
             response, text1, text2 = ViewDialogCommon.show_two_entry(
                                 window, params['title'],
                                 params['entry1_label'], params['text1'],

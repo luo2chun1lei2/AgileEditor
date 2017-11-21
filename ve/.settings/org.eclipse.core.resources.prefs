@@ -18,6 +18,7 @@ encoding//src/component/model/ModelTags.py=utf-8
 encoding//src/component/model/ModelTask.py=utf-8
 encoding//src/component/model/ModelWorkshop.py=utf-8
 encoding//src/component/model/__init__.py=utf-8
+encoding//src/component/util/UtilDialog.py=utf-8
 encoding//src/component/util/UtilEditor.py=utf-8
 encoding//src/component/util/UtilWordComplete.py=utf-8
 encoding//src/component/util/__init__.py=utf-8
