@@ -38,7 +38,6 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
         </menu>
         <menu action='SearchMenu'>
-            <menuitem action='SearchBackTag' />
         </menu>
     </menubar>
 
