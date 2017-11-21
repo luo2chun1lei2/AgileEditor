@@ -47,9 +47,13 @@ class ViewWindow(Gtk.Window, FwComponent):
             {'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
             {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
+            {'name':'view.main.close_files', 'help': 'close opened files.'},  # TODO
             {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
+            {'name':'view.main.set_current_project', 'help': 'set current project.'},  # TODO
             {'name':'view.main.get_current_workshop', 'help': 'get current workshop.'},  # TODO
+            {'name':'view.main.set_title', 'help': 'set title of window.'},
+            {'name':'view.main.close_current_project', 'help': 'close the current project.'},
             ]
         manager.registerService(info, self)
 
@@ -66,15 +70,28 @@ class ViewWindow(Gtk.Window, FwComponent):
             self.ide_editor_set_focus()
             return (True, None)
 
+        elif serviceName == "view.main.set_title":
+            self.ide_set_title(params['title'])
+            return (True, None)
+
         elif serviceName == "view.main.make_bookmark":
             return self._svc_add_bookmark()
 
         elif serviceName == 'view.main.open_file':
             rlt = self.ide_open_file(params['abs_file_path'])
             return True, {'result': rlt}
+        elif serviceName == 'view.main.close_files':
+            rlt = self.ide_close_file()
+            return True, {'result':rlt}
 
         elif serviceName == 'view.main.get_current_project':
             return True, {'project':self.cur_prj}
+        elif serviceName == 'view.main.set_current_project':
+            self.cur_prj = params['project']
+            return True, None
+        elif serviceName == 'view.main.close_current_project':
+            self.ide_close_project()
+            return True, None
         elif serviceName == 'view.main.get_current_workshop':
             return True, {'workshop':self.ideWorkshop}
 
@@ -118,7 +135,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 初始化状态
         if prj:
-            self._ide_open_prj(prj)
+            pass
 
         if want_open_file:
             path = os.path.abspath(want_open_file)
@@ -186,25 +203,16 @@ class ViewWindow(Gtk.Window, FwComponent):
     ###################################
     # # 回调方法
     def on_menu_func(self, widget, action, param=None, param2=None, param3=None, param4=None):
-        if action == ViewMenu.ACTION_PROJECT_NEW:
-            self.ide_new_project()
-        elif action == ViewMenu.ACTION_PROJECT_OPEN:
-            self.ide_open_project()
-        elif action == ViewMenu.ACTION_PROJECT_CLOSE:
-            self.ide_close_project()
 
-        elif action == ViewMenu.ACTION_APP_QUIT:
-            self.ide_quit(widget)
-
-        elif action == ViewMenu.ACTION_FILE_NEW:
+        if action == ViewMenu.ACTION_FILE_NEW:
             self.ide_new_file(widget)
         elif action == ViewMenu.ACTION_FILE_OPEN:
             self.ide_open_file()
         elif action == ViewMenu.ACTION_FILE_CLOSE:
-            self.ide_close_file(widget)
+            self.ide_close_file()
             self.ide_new_file(widget)
         elif action == ViewMenu.ACTION_FILE_SAVE:
-            self.ide_save_file(widget)
+            self.ide_save_file()
         elif action == ViewMenu.ACTION_FILE_SAVE_AS:
             self.ide_save_as_file(widget)
 
@@ -220,67 +228,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     ###################################
     # # 基本功能
-
-    def ide_new_project(self):
-        # 新建项目
-
-        isOK, results = FwManager.instance().requestService("dialog.project.new", {'parent':self})
-        prj_name = results['prj_name']
-        prj_src_dirs = results['prj_src_dirs']
-
-        if prj_name is None:
-            return False
-
-        prj = self.ideWorkshop.create_project(prj_name, prj_src_dirs)
-        if prj is None:
-            logging.error("Failed to create project:%s, and src dirs:%s", (prj_name, prj_src_dirs))
-            return False
-
-        # 预处理
-        prj.prepare()
-
-        self.cur_prj = prj
-
-        self.ideWorkshop.add_project(prj)
-
-        return True
-
-    def ide_open_project(self, prj_name=None):
-        # 打开项目
-
-        prj = None
-
-        if prj_name:
-            for each_prj in self.ideWorkshop.projects:
-                if each_prj.prj_name == prj_name:
-                    prj = each_prj
-        else:
-            isOK, results = FwManager.instance().requestService("dialog.project.open",
-                                        {'parent':self, 'workshop':self.ideWorkshop})
-            prj = results['project']
-
-        if prj is None:
-            return False
-
-        return self._ide_open_prj(prj)
-
-    def _ide_open_prj(self, prj):
-        # 使用这个Project，并开始进行初始化。
-        prj.prepare()
-
-        self.cur_prj = prj
-
-        # 打开代码所在的目录
-        # TODO:有多个代码的项目，应该显示哪个目录？
-        if len(prj.src_dirs) > 0:
-            FwManager.instance().requestService('view.fstree.set_dir', {'dir':prj.src_dirs[0]})
-
-        # 设置窗口标题。
-        self.ide_set_title("")
-
-        # 设置终端属性。
-        FwManager.instance().requestService('view.terminal.init', {'dir':self.cur_prj.src_dirs[0]})
-        return True
 
     def ide_close_project(self):
         ''' 关闭当前的项目 '''
@@ -333,7 +280,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         return result
 
-    def ide_close_file(self, widget):
+    def ide_close_file(self):
         '''
         如果打开了文件，
             如果文件已经修改过，保存当前的文件。
@@ -361,7 +308,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 需要保存，就保存，如果不需要，就直接关闭。
         if needSave:
-            result = self.ide_save_file(widget)
+            result = self.ide_save_file()
             if result != self.RLT_OK:
                 return result
 
@@ -376,7 +323,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         return self.RLT_OK
 
-    def ide_save_file(self, widget):
+    def ide_save_file(self):
         ''' 如果当前文件已经打开，并且已经修改了，就保存文件。
         '''
 
@@ -444,7 +391,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         src_buffer = UtilEditor.get_editor_buffer()
         if src_buffer.get_modified():
             if ide_editor.ide_file.file_path is None:
-                return self.ide_save_file(widget)
+                return self.ide_save_file()
 
         # 如果是已经打开的文件，就将当前文件保存成新文件后，关闭旧的，打开新的。
         # 设定新的文件路径
@@ -475,18 +422,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 切换当前的状态
         self._set_status(ViewMenu.STATUS_FILE_OPEN)
 
-    def ide_quit(self, widget):
-        '''
-        如果打开了当前文件，且修改过了，需要保存。
-        关闭当前文件。
-        退出程序。
-        '''
-
-        result = self.ide_close_file(widget)
-        if result != self.RLT_OK:
-            return result
-
-        Gtk.main_quit()
+    
 
     def ide_switch_page(self, abs_file_path):
         # abs_file_path string 切换到的文件名字
@@ -573,6 +509,8 @@ class ViewWindow(Gtk.Window, FwComponent):
         return src_buffer
 
     def _set_status(self, status):
+        ''' TODO 这个方法需要彻底修改. '''
+        
 #         if self.current_idefile is None:
 #             self.set_title(self.PROGRAM_NAME)
 #         else:

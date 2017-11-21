@@ -17,11 +17,6 @@ MENU_CONFIG = """
 <ui>
     <menubar name='MenuBar'>
         <menu action='ProjectMenu'>
-            <menuitem action='ProjectNew' />
-            <menuitem action='ProjectOpen' />
-            <menuitem action='ProjectClose' />
-            <separator />
-            <menuitem action='AppQuit' />
         </menu>
         <menu action='FileMenu'>
             <menuitem action='FileNew' />
@@ -38,8 +33,6 @@ MENU_CONFIG = """
     </menubar>
 
     <toolbar name='ToolBar'>
-        <toolitem action='AppQuit' />
-        <separator/>
         <toolitem action='FileNew' />
         <toolitem action='FileOpen' />
         <toolitem action='FileSave' />
@@ -63,11 +56,6 @@ class ViewMenu(FwComponent):
 
     # 可以发出的命令。
     (
-     ACTION_PROJECT_NEW,
-     ACTION_PROJECT_OPEN,
-     ACTION_PROJECT_CLOSE,
-     ACTION_APP_QUIT,
-
      ACTION_FILE_NEW,
      ACTION_FILE_OPEN,
      ACTION_FILE_CLOSE,
@@ -76,7 +64,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(10)
+     ) = range(6)
 
     def __init__(self, window, on_menu_func):
 
@@ -163,54 +151,54 @@ class ViewMenu(FwComponent):
             return
         self.menu_status = status
 
-        if self.menu_status == self.STATUS_PROJECT_NONE:
-            self.action_project_new.set_sensitive(True)
-            self.action_project_open.set_sensitive(True)
-            self.action_workshop_preferences.set_sensitive(False)
-            self.action_project_close.set_sensitive(False)
-
-            self.action_file_new.set_sensitive(False)
-            self.action_file_open.set_sensitive(False)
-            self.action_file_close.set_sensitive(False)
-            self.action_file_save.set_sensitive(False)
-            self.action_file_save_as.set_sensitive(False)
-
-        elif self.menu_status == self.STATUS_FILE_OPEN:
-
-            self.action_project_new.set_sensitive(True)
-            self.action_project_open.set_sensitive(True)
-            self.action_workshop_preferences.set_sensitive(True)
-            self.action_project_close.set_sensitive(True)
-
-            self.action_file_new.set_sensitive(True)
-            self.action_file_open.set_sensitive(True)
-            self.action_file_close.set_sensitive(True)
-            self.action_file_save.set_sensitive(False)
-            self.action_file_save_as.set_sensitive(True)
-
-        elif self.menu_status == self.STATUS_FILE_OPEN_CHANGED:
-            self.action_project_new.set_sensitive(True)
-            self.action_project_open.set_sensitive(True)
-            self.action_workshop_preferences.set_sensitive(True)
-            self.action_project_close.set_sensitive(True)
-
-            self.action_file_new.set_sensitive(True)
-            self.action_file_open.set_sensitive(True)
-            self.action_file_close.set_sensitive(True)
-            self.action_file_save.set_sensitive(True)
-            self.action_file_save_as.set_sensitive(True)
-
-        else:  # STATUS_FILE_NONE:
-            self.action_project_new.set_sensitive(True)
-            self.action_project_open.set_sensitive(True)
-            self.action_workshop_preferences.set_sensitive(True)
-            self.action_project_close.set_sensitive(True)
-
-            self.action_file_new.set_sensitive(True)
-            self.action_file_open.set_sensitive(True)
-            self.action_file_close.set_sensitive(False)
-            self.action_file_save.set_sensitive(False)
-            self.action_file_save_as.set_sensitive(False)
+#         if self.menu_status == self.STATUS_PROJECT_NONE:
+#             self.action_project_new.set_sensitive(True)
+#             self.action_project_open.set_sensitive(True)
+#             self.action_workshop_preferences.set_sensitive(False)
+#             self.action_project_close.set_sensitive(False)
+# 
+#             self.action_file_new.set_sensitive(False)
+#             self.action_file_open.set_sensitive(False)
+#             self.action_file_close.set_sensitive(False)
+#             self.action_file_save.set_sensitive(False)
+#             self.action_file_save_as.set_sensitive(False)
+# 
+#         elif self.menu_status == self.STATUS_FILE_OPEN:
+# 
+#             self.action_project_new.set_sensitive(True)
+#             self.action_project_open.set_sensitive(True)
+#             self.action_workshop_preferences.set_sensitive(True)
+#             self.action_project_close.set_sensitive(True)
+# 
+#             self.action_file_new.set_sensitive(True)
+#             self.action_file_open.set_sensitive(True)
+#             self.action_file_close.set_sensitive(True)
+#             self.action_file_save.set_sensitive(False)
+#             self.action_file_save_as.set_sensitive(True)
+# 
+#         elif self.menu_status == self.STATUS_FILE_OPEN_CHANGED:
+#             self.action_project_new.set_sensitive(True)
+#             self.action_project_open.set_sensitive(True)
+#             self.action_workshop_preferences.set_sensitive(True)
+#             self.action_project_close.set_sensitive(True)
+# 
+#             self.action_file_new.set_sensitive(True)
+#             self.action_file_open.set_sensitive(True)
+#             self.action_file_close.set_sensitive(True)
+#             self.action_file_save.set_sensitive(True)
+#             self.action_file_save_as.set_sensitive(True)
+# 
+#         else:  # STATUS_FILE_NONE:
+#             self.action_project_new.set_sensitive(True)
+#             self.action_project_open.set_sensitive(True)
+#             self.action_workshop_preferences.set_sensitive(True)
+#             self.action_project_close.set_sensitive(True)
+# 
+#             self.action_file_new.set_sensitive(True)
+#             self.action_file_open.set_sensitive(True)
+#             self.action_file_close.set_sensitive(False)
+#             self.action_file_save.set_sensitive(False)
+#             self.action_file_save_as.set_sensitive(False)
 
     def get_status(self):
         return self.menu_status
@@ -275,26 +263,6 @@ class ViewMenu(FwComponent):
         # Project菜单设定。
         action_projectmenu = Gtk.Action("ProjectMenu", "Project", None, None)
         action_group.add_action(action_projectmenu)
-
-        action_project_new = Gtk.Action("ProjectNew", None, "New a Project", Gtk.STOCK_NEW)
-        action_project_new.connect("activate", self.on_menu_project_new)
-        action_group.add_action(action_project_new)
-        self.action_project_new = action_project_new
-
-        action_project_open = Gtk.Action("ProjectOpen", None, "Open a Project", Gtk.STOCK_OPEN)
-        action_project_open.connect("activate", self.on_menu_project_open)
-        action_group.add_action(action_project_open)
-        self.action_project_open = action_project_open
-
-        action_project_close = Gtk.Action("ProjectClose", None, "Close Current Project", Gtk.STOCK_CLOSE)
-        action_project_close.connect("activate", self.on_menu_project_close)
-        action_group.add_action(action_project_close)
-        self.action_project_close = action_project_close
-
-        action_app_quit = Gtk.Action("AppQuit", None, None, Gtk.STOCK_QUIT)
-        action_app_quit.connect("activate", self.on_menu_app_quit)
-        action_group.add_action(action_app_quit)
-        self.action_app_quit = action_app_quit
 
     def add_file_menu_actions(self, action_group):
         # File项目的菜单设定。
@@ -362,22 +330,6 @@ class ViewMenu(FwComponent):
             self.search_entry.set_text(text)
 
         self.search_entry.grab_focus()
-
-    def on_menu_project_new(self, widget):
-        logging.debug("A Project|New menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_PROJECT_NEW)
-
-    def on_menu_project_open(self, widget):
-        logging.debug("A Project|Open menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_PROJECT_OPEN)
-
-    def on_menu_project_close(self, widget):
-        logging.debug("A Project|Close menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_PROJECT_CLOSE)
-
-    def on_menu_app_quit(self, widget):
-        logging.debug("A App|Quit as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_APP_QUIT)
 
     def on_menu_file_new(self, widget):
         logging.debug("A File|New menu item was selected.")

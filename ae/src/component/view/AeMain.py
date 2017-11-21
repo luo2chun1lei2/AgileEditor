@@ -83,6 +83,7 @@ class AeMain(FwComponent):
 
         # 创建窗口，注册关闭事件
         editorWin = ViewWindow(self.workshop, prj, want_open_file)
+        
         editorWin.connect("delete-event", Gtk.main_quit)
 
         # - 全屏
@@ -92,11 +93,14 @@ class AeMain(FwComponent):
         # - 设定图标。
         base_path = os.path.dirname((os.path.abspath(sys.argv[0])))
         editorWin.set_icon_from_file(os.path.join(base_path, "ae.png"))
+        
+        FwManager.instance().load('view_main', editorWin)
+        # TODO 现在服务之间相互调用，已经出现先后顺序的问题，因为有的组件生成实例时，
+        #      就需要调用服务。
+        FwManager.instance().requestService('ctrl.workshop.open_project', {'project':prj})
 
         # - 显示画面
         editorWin.show_all()
-
-        FwManager.instance().load('view_main', editorWin)
 
         # - 并进入主循环。
         Gtk.main()
