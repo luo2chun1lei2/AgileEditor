@@ -38,8 +38,6 @@ MENU_CONFIG = """
         <menu action='EditMenu'>
         </menu>
         <menu action='SearchMenu'>
-            <menuitem action='SearchFindNext' />
-            <menuitem action='SearchFindPrev' />
             <menuitem action='SearchFindInFiles' />
             <menuitem action='SearchAgainFindInFiles' />
             <menuitem action='SearchFindPath' />
@@ -92,11 +90,6 @@ class ViewMenu(FwComponent):
      ACTION_FILE_SAVE,
      ACTION_FILE_SAVE_AS,
 
-     ACTION_SEARCH_JUMP_TO,
-     ACTION_SEARCH_FIND,  # 跳转到检索框
-     ACTION_SEARCH_FIND_TEXT,  # 开始检索
-     ACTION_SEARCH_FIND_NEXT,  # 跳转到下一个检索结果
-     ACTION_SEARCH_FIND_PREV,  # 跳转到上一个检索结果
      ACTION_SEARCH_FIND_IN_FILES,  # 在多个文件中检索等
      ACTION_SEARCH_FIND_IN_FILES_AGAIN,
      ACTION_SEARCH_FIND_PATH,  # 检索需要的文件路径
@@ -108,7 +101,7 @@ class ViewMenu(FwComponent):
 
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(24)
+     ) = range(19)
 
     def __init__(self, window, on_menu_func):
 
@@ -165,7 +158,11 @@ class ViewMenu(FwComponent):
         self.uimanager.add_ui_from_string(strMenu)
 
         action = Gtk.Action(menuItemName, title, None, stock_id)
-        action.connect("activate", self.on_menuitem_active_send_service, serviceName)
+        if serviceName == 'ctrl.search.find_prev' or serviceName == 'ctrl.search.find_next':
+            # TODO 这是两个特例，破坏了菜单实现的一致性，需要仔细研究怎么处理！
+            action.connect("activate", self.on_menuitem_active_with_search_text, serviceName)
+        else:
+            action.connect("activate", self.on_menuitem_active_send_service, serviceName)
         if not accel is None:
             actionGroup.add_action_with_accel(action, accel)
 
@@ -359,11 +356,8 @@ class ViewMenu(FwComponent):
 
         # JumpTo's accelerator is Ctrl+L
         # Find's accelerator is Ctrl+F
-
         action_group.add_actions([
             ("SearchMenu", None, "Search"),
-            ("SearchFindNext", None, "Find Next", "<control>G", None, self.on_menu_search_find_next),
-            ("SearchFindPrev", None, "Find Prev", "<shift><control>G", None, self.on_menu_search_find_prev),
             ("SearchFindInFiles", Gtk.STOCK_FIND, "Find in files", "<control>H", None, self.on_menu_search_find_in_files),
             ("SearchAgainFindInFiles", Gtk.STOCK_FIND, "Find in files Again", "<shift><control>H", None, self.on_menu_search_find_in_files_again),
             ("SearchFindPath", Gtk.STOCK_FIND, "Find path", "<control>P", None, self.on_menu_search_find_path),
@@ -394,8 +388,9 @@ class ViewMenu(FwComponent):
     def _jump_to_search_textbox_and_set_text(self, text):
         # 跳转到 SearchEntry中。
         # TODO 算是临时方案，首先设定为“”，然后再设定为需要的检索文字，这样就可以100%引发text_changed事件。
-        self.search_entry.set_text("")
-        self.search_entry.set_text(text)
+        if text is not None:
+            self.search_entry.set_text("")
+            self.search_entry.set_text(text)
 
         self.search_entry.grab_focus()
 
@@ -443,29 +438,6 @@ class ViewMenu(FwComponent):
         logging.debug("A File|Save as menu item was selected.")
         self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
 
-
-
-    def on_search_options_changed(self, widget, need_jump):
-        search_text = self.search_entry.get_text()
-        need_case_sensitive = self.search_case_sensitive.get_active()
-        need_search_is_word = self.search_is_word.get_active()
-
-        self.on_menu_func(self.search_entry, self.ACTION_SEARCH_FIND_TEXT,
-                          need_jump.need, search_text, need_case_sensitive, need_search_is_word)
-
-        if need_jump.need is False:
-            need_jump.need = True
-
-    def on_menu_search_find_next(self, widget):
-        logging.debug("A Search|find next menu item was selected.")
-        search_text = self.search_entry.get_text()
-        self.on_menu_func(widget, self.ACTION_SEARCH_FIND_NEXT, search_text)
-
-    def on_menu_search_find_prev(self, widget):
-        logging.debug("A Search|find prev menu item was selected.")
-        search_text = self.search_entry.get_text()
-        self.on_menu_func(widget, self.ACTION_SEARCH_FIND_PREV, search_text)
-
     def on_menu_search_find_in_files(self, widget):
         logging.debug("A Search|find in files menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_FIND_IN_FILES)
@@ -494,21 +466,17 @@ class ViewMenu(FwComponent):
         logging.debug("A Search|back tag menu item was selected.")
         self.on_menu_func(widget, self.ACTION_SEARCH_BACK_TAG)
 
-    def on_menu_search_add_bookmark(self, widget):
-        logging.debug("A Search|Add bookmark menu item was selected.")
-        FwManager.instance().requestService('view.bookmarks.add_bookmark', None)
-
-    def on_menu_search_remove_bookmark(self, widget):
-        logging.debug("A Search|Remove bookmark menu item was selected.")
-        FwManager.instance().requestService('view.bookmarks.remove_bookmark', None)
-
     def on_menuitem_active_send_service(self, widget, service):
         ''' 通用的菜单 Active 函数，发送service'''
         logging.debug("Common process of one menu item and send service.")
         FwManager.instance().requestService(service, None)
 
-    def set_search_options(self, search_text, case_sensitive, is_word):
+    def on_menuitem_active_with_search_text(self, widget, service):
+        search_text = self.search_entry.get_text()
+        FwManager.instance().requestService(service, {'text':search_text})
 
+    def set_search_options(self, search_text, case_sensitive, is_word):
+        # TODO ViewWindow 直接调用这个函数，存在问题！
         # 在此设置检索用的项目，想让 编辑器 显示检索项目，但是还不能跳转。下面是解决方法：（不优美）
         # 解决方法是引发事件的动作，放入一个 Object(不能是普通的数据)，然后在 on_search_options_changed 函数中，
         # 发送了信息后，再把此标志位改过来。
@@ -521,3 +489,14 @@ class ViewMenu(FwComponent):
             self.search_entry.set_text(search_text)
         self.search_case_sensitive.set_active(case_sensitive)
         self.search_is_word.set_active(is_word)
+
+    def on_search_options_changed(self, widget, need_jump):
+        search_text = self.search_entry.get_text()
+        need_case_sensitive = self.search_case_sensitive.get_active()
+        need_search_is_word = self.search_is_word.get_active()
+
+        FwManager.instance().requestService('ctrl.search.find_text',
+                    {'need_jump':need_jump.need, 'search_text':search_text, 'need_case_sensitive':need_case_sensitive, 'need_search_is_word':need_search_is_word})
+
+        if need_jump.need is False:
+            need_jump.need = True
