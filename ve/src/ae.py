@@ -29,6 +29,7 @@ def init_components(manager):
     from component.view.ViewBookmarks import ViewBookmarks
     from component.control.CtrlEdit import CtrlEdit
     from component.control.CtrlSearch import CtrlSearch
+    from component.model.ModelJumpHistory import ModelJumpHistory
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -47,6 +48,7 @@ def init_components(manager):
     manager.register("bookmarks", ViewBookmarks())
     manager.register("ctrl_edit", CtrlEdit())
     manager.register("ctrl_search", CtrlSearch())
+    manager.register("ctrl_search", ModelJumpHistory())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

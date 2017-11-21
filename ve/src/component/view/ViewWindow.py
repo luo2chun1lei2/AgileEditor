@@ -103,8 +103,6 @@ class ViewWindow(Gtk.Window, FwComponent):
     ''' 主窗口。 '''
     def __init__(self, workshop, prj, want_open_file):
 
-        # 跳转的记录。
-        self.jumps = []
         self.cur_prj = None
         self.last_search_pattern = None
 
@@ -247,8 +245,6 @@ class ViewWindow(Gtk.Window, FwComponent):
     def on_src_bufer_changed(self, widget):
         ''' 当文件发了变化后。'''
         self._set_status(ViewMenu.STATUS_FILE_OPEN_CHANGED)
-
-
 
     ###################################
     # # 基本功能
@@ -979,29 +975,11 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     def _ide_push_jumps(self):
         # 记录当前的位置
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
-        if editor is None:
-            return
-
-        ide_file = FwManager.requestOneSth('ide_file', 'view.multi_editors.get_current_ide_file')
-        if ide_file is None:
-            return
-
-        text_buffer = editor.get_buffer()
-        mark = text_buffer.get_insert()
-        ite = text_buffer.get_iter_at_mark(mark)
-
-        self.jumps.append((ide_file.file_path, ite.get_line() + 1))
+        FwManager.instance().requestService("model.jump_history.push")
 
     def _ide_pop_jumps(self):
         # 恢复到原来的位置
-
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
-        if editor is None:
+        isOK, results = FwManager.instance().requestService('model.jump_history.pop')
+        if results is None:
             return
-
-        if len(self.jumps) == 0:
-            return
-
-        file_path, line_no = self.jumps.pop()
-        self.ide_goto_file_line(file_path, line_no, record=False)
+        self.ide_goto_file_line(results['file_path'], results['line_no'], record=False)
