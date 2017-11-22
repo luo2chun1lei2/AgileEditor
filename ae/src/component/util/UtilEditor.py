@@ -5,7 +5,7 @@
 '''
 
 import re, logging
-from gi.repository import Gtk, Gdk, GtkSource
+from gi.repository import Gio, Gtk, Gdk, GtkSource
 
 from framework.FwManager import FwManager
 
@@ -290,3 +290,58 @@ class UtilEditor(object):
     def push_jumps():
         # 记录当前的位置
         FwManager.instance().requestService("model.jump_history.push")
+
+#     @staticmethod
+#     def set_src_language(src_buffer, file_path):
+#         manager = GtkSource.LanguageManager()
+#
+#         if file_path is not None:
+#             language = manager.guess_language(file_path, None)  # 设定语法的类型
+#             src_buffer.set_language(language)
+#         else:
+#             src_buffer.set_language(None)
+#
+#         return src_buffer
+
+    @staticmethod
+    def set_src_language(src_buffer, file_path):
+
+        if file_path is None:
+            src_buffer.set_language(None)
+            return src_buffer
+
+        # 取出一段内容，进行判断
+        f = file(file_path, 'r')
+        line = f.readline()
+        f.close()
+
+        # 猜测content type，根据文件的名字
+        content_type, uncertain = Gio.content_type_guess(file_path, line)
+        if uncertain:
+            content_type = None
+
+        # 猜测文件的语言类型，根据文件名字的后缀
+        manager = GtkSource.LanguageManager()
+        language = manager.guess_language(file_path, content_type)
+
+        src_buffer.set_language(language)  # 设定语法的类型
+
+        return src_buffer
+
+    @staticmethod
+    def set_completion(mdl_project):
+        ''' 设定当前的编辑器的单词补足，当切换不同的Project时，才有必要 '''
+
+        # 单词补齐，使用CompletionWords
+
+        # 配置单词自动补齐，使用自定义的CompletionProvider
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        completion = editor.props.completion
+
+        # 清除之前的所有provider
+        providers = completion.get_providers()
+        for p in providers:
+            completion.remove_provider(p)
+
+        # 加入新的Provider
+        completion.add_provider(mdl_project.get_completion_provider())

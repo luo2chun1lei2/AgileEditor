@@ -19,12 +19,6 @@ MENU_CONFIG = """
         <menu action='ProjectMenu'>
         </menu>
         <menu action='FileMenu'>
-            <menuitem action='FileNew' />
-            <menuitem action='FileOpen' />
-            <menuitem action='FileClose' />
-            <separator />
-            <menuitem action='FileSave' />
-            <menuitem action='FileSaveAs' />
         </menu>
         <menu action='EditMenu'>
         </menu>
@@ -33,11 +27,6 @@ MENU_CONFIG = """
     </menubar>
 
     <toolbar name='ToolBar'>
-        <toolitem action='FileNew' />
-        <toolitem action='FileOpen' />
-        <toolitem action='FileSave' />
-        <toolitem action='FileClose' />
-        <separator/>
     </toolbar>
 </ui>
 """
@@ -56,15 +45,9 @@ class ViewMenu(FwComponent):
 
     # 可以发出的命令。
     (
-     ACTION_FILE_NEW,
-     ACTION_FILE_OPEN,
-     ACTION_FILE_CLOSE,
-     ACTION_FILE_SAVE,
-     ACTION_FILE_SAVE_AS,
-
      # 其他地方的功能
      ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(6)
+     ) = range(1)
 
     def __init__(self, window, on_menu_func):
 
@@ -106,7 +89,7 @@ class ViewMenu(FwComponent):
         menuName = params['menu_name']
         menuItemName = params['menu_item_name']
         title = params['title']
-        accel = params['accel'] 
+        accel = params['accel']
         stock_id = params['stock_id']
         serviceName = params['service_name']
 
@@ -122,7 +105,7 @@ class ViewMenu(FwComponent):
             </menubar> </ui> """ % (menuName, menuItemName)
         self.uimanager.add_ui_from_string(strMenu)
 
-        action = Gtk.Action(menuItemName, title, None, stock_id)
+        action = Gtk.Action(menuItemName, title, title, stock_id)
         if serviceName == 'ctrl.search.find_prev' or serviceName == 'ctrl.search.find_next':
             # TODO 这是两个特例，破坏了菜单实现的一致性，需要仔细研究怎么处理！
             action.connect("activate", self.on_menuitem_active_with_search_text, serviceName)
@@ -132,14 +115,14 @@ class ViewMenu(FwComponent):
             actionGroup.add_action_with_accel(action, accel)
 
         self.actions.append(action)
-        
+
         # 添加到Toolbar上
         if 'in_toolbar' in params:
-            #tool_item = Gtk.ToolItem()
-            #self.toolbar.insert(tool_item, -1)
+            # tool_item = Gtk.ToolItem()
+            # self.toolbar.insert(tool_item, -1)
             strMenu = """ <toolbar name='ToolBar'>
                         <toolitem action='%s' /></toolbar>""" % (menuItemName)
-        self.uimanager.add_ui_from_string(strMenu)
+            self.uimanager.add_ui_from_string(strMenu)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass
@@ -156,44 +139,44 @@ class ViewMenu(FwComponent):
 #             self.action_project_open.set_sensitive(True)
 #             self.action_workshop_preferences.set_sensitive(False)
 #             self.action_project_close.set_sensitive(False)
-# 
+#
 #             self.action_file_new.set_sensitive(False)
 #             self.action_file_open.set_sensitive(False)
 #             self.action_file_close.set_sensitive(False)
 #             self.action_file_save.set_sensitive(False)
 #             self.action_file_save_as.set_sensitive(False)
-# 
+#
 #         elif self.menu_status == self.STATUS_FILE_OPEN:
-# 
+#
 #             self.action_project_new.set_sensitive(True)
 #             self.action_project_open.set_sensitive(True)
 #             self.action_workshop_preferences.set_sensitive(True)
 #             self.action_project_close.set_sensitive(True)
-# 
+#
 #             self.action_file_new.set_sensitive(True)
 #             self.action_file_open.set_sensitive(True)
 #             self.action_file_close.set_sensitive(True)
 #             self.action_file_save.set_sensitive(False)
 #             self.action_file_save_as.set_sensitive(True)
-# 
+#
 #         elif self.menu_status == self.STATUS_FILE_OPEN_CHANGED:
 #             self.action_project_new.set_sensitive(True)
 #             self.action_project_open.set_sensitive(True)
 #             self.action_workshop_preferences.set_sensitive(True)
 #             self.action_project_close.set_sensitive(True)
-# 
+#
 #             self.action_file_new.set_sensitive(True)
 #             self.action_file_open.set_sensitive(True)
 #             self.action_file_close.set_sensitive(True)
 #             self.action_file_save.set_sensitive(True)
 #             self.action_file_save_as.set_sensitive(True)
-# 
+#
 #         else:  # STATUS_FILE_NONE:
 #             self.action_project_new.set_sensitive(True)
 #             self.action_project_open.set_sensitive(True)
 #             self.action_workshop_preferences.set_sensitive(True)
 #             self.action_project_close.set_sensitive(True)
-# 
+#
 #             self.action_file_new.set_sensitive(True)
 #             self.action_file_open.set_sensitive(True)
 #             self.action_file_close.set_sensitive(False)
@@ -269,31 +252,6 @@ class ViewMenu(FwComponent):
         action_filemenu = Gtk.Action("FileMenu", "File", None, None)
         action_group.add_action(action_filemenu)
 
-        action_file_new = Gtk.Action("FileNew", None, "New a File", Gtk.STOCK_NEW)
-        action_file_new.connect("activate", self.on_menu_file_open)
-        action_group.add_action_with_accel(action_file_new, "<control>N")
-        self.action_file_new = action_file_new
-
-        action_file_open = Gtk.Action("FileOpen", None, "Open a file", Gtk.STOCK_OPEN)
-        action_file_open.connect("activate", self.on_menu_file_open)
-        action_group.add_action_with_accel(action_file_open, "<control>O")
-        self.action_file_open = action_file_open
-
-        action_file_close = Gtk.Action("FileClose", None, "Close current file", Gtk.STOCK_CLOSE)
-        action_file_close.connect("activate", self.on_menu_file_close)
-        action_group.add_action_with_accel(action_file_close, "<control>W")
-        self.action_file_close = action_file_close
-
-        action_file_save = Gtk.Action("FileSave", None, "Save current file", Gtk.STOCK_SAVE)
-        action_file_save.connect("activate", self.on_menu_file_save)
-        action_group.add_action_with_accel(action_file_save, "<control>S")
-        self.action_file_save = action_file_save
-
-        action_file_save_as = Gtk.Action("FileSaveAs", None, "Save current file as ...", Gtk.STOCK_SAVE_AS)
-        action_file_save_as.connect("activate", self.on_menu_file_save_as)
-        action_group.add_action(action_file_save_as)
-        self.action_file_save_as = action_file_save_as
-
     def add_edit_menu_actions(self, action_group):
         action_group.add_actions([
             ("EditMenu", None, "Edit"),
@@ -330,26 +288,6 @@ class ViewMenu(FwComponent):
             self.search_entry.set_text(text)
 
         self.search_entry.grab_focus()
-
-    def on_menu_file_new(self, widget):
-        logging.debug("A File|New menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_FILE_NEW)
-
-    def on_menu_file_open(self, widget):
-        logging.debug('A File|Open menu item was selected.')
-        self.on_menu_func(widget, self.ACTION_FILE_OPEN)
-
-    def on_menu_file_close(self, widget):
-        logging.debug("A File|Close menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_FILE_CLOSE)
-
-    def on_menu_file_save(self, widget):
-        logging.debug("A File|Save menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_FILE_SAVE)
-
-    def on_menu_file_save_as(self, widget):
-        logging.debug("A File|Save as menu item was selected.")
-        self.on_menu_func(widget, self.ACTION_FILE_SAVE_AS)
 
     def on_menuitem_active_send_service(self, widget, service):
         ''' 通用的菜单 Active 函数，发送service'''

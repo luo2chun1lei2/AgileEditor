@@ -12,6 +12,7 @@ from component.model.ModelFile import ModelFile
 from component.view.ViewMenu import ViewMenu
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
+from component.util.UtilEditor import UtilEditor
 
 class ViewEditor:
     # [模块内使用]一个编辑器的信息
@@ -245,7 +246,7 @@ class ViewMultiEditors(FwComponent):
 
         src_buffer = editor.get_buffer()
         ide_file.read_file(src_buffer)
-        self._set_src_language(src_buffer, file_path)
+        UtilEditor.set_src_language(src_buffer, file_path)
         src_buffer.set_modified(False)
 
         self.unfreeze_editor(editor)
@@ -362,29 +363,7 @@ class ViewMultiEditors(FwComponent):
 
         return src_buffer
 
-    def _set_src_language(self, src_buffer, file_path):
 
-        if file_path is None:
-            src_buffer.set_language(None)
-            return src_buffer
-
-        # 取出一段内容，进行判断
-        f = file(file_path, 'r')
-        line = f.readline()
-        f.close()
-
-        # 猜测content type，根据文件的名字
-        content_type, uncertain = Gio.content_type_guess(file_path, line)
-        if uncertain:
-            content_type = None
-
-        # 猜测文件的语言类型，根据文件名字的后缀
-        manager = GtkSource.LanguageManager()
-        language = manager.guess_language(file_path, content_type)
-
-        src_buffer.set_language(language)  # 设定语法的类型
-
-        return src_buffer
 
     def on_switch_page(self, notebook, page, page_num):
         # 当切换Page时，发生，无论是用户手动还是编程方法调用。
