@@ -41,7 +41,10 @@ class CtrlFile(FwComponent):
             rlt = self._new_file()
             return (True, {'result': rlt})
         elif serviceName == 'ctrl.file.open':
-            rlt = self._open_file()
+            if 'abs_file_path' in params:
+                rlt = self._open_file(params['abs_file_path'])
+            else:
+                rlt = self._open_file()
             return (True, {'result': rlt})
         elif serviceName == 'ctrl.file.close':
             rlt = self._close_file()
@@ -312,7 +315,7 @@ class CtrlFile(FwComponent):
         return result
 
     def _open_page(self, abs_file_path):
-        ''' TODO same as _ide_open_page
+        '''
         @param abs_file_path: string: 切换到的文件名字
         '''
         FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})

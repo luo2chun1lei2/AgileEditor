@@ -616,7 +616,7 @@ class ViewFsTree(FwComponent):
             treeview.expand_row(tree_path, False)
         else:
             # 根据绝对路径显示名字。
-            FwManager.instance().requestService('view.main.open_file', {'abs_file_path': abs_path})
+            FwManager.instance().requestService('ctrl.file.open', {'abs_file_path': abs_path})
 
     # event handle
     def on_fstree_row_button_release(self, tree_view, event_button):

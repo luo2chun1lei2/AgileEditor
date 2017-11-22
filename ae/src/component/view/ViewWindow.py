@@ -44,8 +44,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         info = [
             {'name':'view.main.get_window', 'help':'get the main window.'},
-            {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
-            {'name':'view.main.close_files', 'help': 'close opened files.'},  # TODO
+            {'name':'view.main.close_files', 'help': 'close all opened files.'},  # TODO  is not same with 'ctrl.file.close'
             {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
             {'name':'view.main.set_current_project', 'help': 'set current project.'},  # TODO
             {'name':'view.main.get_current_workshop', 'help': 'get current workshop.'},  # TODO
@@ -66,9 +65,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             self._set_status(params['status'])
             return (True, None)
 
-        elif serviceName == 'view.main.open_file':
-            rlt = self.ide_open_file(params['abs_file_path'])
-            return True, {'result': rlt}
         elif serviceName == 'view.main.close_files':
             # TODO 实现是错误的，没有关闭所有的文件!只关闭了当前的！
             isOK, results = FwManager.instance().requestService('ctrl.file.close')
@@ -103,10 +99,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 创建画面
         self._create_layout()
-
-        # 初始化状态
-        if prj:
-            pass
 
         if want_open_file:
             path = os.path.abspath(want_open_file)
@@ -165,97 +157,10 @@ class ViewWindow(Gtk.Window, FwComponent):
         self.add(vbox)
 
     ###################################
-    # # 创建画面
-
-    def create_src_list(self):
-        # 显示分析结果的列表
-        pass
-
-    ###################################
-    # # 回调方法
-
-    def on_src_bufer_changed(self, widget):
-        ''' 当文件发了变化后。'''
-        self._set_status(ViewMenu.STATUS_FILE_OPEN_CHANGED)
-
-    ###################################
-    # # 基本功能
 
     def ide_close_project(self):
         ''' 关闭当前的项目 TODO 什么都没有实现！'''
         self._set_status(ViewMenu.STATUS_PROJECT_NONE)
-
-    def ide_new_file(self):
-        '''
-        产生一个没有路径的项目文件。
-        TODO:还没有决定如何实现！
-        '''
-        self._set_status(ViewMenu.STATUS_FILE_OPEN)
-
-    def ide_open_file(self, path=None):
-        ''' TODO 现在不能删除
-        如果已经打开文件，变为当前文件。如果路径是空，就显示“挑选”文件。然后打开此文件。
-        @param path:string:绝对路径。
-        '''
-        result = self.RLT_CANCEL
-
-        if(path is None):
-            dialog = Gtk.FileChooserDialog("请选择一个文件", self,
-                    Gtk.FileChooserAction.OPEN,
-                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-
-            UtilDialog.add_filters(dialog)
-
-            response = dialog.run()
-
-            file_path = dialog.get_filename()
-            dialog.destroy()
-        else:
-            response = Gtk.ResponseType.OK
-            file_path = path
-
-        if response == Gtk.ResponseType.OK:
-            logging.debug("File selected: %s " % file_path)
-            self._ide_open_page(file_path)
-
-            result = self.RLT_OK
-
-        elif response == Gtk.ResponseType.CANCEL:
-            logging.debug("Cancel to open one file.")
-            result = self.RLT_CANCEL
-
-        self._set_status(ViewMenu.STATUS_FILE_OPEN)
-
-        # 设定单词补全。
-        UtilEditor.set_completion(self.cur_prj)
-
-        return result
-
-    def _ide_open_page(self, abs_file_path):
-        ''' TODO 已经移植到 CtrlFile 中。
-        abs_file_path string 切换到的文件名字
-        '''
-        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
-
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
-        FwManager.instance().requestService('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
-
-        # 分析标记
-        if self.cur_prj is not None:
-            # tags = self.cur_prj.query_tags_by_file(abs_file_path)
-            # self.ide_refresh_file_tag_list(tags)
-            # 在switch page时，会引发switch事件，调用ide_switch_page，会重新查询tags。
-            pass
-
-        # 显示文件的路径。
-        self.ide_set_title(abs_file_path)
-
-        # 在文件树那里同步
-        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
-
-    ###################################
-    # # 更加底层的功能
 
     def _set_status(self, status):
         ''' TODO 这个方法需要彻底修改. '''

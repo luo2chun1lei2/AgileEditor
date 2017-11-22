@@ -397,7 +397,7 @@ class CtrlSearch(FwComponent):
         ''' 跳转到指定文件的行。 '''
         # 先找到对应的文件，然后再滚动到指定的位置
         logging.debug('jump to path:' + file_path + ', line:' + str(line_number))
-        isOK, results = FwManager.instance().requestService('view.main.open_file', {'abs_file_path': file_path})
+        isOK, results = FwManager.instance().requestService('ctrl.file.open', {'abs_file_path': file_path})
         if isOK and results['result'] == ViewWindow.RLT_OK:  # TODO 这里需要知道ViewWindow的常亮
             # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。

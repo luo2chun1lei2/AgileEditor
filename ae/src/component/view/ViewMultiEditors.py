@@ -348,7 +348,6 @@ class ViewMultiEditors(FwComponent):
             src_buffer.set_highlight_syntax(True)  # 语法高亮
 
         if self.styleScheme is None:
-            # src_buffer.connect("changed", self.on_src_bufer_changed)
             # 可以利用 styleSchemeManager.get_scheme_ids() 得到所有的id
             # ['cobalt', 'kate', 'oblivion', 'solarized-dark', 'solarized-light', 'tango', 'classic']
             isOK, results = FwManager.instance().requestService("model.workshop.getopt", {'key':"style"})
