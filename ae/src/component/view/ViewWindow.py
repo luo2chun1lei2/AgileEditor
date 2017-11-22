@@ -44,8 +44,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         info = [
             {'name':'view.main.get_window', 'help':'get the main window.'},
-            {'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
-            {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
             {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
             {'name':'view.main.close_files', 'help': 'close opened files.'},  # TODO
@@ -62,21 +60,12 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "view.main.show_bookmark":  # 显示一个bookmark
-            tag = params['tag']  # ModelTag
-            self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-            self.ide_editor_set_focus()
-            return (True, None)
-
-        elif serviceName == "view.main.set_title":
+        if serviceName == "view.main.set_title":
             self.ide_set_title(params['title'])
             return (True, None)
         elif serviceName == "view.main.set_status":
             self._set_status(params['status'])
             return (True, None)
-
-        elif serviceName == "view.main.make_bookmark":
-            return self._svc_add_bookmark()
 
         elif serviceName == 'view.main.open_file':
             rlt = self.ide_open_file(params['abs_file_path'])
@@ -100,7 +89,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         elif serviceName == 'view.main.goto_line':
             # 跳转到对应的行。
-
             if 'file_path' in params:
                 self.ide_goto_file_line(params['file_path'], params['line_no'])
             else:
@@ -325,9 +313,3 @@ class ViewWindow(Gtk.Window, FwComponent):
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
             Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)
 
-    def _svc_add_bookmark(self):
-        ''' 【服务】根据当前情况加入新的bookmark。
-        '''
-        bookmark = UtilEditor.make_bookmark()
-        self.cur_prj.add_bookmark(bookmark)
-        return True, {'bookmarks':self.cur_prj.bookmarks, 'current_project': self.cur_prj}

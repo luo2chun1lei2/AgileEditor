@@ -35,7 +35,9 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find_definition', 'help':'find the definition of symbol.'},
                 {'name':'ctrl.search.find_reference', 'help':'find the reference of symbol.'},
                 {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'},
-                {'name':'ctrl.search.update_tags', 'help':'go back to the previous tag.'}
+                {'name':'ctrl.search.update_tags', 'help':'go back to the previous tag.'},
+                {'name':'ctrl.search.show_bookmark', 'help':'show a bookmark.'},
+                {'name':'ctrl.search.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
                 ]
         manager.registerService(info, self)
 
@@ -84,6 +86,15 @@ class CtrlSearch(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.search.update_tags':
             self._update_tags_of_project()
+            return (True, None)
+        elif serviceName == "ctrl.search.make_bookmark":
+            return self._add_bookmark()
+        elif serviceName == "ctrl.search.show_bookmark":  # 显示一个bookmark
+            tag = params['tag']  # ModelTag
+            FwManager.instance().requestService('view.main.goto_line',
+                            {'file_path':tag.tag_file_path, 'line_no':tag.tag_line_no})
+            #self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
+            #self.ide_editor_set_focus()
             return (True, None)
         else:
             return (False, None)
@@ -491,3 +502,11 @@ class CtrlSearch(FwComponent):
 
         # 更新右边的TAGS
         cur_prj.prepare()
+        
+    def _add_bookmark(self):
+        ''' 【服务】根据当前情况加入新的bookmark。
+        '''
+        bookmark = UtilEditor.make_bookmark()
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj.add_bookmark(bookmark)
+        return True, {'bookmarks':cur_prj.bookmarks, 'current_project': cur_prj}

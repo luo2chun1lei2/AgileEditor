@@ -61,7 +61,7 @@ class ViewBookmarks(FwComponent):
         
         elif serviceName == "view.bookmarks.add_bookmark":
             # 获取根据当前情况而建立的bookmark。
-            isOK, results = manager.requestService("view.main.make_bookmark", None)
+            isOK, results = manager.requestService("ctrl.search.make_bookmark")
             if not isOK:
                 return (False, None)
 
@@ -158,7 +158,7 @@ class ViewBookmarks(FwComponent):
             tag = self.tags[selected_index]
 
             # 跳转到对应的行。
-            FwManager.instance().requestService('view.main.show_bookmark', {'tag':tag})
+            FwManager.instance().requestService('ctrl.search.show_bookmark', {'tag':tag})
 
     def get_view(self):
         # 返回容器控件
