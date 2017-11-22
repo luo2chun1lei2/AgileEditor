@@ -148,7 +148,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # # 重要控件
 
         # 菜单和工具栏
-        self.ide_menu = ViewMenu(self, self.on_menu_func)
+        self.ide_menu = ViewMenu(self)
 
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
@@ -197,9 +197,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     ###################################
     # # 回调方法
-    def on_menu_func(self, widget, action, param=None, param2=None, param3=None, param4=None):
-        # TODO 删除！
-        pass
 
     def on_src_bufer_changed(self, widget):
         ''' 当文件发了变化后。'''

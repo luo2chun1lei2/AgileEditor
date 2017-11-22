@@ -43,13 +43,11 @@ class ViewMenu(FwComponent):
      STATUS_FILE_OPEN_CHANGED,  # 项目已经打开，文件打开状态，且已经有了修改。
     ) = range(4)
 
-    def __init__(self, window, on_menu_func):
+    def __init__(self, window):
 
         # 附件检索的控件
         self.search_entry = None
         self.actions = []
-
-        self.on_menu_func = on_menu_func
 
         self._create_menu(window)
 
