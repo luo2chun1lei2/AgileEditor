@@ -30,6 +30,9 @@ class CtrlFile(FwComponent):
                 ]
         manager.registerService(info, self)
 
+        # register listening event.
+        manager.register_event_listener('view.multi_editors.switch_page', self)
+
         return True
 
     # override component
@@ -53,6 +56,14 @@ class CtrlFile(FwComponent):
             return (True, {'result': rlt})
         else:
             return (False, None)
+
+    # override FwListener
+    def on_listened(self, event_name, params):
+        if event_name == 'view.multi_editors.switch_page':
+            self._switch_page(params['abs_file_path'])
+            return True
+        else:
+            return False
 
     # override component
     def onSetup(self, manager):
@@ -314,8 +325,32 @@ class CtrlFile(FwComponent):
         if cur_prj is not None:
             # tags = self.cur_prj.query_tags_by_file(abs_file_path)
             # self.ide_refresh_file_tag_list(tags)
-            # 在switch page时，会引发switch事件，调用ide_switch_page，会重新查询tags。
+            # 在switch page时，会引发switch事件，调用_switch_page，会重新查询tags。
             pass
+
+        # 显示文件的路径。
+        FwManager.instance().requestService('view.main.set_title', {'title':abs_file_path})
+
+        # 在文件树那里同步
+        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
+
+    def _switch_page(self, abs_file_path):
+        # abs_file_path string 切换到的文件名字
+        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
+
+        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
+        mdl_file = view_editor.ide_file
+
+        # 初始化检索。
+        # - 检索会影响到位置，这里只有在函数结尾再加上定位了。
+        FwManager.instance().requestService('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
+        FwManager.instance().requestService('view.menu.set_search_option',
+                    {'search_text':mdl_file.file_search_key, 'case_sensitive':mdl_file.file_search_case_sensitive, 'is_word':mdl_file.file_search_is_word})
+
+        # 分析标记
+        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        if cur_prj is not None:
+            self._query_tags_by_file_and_refresh(abs_file_path)
 
         # 显示文件的路径。
         FwManager.instance().requestService('view.main.set_title', {'title':abs_file_path})

@@ -46,20 +46,17 @@ class ViewWindow(Gtk.Window, FwComponent):
             {'name':'view.main.get_window', 'help':'get the main window.'},
             {'name':'view.main.show_bookmark', 'help':'show a bookmark.'},
             {'name':'view.main.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
+            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
             {'name':'view.main.close_files', 'help': 'close opened files.'},  # TODO
-            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
             {'name':'view.main.set_current_project', 'help': 'set current project.'},  # TODO
             {'name':'view.main.get_current_workshop', 'help': 'get current workshop.'},  # TODO
-            {'name':'view.main.set_title', 'help': 'set title of window.'},
             {'name':'view.main.close_current_project', 'help': 'close the current project.'},
+            {'name':'view.main.set_title', 'help': 'set title of window.'},
             {'name':'view.main.set_status', 'help': 'set status of window.'},  # TODO
             ]
         manager.registerService(info, self)
-
-        # register listening event.
-        manager.register_event_listener('view.multi_editors.switch_page', self)
 
         return True
 
@@ -117,14 +114,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             return (True, {'window': self})
         else:
             return (False, None)
-
-    # override FwListener
-    def on_listened(self, event_name, params):
-        if event_name == 'view.multi_editors.switch_page':
-            self.ide_switch_page(params['abs_file_path'])
-            return True
-        else:
-            return False
 
     ''' 主窗口。 '''
     def __init__(self, workshop, prj, want_open_file):
@@ -209,15 +198,8 @@ class ViewWindow(Gtk.Window, FwComponent):
     ###################################
     # # 回调方法
     def on_menu_func(self, widget, action, param=None, param2=None, param3=None, param4=None):
-
-        if action == ViewMenu.ACTION_FILE_OPEN:
-            self.ide_open_file()
-
-        elif action == ViewMenu.ACTION_EDITOR_SWITCH_PAGE:
-            self.ide_switch_page(param)
-
-        else:
-            logging.error('Unknown action %d' % action)
+        # TODO 删除！
+        pass
 
     def on_src_bufer_changed(self, widget):
         ''' 当文件发了变化后。'''
@@ -276,39 +258,6 @@ class ViewWindow(Gtk.Window, FwComponent):
         UtilEditor.set_completion(self.cur_prj)
 
         return result
-
-    def ide_switch_page(self, abs_file_path):
-        # abs_file_path string 切换到的文件名字
-        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
-
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
-        mdl_file = view_editor.ide_file
-
-        # 初始化检索。
-        # - 检索会影响到位置，这里只有在函数结尾再加上定位了。
-        FwManager.instance().requestService('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
-        self.ide_menu.set_search_options(mdl_file.file_search_key, mdl_file.file_search_case_sensitive, mdl_file.file_search_is_word)
-
-        # 分析标记
-        if self.cur_prj is not None:
-            self._ide_query_tags_by_file_and_refresh(abs_file_path)
-
-        # 显示文件的路径。
-        self.ide_set_title(abs_file_path)
-
-        # 在文件树那里同步
-        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
-
-    def _ide_query_tags_by_file_and_refresh(self, abs_file_path):
-        # TODO 建议和switch一起移动到CtrlFile中，已经复制了一份“_query_tags_by_file_and_refresh”
-        ModelTask.execute(self.ide_refresh_file_tag_list,
-                          self.cur_prj.query_ctags_of_file, abs_file_path)
-
-    def ide_refresh_file_tag_list(self, tags):
-        # TODO 建议和switch一起移动到CtrlFile中，已经复制了一份“_refresh_file_tag_list”
-        # 根据Tag的列表，更新文件对应的Tag列表
-        # tags:[IdeOneTag]:Tag列表。
-        FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist':tags})
 
     def _ide_open_page(self, abs_file_path):
         ''' TODO 已经移植到 CtrlFile 中。

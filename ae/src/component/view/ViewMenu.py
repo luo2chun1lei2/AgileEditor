@@ -43,12 +43,6 @@ class ViewMenu(FwComponent):
      STATUS_FILE_OPEN_CHANGED,  # 项目已经打开，文件打开状态，且已经有了修改。
     ) = range(4)
 
-    # 可以发出的命令。
-    (
-     # 其他地方的功能
-     ACTION_EDITOR_SWITCH_PAGE,  # 切换当前编辑的文件
-     ) = range(1)
-
     def __init__(self, window, on_menu_func):
 
         # 附件检索的控件
@@ -62,7 +56,8 @@ class ViewMenu(FwComponent):
     # from component
     def onRegistered(self, manager):
         info = [{'name':'view.menu.add', 'help':'add item in menu.'},
-                {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'}
+                {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
+                {'name':'view.menu.set_search_option', 'help':'set option of search.'}
                 ]
         manager.registerService(info, self)
 
@@ -75,6 +70,9 @@ class ViewMenu(FwComponent):
             return (True, None)
         elif serviceName == "view.menu.set_and_jump_to_search_textbox":
             self._jump_to_search_textbox_and_set_text(params['text'])
+            return (True, None)
+        elif serviceName == 'view.menu.set_search_option':
+            self._set_search_options(params['search_text'], params['case_sensitive'], params['is_word'])
             return (True, None)
         else:
             return (False, None)
@@ -298,8 +296,7 @@ class ViewMenu(FwComponent):
         search_text = self.search_entry.get_text()
         FwManager.instance().requestService(service, {'text':search_text})
 
-    def set_search_options(self, search_text, case_sensitive, is_word):
-        # TODO ViewWindow 直接调用这个函数，存在问题！
+    def _set_search_options(self, search_text, case_sensitive, is_word):
         # 在此设置检索用的项目，想让 编辑器 显示检索项目，但是还不能跳转。下面是解决方法：（不优美）
         # 解决方法是引发事件的动作，放入一个 Object(不能是普通的数据)，然后在 on_search_options_changed 函数中，
         # 发送了信息后，再把此标志位改过来。
