@@ -189,7 +189,7 @@ class ViewFileTagList (FwComponent):
             return
 
         # 跳转到对应的行。
-        FwManager.instance().requestService('view.main.goto_line', {'line_no':line_no})
+        FwManager.instance().requestService('ctrl.search.goto_line', {'line_no':line_no})
 
     def get_view(self):
         # 返回容器控件

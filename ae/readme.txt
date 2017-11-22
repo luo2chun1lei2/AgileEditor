@@ -38,6 +38,9 @@
 cp ./doc/global/examples/gtags.conf etc/
 在common::skip中加入obj/
 
+5, 快捷键参考 gdkkeysyms.h 中的GDK_KEY_XXX 设定。
+  需要安装 libgtk-3-dev。
+
 计划
 ----
 

@@ -23,6 +23,7 @@ class CtrlSearch(FwComponent):
     # override component
     def onRegistered(self, manager):
         info = [{'name':'ctrl.search.init', 'help':'initialize the search context.'},  # TODO 这里是否是一个服务，还应该是监听事件，应该仔细考虑！
+                {'name':'ctrl.search.goto_line', 'help': 'goto the given line and focus on editor.'},
                 {'name':'ctrl.search.jump_to', 'help':'Jump to ? line.'},
                 {'name':'ctrl.search.find', 'help':'get the selected word and focus on search textbox.'},  # This is NOT direct finding function.
                 {'name':'ctrl.search.find_text', 'help':'begin to find text.'},
@@ -91,11 +92,19 @@ class CtrlSearch(FwComponent):
             return self._add_bookmark()
         elif serviceName == "ctrl.search.show_bookmark":  # 显示一个bookmark
             tag = params['tag']  # ModelTag
-            FwManager.instance().requestService('view.main.goto_line',
-                            {'file_path':tag.tag_file_path, 'line_no':tag.tag_line_no})
-            #self.ide_goto_file_line(tag.tag_file_path, tag.tag_line_no)
-            #self.ide_editor_set_focus()
+            self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+            self._editor_set_focus()
             return (True, None)
+        elif serviceName == 'ctrl.search.goto_line':
+            # 跳转到对应的行。
+            if 'file_path' in params:
+                self._goto_file_line(params['file_path'], params['line_no'])
+            else:
+                UtilEditor.goto_line(params['line_no'])
+
+            # 其他控件发送过来此信息后，需要让编辑器获取焦点。
+            self._editor_set_focus()
+            return True, None
         else:
             return (False, None)
 
@@ -379,7 +388,6 @@ class CtrlSearch(FwComponent):
                 tag = tags[0]
                 self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
 
-    # TODO is same with VieWindow.ide_goto_file_line
     def _goto_file_line(self, file_path, line_number, record=True):
 
         # 记录的当前的位置
@@ -510,3 +518,12 @@ class CtrlSearch(FwComponent):
         cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
         cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':cur_prj.bookmarks, 'current_project': cur_prj}
+    
+    def _editor_set_focus(self):
+        ''' 获取焦点(延迟调用) '''
+        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._idle_editor_set_focus)
+
+    def _idle_editor_set_focus(self):
+        ''' 获取焦点 '''
+        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor.grab_focus()

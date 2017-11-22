@@ -44,7 +44,6 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         info = [
             {'name':'view.main.get_window', 'help':'get the main window.'},
-            {'name':'view.main.goto_line', 'help': 'goto the given line and focus on editor.'},
             {'name':'view.main.open_file', 'help': 'show a file by absolutive file path.'},  # TODO
             {'name':'view.main.close_files', 'help': 'close opened files.'},  # TODO
             {'name':'view.main.get_current_project', 'help': 'get current project.'},  # TODO
@@ -86,17 +85,6 @@ class ViewWindow(Gtk.Window, FwComponent):
             return True, None
         elif serviceName == 'view.main.get_current_workshop':
             return True, {'workshop':self.ideWorkshop}
-
-        elif serviceName == 'view.main.goto_line':
-            # 跳转到对应的行。
-            if 'file_path' in params:
-                self.ide_goto_file_line(params['file_path'], params['line_no'])
-            else:
-                UtilEditor.goto_line(params['line_no'])
-
-            # 其他控件发送过来此信息后，需要让编辑器获取焦点。
-            self.ide_editor_set_focus()
-            return True, None
 
         elif serviceName == 'view.main.get_window':
             return (True, {'window': self})
@@ -287,29 +275,4 @@ class ViewWindow(Gtk.Window, FwComponent):
         # TODO:不让状态变化。
         # self.ide_menu.set_status(status)
         self.ide_menu.set_status(ViewMenu.STATUS_FILE_OPEN_CHANGED)
-
-    def ide_editor_set_focus(self):
-        ''' 获取焦点(延迟调用) '''
-        Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._ide_editor_set_focus)
-
-    def _ide_editor_set_focus(self):
-        ''' 获取焦点 '''
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
-        editor.grab_focus()
-
-    # TODO same with CtrlSearch's goto_file_line, should be removed.
-    def ide_goto_file_line(self, file_path, line_number, record=True):
-
-        # 记录的当前的位置
-        if record:
-            UtilEditor.push_jumps()
-
-        ''' 跳转到指定文件的行。 '''
-        # 先找到对应的文件
-        # 然后再滚动到指定的位置
-        # print 'jump to path:' + file_path + ', line:' + str(line_number)
-        if self.ide_open_file(file_path) == self.RLT_OK:
-            # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
-            # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
-            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)
 
