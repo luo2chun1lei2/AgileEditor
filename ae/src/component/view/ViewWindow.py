@@ -104,6 +104,9 @@ class ViewWindow(Gtk.Window, FwComponent):
             path = os.path.abspath(want_open_file)
             self.ide_open_file(path)
 
+        # 注册整个窗体的mouse button按键操作！
+        self.connect('button-press-event', self.mouse_button_press_event)
+
     def _create_layout(self):
         # 创建画面。
 
@@ -181,3 +184,10 @@ class ViewWindow(Gtk.Window, FwComponent):
         # self.ide_menu.set_status(status)
         self.ide_menu.set_status(ViewMenu.STATUS_FILE_OPEN_CHANGED)
 
+    def mouse_button_press_event(self, widget, event):
+        if event.button == 8:
+            # mouse's back, 9 is prev.
+            FwManager.instance().requestService('ctrl.search.go_back_tag')
+            return True
+
+        return False

@@ -66,9 +66,6 @@ class ViewMultiEditors(FwComponent):
                 {'name':'view.multi_editors.change_editor_style', 'help':'change the style scheme of editors.'},
                 {'name':'view.multi_editors.change_editor_font', 'help':'change the font of editors.'}]
         manager.registerService(info, self)
-
-
-
         return True
 
     # override component
@@ -361,8 +358,6 @@ class ViewMultiEditors(FwComponent):
             src_buffer.set_style_scheme(self.styleScheme)
 
         return src_buffer
-
-
 
     def on_switch_page(self, notebook, page, page_num):
         # 当切换Page时，发生，无论是用户手动还是编程方法调用。
