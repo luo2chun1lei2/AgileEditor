@@ -194,12 +194,12 @@ class CtrlSearch(FwComponent):
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchBackTag',
                   'title':'Back Tag',
-                  'accel':"<shift><control>Left",
+                  'accel':"<control>Escape",
                   'stock_id':Gtk.STOCK_GO_BACK,
                   'service_name':'ctrl.search.go_back_tag',
                   'in_toolbar':True}
         manager.requestService("view.menu.add", params)
-        
+
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchUpdateTags',
                   'title':'Update Tags',
@@ -495,12 +495,12 @@ class CtrlSearch(FwComponent):
         if results is None:
             return
         self._goto_file_line(results['file_path'], results['line_no'], record=False)
-        
+
     def _update_tags_of_project(self):
         ''' 更新当前项目的TAGS，并且更新文件列表。
         TODO: 以后应该改成监听“事件”
         '''
-        
+
         cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
         if cur_prj is None:
             return
@@ -510,7 +510,7 @@ class CtrlSearch(FwComponent):
 
         # 更新右边的TAGS
         cur_prj.prepare()
-        
+
     def _add_bookmark(self):
         ''' 【服务】根据当前情况加入新的bookmark。
         '''
@@ -518,7 +518,7 @@ class CtrlSearch(FwComponent):
         cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
         cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':cur_prj.bookmarks, 'current_project': cur_prj}
-    
+
     def _editor_set_focus(self):
         ''' 获取焦点(延迟调用) '''
         Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, self._idle_editor_set_focus)
