@@ -259,7 +259,7 @@ class UtilEditor(object):
         # line_number:int:行号（从1开始）
         # return:Bool:False，以后不再调用，True，以后还会调用。
 
-        if line_number < 1:
+        if line_number < 0:
             logging.error("Error line number %d" % line_number)
             return False
 
