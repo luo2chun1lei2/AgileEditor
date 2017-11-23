@@ -651,6 +651,16 @@ class ViewFsTree(FwComponent):
             self.treemenu.append(menuitem)
             menuitem.show()
 
+            menuitem = Gtk.MenuItem.new_with_label("文件名字")
+            menuitem.connect("activate", self.on_fstree_row_popup_menuitem_get_filename_active, tree_view)
+            self.treemenu.append(menuitem)
+            menuitem.show()
+
+            menuitem = Gtk.MenuItem.new_with_label("文件绝对路径")
+            menuitem.connect("activate", self.on_fstree_row_popup_menuitem_get_file_abspath_active, tree_view)
+            self.treemenu.append(menuitem)
+            menuitem.show()
+
             self.treemenu.popup(None, None, None, None, 0, event_button.time)
 
             return True
@@ -794,6 +804,38 @@ class ViewFsTree(FwComponent):
 
         # 刷新tree
         self._refresh_project()
+
+    # event handle
+    def on_fstree_row_popup_menuitem_get_filename_active(self, widget, tree_view):
+        ''' 获取选中项目的文件名字，放到剪贴板上。 '''
+
+        # 先取得选中的item
+        tree_model, itr = tree_view.get_selection().get_selected()
+        if itr is None:
+            return
+
+        # 得到文件名字
+        file_name = os.path.basename(self._get_abs_file_path_by_iter(itr))
+
+        atom = Gdk.atom_intern('CLIPBOARD', True)
+        clipboard = self.treeview.get_clipboard(atom)
+        clipboard.set_text(file_name, -1)
+
+    # event handle
+    def on_fstree_row_popup_menuitem_get_file_abspath_active(self, widget, tree_view):
+        ''' 获取选中项目的文件绝对路径，放到剪贴板上。 '''
+
+        # 先取得选中的item
+        tree_model, itr = tree_view.get_selection().get_selected()
+        if itr is None:
+            return
+
+        # 得到路径
+        file_path = self._get_abs_file_path_by_iter(itr)
+
+        atom = Gdk.atom_intern('CLIPBOARD', True)
+        clipboard = self.treeview.get_clipboard(atom)
+        clipboard.set_text(file_path, -1)
 
     def _refresh_project(self):
         FwManager.instance().requestService('ctrl.search.update_tags')
