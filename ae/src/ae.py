@@ -25,14 +25,12 @@ import sys, logging
     util.word_complete.get_provider
     
     # 画面类型的组件，都应该有 get_view 获得组件中的中view。
-    view.menu.add : add item in menu.
-    view.menu.set_and_jump_to_search_textbox : jump to search textbox and set text.
-    view.menu.set_search_option : set option of search.
+    view.menu.add/view.menu.set_and_jump_to_search_textbox[这个需要整理！]/view.menu.set_search_option
     view.main.get_window : get the main window.
     view.main.close_files : close all opened files.
-    view.main.get_current_project : get current project.
-    view.main.set_current_project : set current project.
-    view.main.get_current_workshop : get current workshop.
+    view.main.get_current_project : get current project.  -> [model.workshop]
+    view.main.set_current_project : set current project.  -> [model.workshop]
+    view.main.get_current_workshop : get current workshop.  -> [model.workshop]
     view.main.close_current_project : close the current project.
     view.main.set_title : set title of window.
     view.main.set_status : set status of window.
