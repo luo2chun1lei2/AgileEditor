@@ -17,12 +17,14 @@ class FwListener:
         '''
         return True
 
-class FwEventPipe:
+class FwEventPipe(object):
     ''' 消息管道，可以注册、注销和发送消息。
     '''
 
     def __init__(self):
         # events {event_name, [FwListener]}
+        super(FwEventPipe, self).__init__()
+        
         self.events = OrderedDict()
 
     ###################################

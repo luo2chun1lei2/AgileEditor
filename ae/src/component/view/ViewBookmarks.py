@@ -21,8 +21,9 @@ class ViewBookmarks(FwComponent):
      NUM_COLUMNS) = range(3)
 
     def __init__(self):
+        super(ViewBookmarks, self).__init__()
+        
         self.cur_prj = None
-
         self._init_view()
 
     # override component
@@ -33,7 +34,7 @@ class ViewBookmarks(FwComponent):
                   'accel':"<control>B",
                   'stock_id':Gtk.STOCK_GO_BACK,
                   'service_name': 'view.bookmarks.add_bookmark'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchRemoveBookmark',
@@ -41,7 +42,7 @@ class ViewBookmarks(FwComponent):
                   'accel':"<shift><control>B",
                   'stock_id':Gtk.STOCK_GO_BACK,
                   'service_name': 'view.bookmarks.remove_bookmark'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         return True
 
@@ -50,7 +51,7 @@ class ViewBookmarks(FwComponent):
         info = [{'name':'view.bookmarks.add_bookmark', 'help':'add one bookmark by current pos.'},
                 {'name':'view.bookmarks.remove_bookmark', 'help':'remove one bookmark by current pos.'},
                 {'name':'view.bookmarks.get_view', 'help':'get view of bookmark.'}]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -61,7 +62,7 @@ class ViewBookmarks(FwComponent):
         
         elif serviceName == "view.bookmarks.add_bookmark":
             # 获取根据当前情况而建立的bookmark。
-            isOK, results = manager.requestService("ctrl.search.make_bookmark")
+            isOK, results = manager.request_service("ctrl.search.make_bookmark")
             if not isOK:
                 return (False, None)
 
@@ -158,7 +159,7 @@ class ViewBookmarks(FwComponent):
             tag = self.tags[selected_index]
 
             # 跳转到对应的行。
-            FwManager.instance().requestService('ctrl.search.show_bookmark', {'tag':tag})
+            FwManager.instance().request_service('ctrl.search.show_bookmark', {'tag':tag})
 
     def get_view(self):
         # 返回容器控件

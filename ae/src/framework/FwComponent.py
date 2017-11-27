@@ -6,12 +6,12 @@ from FwEvent import FwListener
 
 from FwService import FwService
 
-class FwComponent(object, FwListener, FwService):
+class FwComponent(FwListener, FwService):
     ''' 组件的基础类，每个组件都可以注册自己，以及可以监听事件，和注册自己提供的服务。
     '''
 
     def __init__(self):
-        pass
+        super(FwComponent, self).__init__()
 
     def onRegistered(self, manager):
         ''' 在Framework中初始化，比如注册服务等。

@@ -10,6 +10,9 @@ from gi.repository import Gio, Gtk, Gdk, GtkSource
 from framework.FwManager import FwManager
 
 class UtilEditor(object):
+    
+    def __init__(self):
+        super(UtilEditor, self).__init__()
 
     @staticmethod
     def get_selected_line(textview):
@@ -73,7 +76,7 @@ class UtilEditor(object):
     def get_editor_buffer():
         ''' 获得当前的编辑器！
         '''
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         if editor is None:
             return None
 
@@ -145,7 +148,7 @@ class UtilEditor(object):
             name = "None"
 
         # 得到文件
-        path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
+        path = FwManager.request_one('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
 
         # 得到行号
         mark = text_buf.get_insert()
@@ -163,7 +166,7 @@ class UtilEditor(object):
     @staticmethod
     def replace_in_file(replace_from, replace_to):
         # 替换当前文件中的文字
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -181,7 +184,7 @@ class UtilEditor(object):
 
     @staticmethod
     def edit_cut():
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -191,7 +194,7 @@ class UtilEditor(object):
 
     @staticmethod
     def edit_copy():
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -201,7 +204,7 @@ class UtilEditor(object):
 
     @staticmethod
     def edit_paste():
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -211,7 +214,7 @@ class UtilEditor(object):
 
     @staticmethod
     def edit_select_all():
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -222,7 +225,7 @@ class UtilEditor(object):
     def edit_delete_line():
         # 删除光标所在的行
 
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
         src_buffer = ve_editor.editor.get_buffer()
@@ -235,7 +238,7 @@ class UtilEditor(object):
 
     @staticmethod
     def edit_redo():
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -245,7 +248,7 @@ class UtilEditor(object):
 
     @staticmethod
     def edit_undo():
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -272,7 +275,7 @@ class UtilEditor(object):
         # 设定光标的位置，和什么都没有选中
         text_buf.select_range(it, it)
         # 屏幕滚动到这个地方。
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         editor.scroll_to_iter(it, 0.25, False, 0.0, 0.5)
 
         # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
@@ -289,7 +292,7 @@ class UtilEditor(object):
     @staticmethod
     def push_jumps():
         # 记录当前的位置
-        FwManager.instance().requestService("model.jump_history.push")
+        FwManager.instance().request_service("model.jump_history.push")
 
 #     @staticmethod
 #     def set_src_language(src_buffer, file_path):
@@ -335,7 +338,7 @@ class UtilEditor(object):
         # 单词补齐，使用CompletionWords
 
         # 配置单词自动补齐，使用自定义的CompletionProvider
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         completion = editor.props.completion
 
         # 清除之前的所有provider

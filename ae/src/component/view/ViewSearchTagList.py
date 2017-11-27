@@ -21,6 +21,8 @@ class ViewSearchTagList(FwComponent):
      NUM_COLUMNS) = range(3)
 
     def __init__(self):
+        super(ViewSearchTagList, self).__init__()
+        
         vbox = Gtk.VBox(spacing=0)
 
         ###############################
@@ -61,7 +63,7 @@ class ViewSearchTagList(FwComponent):
     def onRegistered(self, manager):
         info = [{'name':'view.search_taglist.get_view', 'help':'get view of search taglist.'},
                 {'name':'view.search_taglist.show_taglist', 'help':'show tag list in view.'}]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -108,7 +110,7 @@ class ViewSearchTagList(FwComponent):
 
             # 跳转到对应的行。
             # 跳转到对应的行。
-            FwManager.instance().requestService('ctrl.search.goto_line', {'file_path':tag.tag_file_path, 'line_no':tag.tag_line_no})
+            FwManager.instance().request_service('ctrl.search.goto_line', {'file_path':tag.tag_file_path, 'line_no':tag.tag_line_no})
 
     def get_view(self):
         # 返回容器控件

@@ -52,7 +52,7 @@ class ViewWindow(Gtk.Window, FwComponent):
             {'name':'view.main.set_title', 'help': 'set title of window.'},
             {'name':'view.main.set_status', 'help': 'set status of window.'},  # TODO
             ]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -67,7 +67,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         elif serviceName == 'view.main.close_files':
             # TODO 实现是错误的，没有关闭所有的文件!只关闭了当前的！
-            isOK, results = FwManager.instance().requestService('ctrl.file.close')
+            isOK, results = FwManager.instance().request_service('ctrl.file.close')
             rlt = results['result']
             return True, {'result':rlt}
 
@@ -89,6 +89,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
     ''' 主窗口。 '''
     def __init__(self, workshop, prj, want_open_file):
+        super(ViewWindow, self).__init__()
 
         self.cur_prj = None
         self.last_search_pattern = None
@@ -130,16 +131,16 @@ class ViewWindow(Gtk.Window, FwComponent):
         # resize:子控件是否跟着paned的大小而变化。
         # shrink:子控件是否能够比它需要的大小更小。
         panedEdtiorAndTagList = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        view = FwManager.requestOneSth('view', 'view.multi_editors.get_view')
+        view = FwManager.request_one('view', 'view.multi_editors.get_view')
         panedEdtiorAndTagList.pack1(view, resize=True, shrink=True)
-        view = FwManager.requestOneSth('view', 'view.file_taglist.get_view')
+        view = FwManager.request_one('view', 'view.file_taglist.get_view')
         panedEdtiorAndTagList.pack2(view, resize=False, shrink=True)
 
-        view = FwManager.requestOneSth('view', 'view.search_taglist.get_view')
+        view = FwManager.request_one('view', 'view.search_taglist.get_view')
         self.nbPrj.append_page(view, Gtk.Label("检索"))
-        view = FwManager.requestOneSth('view', 'view.bookmarks.get_view')
+        view = FwManager.request_one('view', 'view.bookmarks.get_view')
         self.nbPrj.append_page(view, Gtk.Label("书签"))
-        view = FwManager.requestOneSth('view', 'view.terminal.get_view')
+        view = FwManager.request_one('view', 'view.terminal.get_view')
         self.nbPrj.append_page(view, Gtk.Label("控制台"))
 
         panedEdtiorAndSearchTag = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
@@ -147,7 +148,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         panedEdtiorAndSearchTag.pack2(self.nbPrj, resize=False, shrink=True)
 
         panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
-        view = FwManager.requestOneSth('view', 'view.fstree.get_view')
+        view = FwManager.request_one('view', 'view.fstree.get_view')
         panedFsAndEditor.pack1(view, resize=False, shrink=True)
         panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
         panedFsAndEditor.set_position(200);
@@ -187,7 +188,7 @@ class ViewWindow(Gtk.Window, FwComponent):
     def mouse_button_press_event(self, widget, event):
         if event.button == 8:
             # mouse's back, 9 is prev.
-            FwManager.instance().requestService('ctrl.search.go_back_tag')
+            FwManager.instance().request_service('ctrl.search.go_back_tag')
             return True
 
         return False

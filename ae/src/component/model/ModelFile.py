@@ -13,6 +13,8 @@ class ModelFile(object):
     # 文件状态必须是打开或者创建后，然后进行读写操作，再关闭。
     
     def __init__(self):
+        super(ModelFile, self).__init__()
+        
         self.file_obj = None
         self.file_path = None
         self.file_search_key = None

@@ -7,7 +7,7 @@ from framework.FwManager import FwManager
 
 class ModelJumpHistory(FwComponent):
     def __init__(self):
-        super(FwComponent, self).__init__()
+        super(ModelJumpHistory, self).__init__()
 
         # 跳转的记录 = [(file_path:string, line_no:int)]
         self.jumps = []
@@ -16,7 +16,7 @@ class ModelJumpHistory(FwComponent):
     def onRegistered(self, manager):
         info = [{'name':'model.jump_history.push', 'help':'push one jump info into history.'},
                 {'name':'model.jump_history.pop', 'help':'pop one jump info from history.'}]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -32,11 +32,11 @@ class ModelJumpHistory(FwComponent):
 
     def _push_jump(self):
         # 记录当前的位置
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         if editor is None:
             return
 
-        ide_file = FwManager.requestOneSth('ide_file', 'view.multi_editors.get_current_ide_file')
+        ide_file = FwManager.request_one('ide_file', 'view.multi_editors.get_current_ide_file')
         if ide_file is None:
             return
 
@@ -49,7 +49,7 @@ class ModelJumpHistory(FwComponent):
     def _pop_jump(self):
         # 恢复到原来的位置
 
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         if editor is None:
             return
 

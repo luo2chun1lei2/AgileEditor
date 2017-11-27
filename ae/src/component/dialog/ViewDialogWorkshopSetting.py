@@ -16,11 +16,11 @@ from framework.FwManager import FwManager
 
 class ViewDialogWorkshopSetting(FwComponent):
     def __init__(self):
-        pass
+        super(ViewDialogWorkshopSetting, self).__init__()
 
     def onRegistered(self, manager):
         info = {'name':'dialog.project.setting', 'help':'show dialog for project setting.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -38,6 +38,7 @@ class DialogPreferences(Gtk.Dialog):
     # 显示当前项目各种配置，并可以进行修改。
 
     def __init__(self, parent, setting):
+        super(DialogPreferences, self).__init__()
 
         self.parent = parent
         self.setting = setting

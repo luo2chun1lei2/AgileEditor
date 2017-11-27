@@ -16,12 +16,12 @@ class ViewDialogInfo(FwComponent):
     '''
 
     def __init__(self):
-        pass
+        super(ViewDialogInfo, self).__init__()
 
     # override component
     def onRegistered(self, manager):
         info = {'name':'dialog.info', 'help':'show application information dialog.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -33,7 +33,7 @@ class ViewDialogInfo(FwComponent):
                   'accel':"<Alt>H",
                   'stock_id':Gtk.STOCK_INFO,
                   'service_name':'dialog.info'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         return True
 
@@ -51,8 +51,8 @@ class ViewDialogInfo(FwComponent):
 
         authors = ['罗春雷', "luo2chun1lei2@icloud.com"]
 
-        componentInfo = FwManager.instance().showComponents(True)
-        serviceInfo = FwManager.instance().showServices(True)
+        componentInfo = FwManager.instance().show_components(True)
+        serviceInfo = FwManager.instance().show_services(True)
         documentors = ["------------------------------", componentInfo, serviceInfo]
 
         dirname = os.path.abspath(os.path.dirname(__file__))

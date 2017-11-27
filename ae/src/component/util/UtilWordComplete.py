@@ -15,12 +15,12 @@ from component.model.ModelTags import ModelGTags
 
 class UtilWordComplete(FwComponent):
     def __init__(self):
-        pass
+        super(UtilWordComplete, self).__init__()
 
     # override component
     def onRegistered(self, manager):
         info = {'name':'util.word_complete.get_provider', 'help':'get a word privder.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 

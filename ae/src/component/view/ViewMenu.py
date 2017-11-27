@@ -44,7 +44,8 @@ class ViewMenu(FwComponent):
     ) = range(4)
 
     def __init__(self, window):
-
+        super(ViewMenu, self).__init__()
+        
         # 附件检索的控件
         self.search_entry = None
         self.actions = []
@@ -57,7 +58,7 @@ class ViewMenu(FwComponent):
                 {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
                 {'name':'view.menu.set_search_option', 'help':'set option of search.'}
                 ]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -288,11 +289,11 @@ class ViewMenu(FwComponent):
     def on_menuitem_active_send_service(self, widget, service):
         ''' 通用的菜单 Active 函数，发送service'''
         logging.debug("Common process of one menu item and send service.")
-        FwManager.instance().requestService(service, None)
+        FwManager.instance().request_service(service, None)
 
     def on_menuitem_active_with_search_text(self, widget, service):
         search_text = self.search_entry.get_text()
-        FwManager.instance().requestService(service, {'text':search_text})
+        FwManager.instance().request_service(service, {'text':search_text})
 
     def _set_search_options(self, search_text, case_sensitive, is_word):
         # 在此设置检索用的项目，想让 编辑器 显示检索项目，但是还不能跳转。下面是解决方法：（不优美）
@@ -313,7 +314,7 @@ class ViewMenu(FwComponent):
         need_case_sensitive = self.search_case_sensitive.get_active()
         need_search_is_word = self.search_is_word.get_active()
 
-        FwManager.instance().requestService('ctrl.search.find_text',
+        FwManager.instance().request_service('ctrl.search.find_text',
                     {'need_jump':need_jump.need, 'search_text':search_text, 'need_case_sensitive':need_case_sensitive, 'need_search_is_word':need_search_is_word})
 
         if need_jump.need is False:

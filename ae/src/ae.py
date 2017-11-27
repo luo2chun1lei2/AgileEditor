@@ -7,7 +7,7 @@
 
 import sys, logging
 
-def init_components(manager):
+def load_components(manager):
     ''' 建立最开始的组件，然后注册。
     '''
     # 注册已知的组件工厂。
@@ -57,11 +57,12 @@ def init_components(manager):
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 
 def main(argv):
-    logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
+    logging.basicConfig(level=logging.INFO, 
+                        format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
     from framework.FwManager import FwManager
     mng = FwManager.instance()
-    init_components(mng)
+    load_components(mng)
     mng.run(argv)
 
 if __name__ == '__main__':

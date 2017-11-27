@@ -40,7 +40,7 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.show_bookmark', 'help':'show a bookmark.'},
                 {'name':'ctrl.search.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
                 ]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -117,7 +117,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<control>L",
                   'stock_id':Gtk.STOCK_JUMP_TO,
                   'service_name':'ctrl.search.jump_to'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchFind',
@@ -125,7 +125,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<control>F",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchFindNext',
@@ -133,7 +133,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<control>G",
                   'stock_id':None,
                   'service_name':'ctrl.search.find_next'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchFindPrev',
@@ -141,7 +141,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<shift><control>G",
                   'stock_id':None,
                   'service_name':'ctrl.search.find_prev'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchFindInFiles',
@@ -149,7 +149,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<control>H",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_in_files'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchAgainFindInFiles',
@@ -157,7 +157,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<shift><control>H",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_in_files_again'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchFindPath',
@@ -165,7 +165,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<control>P",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_path'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchDialogDefinition',
@@ -173,7 +173,7 @@ class CtrlSearch(FwComponent):
                   'accel':"<control>F3",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_definition_input_by_dialog'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchDefinition',
@@ -181,7 +181,7 @@ class CtrlSearch(FwComponent):
                   'accel':"F3",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_definition'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchReference',
@@ -189,7 +189,7 @@ class CtrlSearch(FwComponent):
                   'accel':"F4",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_reference'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchBackTag',
@@ -198,7 +198,7 @@ class CtrlSearch(FwComponent):
                   'stock_id':Gtk.STOCK_GO_BACK,
                   'service_name':'ctrl.search.go_back_tag',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchUpdateTags',
@@ -207,7 +207,7 @@ class CtrlSearch(FwComponent):
                   'stock_id':Gtk.STOCK_REFRESH,
                   'service_name':'ctrl.search.update_tags',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         return True
 
@@ -230,7 +230,7 @@ class CtrlSearch(FwComponent):
     def _get_word_and_jump_to_search_box(self):
         # 如果当前编辑器中有选中的文字，就将此文字放入检索文本框中。
 
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -242,7 +242,7 @@ class CtrlSearch(FwComponent):
             (start, end) = buf.get_selection_bounds()
             text = buf.get_text(start, end, False)
 
-        FwManager.instance().requestService('view.menu.set_and_jump_to_search_textbox', {'text': text})
+        FwManager.instance().request_service('view.menu.set_and_jump_to_search_textbox', {'text': text})
 
     def _find_next(self, search_text):
         '''
@@ -251,7 +251,7 @@ class CtrlSearch(FwComponent):
         然后查找定义。 
         search_text string 需要检索的文字
         '''
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -264,7 +264,7 @@ class CtrlSearch(FwComponent):
         然后查找定义。 
         search_text string 需要检索的文字
         '''
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -321,7 +321,7 @@ class CtrlSearch(FwComponent):
         self.search_context.set_highlight(True)
 
     def _find_text(self, need_jump, search_text, need_case_sensitive, search_is_word=False):
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if view_editor is None:
             return
 
@@ -369,7 +369,7 @@ class CtrlSearch(FwComponent):
 
     def _grep_in_files(self, pattern):
         # 执行检索
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute_with_spinner(None, self._after_grep_in_files,
                           cur_prj.query_grep_tags, pattern, False)
 
@@ -381,8 +381,8 @@ class CtrlSearch(FwComponent):
             dialog.destroy()
 
         else:
-            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
+            FwManager.instance().request_service('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
             if len(tags) == 1:
                 ''' 直接跳转。 '''
                 tag = tags[0]
@@ -397,7 +397,7 @@ class CtrlSearch(FwComponent):
         ''' 跳转到指定文件的行。 '''
         # 先找到对应的文件，然后再滚动到指定的位置
         logging.debug('jump to path:' + file_path + ', line:' + str(line_number))
-        isOK, results = FwManager.instance().requestService('ctrl.file.open', {'abs_file_path': file_path})
+        isOK, results = FwManager.instance().request_service('ctrl.file.open', {'abs_file_path': file_path})
         if isOK and results['result'] == ViewWindow.RLT_OK:  # TODO 这里需要知道ViewWindow的常亮
             # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
@@ -412,7 +412,7 @@ class CtrlSearch(FwComponent):
         self._find_path(pattern)
 
     def _find_path(self, pattern):
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._after_find_path,
                           cur_prj.query_grep_filepath, pattern, False)
 
@@ -424,8 +424,8 @@ class CtrlSearch(FwComponent):
             dialog.destroy()
 
         else:
-            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
+            FwManager.instance().request_service('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
             if len(tags) == 1:
                 # 直接跳转。
                 tag = tags[0]
@@ -445,7 +445,7 @@ class CtrlSearch(FwComponent):
         self._search_defination(tag_name)
 
     def _search_defination(self, tag_name):
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._after_search_defination,
                           cur_prj.query_defination_tags, tag_name)
 
@@ -458,8 +458,8 @@ class CtrlSearch(FwComponent):
             dialog.destroy()
 
         else:
-            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
+            FwManager.instance().request_service('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
             if len(tags) == 1:
                 ''' 直接跳转。 '''
                 tag = tags[0]
@@ -469,7 +469,7 @@ class CtrlSearch(FwComponent):
         ''' 查找引用
         '''
         tag_name = UtilEditor.get_selected_text_or_word()
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._after_search_reference,
                           cur_prj.query_reference_tags, tag_name)
 
@@ -481,8 +481,8 @@ class CtrlSearch(FwComponent):
             dialog.run()
             dialog.destroy()
         else:
-            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
-            FwManager.instance().requestService('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
+            cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
+            FwManager.instance().request_service('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})
             if len(tags) == 1:
                 # 直接跳转。
                 tag = tags[0]
@@ -491,7 +491,7 @@ class CtrlSearch(FwComponent):
     def _go_back_tag(self):
         # 回退到上一个位置。
         # 恢复到原来的位置
-        isOK, results = FwManager.instance().requestService('model.jump_history.pop')
+        isOK, results = FwManager.instance().request_service('model.jump_history.pop')
         if results is None:
             return
         self._goto_file_line(results['file_path'], results['line_no'], record=False)
@@ -501,12 +501,12 @@ class CtrlSearch(FwComponent):
         TODO: 以后应该改成监听“事件”
         '''
 
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         if cur_prj is None:
             return
 
         # 更新当前项目的文件列表
-        FwManager.instance().requestService('view.fstree.set_dir', {'dir':cur_prj.src_dirs[0]})
+        FwManager.instance().request_service('view.fstree.set_dir', {'dir':cur_prj.src_dirs[0]})
 
         # 更新右边的TAGS
         cur_prj.prepare()
@@ -515,7 +515,7 @@ class CtrlSearch(FwComponent):
         ''' 【服务】根据当前情况加入新的bookmark。
         '''
         bookmark = UtilEditor.make_bookmark()
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         cur_prj.add_bookmark(bookmark)
         return True, {'bookmarks':cur_prj.bookmarks, 'current_project': cur_prj}
 
@@ -525,5 +525,5 @@ class CtrlSearch(FwComponent):
 
     def _idle_editor_set_focus(self):
         ''' 获取焦点 '''
-        editor = FwManager.requestOneSth('editor', "view.multi_editors.get_current_editor")
+        editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         editor.grab_focus()

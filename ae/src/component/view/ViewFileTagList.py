@@ -25,6 +25,7 @@ class ViewFileTagList (FwComponent):
 
     def __init__(self):
         # editorWindow:ViewWindow:主画面
+        super(ViewFileTagList, self).__init__()
 
         # 总的容器
         vbox = Gtk.VBox(spacing=2)
@@ -64,7 +65,7 @@ class ViewFileTagList (FwComponent):
     def onRegistered(self, manager):
         info = [{'name':'view.file_taglist.get_view', 'help':'get view of tag list.'},
                 {'name':'view.file_taglist.show_taglist', 'help':'show tag list in view.'}]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -189,7 +190,7 @@ class ViewFileTagList (FwComponent):
             return
 
         # 跳转到对应的行。
-        FwManager.instance().requestService('ctrl.search.goto_line', {'line_no':line_no})
+        FwManager.instance().request_service('ctrl.search.goto_line', {'line_no':line_no})
 
     def get_view(self):
         # 返回容器控件

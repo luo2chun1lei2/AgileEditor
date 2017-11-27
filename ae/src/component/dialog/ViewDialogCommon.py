@@ -9,14 +9,17 @@ from framework.FwManager import FwManager
 class ViewDialogCommon(FwComponent):
     # 通用的对话框
     # 可以显示一个Entry或者两个Entry的对话框，然后得到输入的结果。
+    
+    def __init__(self):
+        super(ViewDialogCommon, self).__init__()
 
     # from FwBaseComponnet
     def onRegistered(self, manager):
         info = {'name':'dialog.common.one_entry', 'help':'show command dialog with one entry.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'dialog.common.two_entry', 'help':'show command dialog with two entry.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -25,7 +28,7 @@ class ViewDialogCommon(FwComponent):
         if 'transient_for' in params:
             window = params['transient_for']
         if window is None:
-            window = FwManager.requestOneSth('window', 'view.main.get_window')
+            window = FwManager.request_one('window', 'view.main.get_window')
         return window
 
     # from FwBaseComponnet

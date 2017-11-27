@@ -7,14 +7,14 @@ from framework.FwComponent import FwComponent
 
 class AppArgs(FwComponent):
     def __init__(self):
-        pass
+        super(AppArgs, self).__init__()
 
     def onRegistered(self, manager):
         info = {'name':'command.parse', 'help':'parse the command options, and return result.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'command.help', 'help':'show command help information to console.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 

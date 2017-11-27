@@ -29,7 +29,8 @@ class ModelWorkshop(FwComponent):
 
     def __init__(self, ws_path):
         # ws_path: string: workshop的路径。
-
+        super(ModelWorkshop, self).__init__()
+        
         if is_empty(ws_path):
             logging.error('workshop路径不正确。%s' % (ws_path))
             os.sys.exit(1)
@@ -57,16 +58,16 @@ class ModelWorkshop(FwComponent):
     # override component
     def onRegistered(self, manager):
         info = {'name':'model.workshop.getopt', 'help':'get one option value of workshop.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'model.project.new', 'help':'create a new project in model.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'model.project.delete', 'help':'delete the given project in model.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'model.project.change', 'help':'change the given project in model.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 

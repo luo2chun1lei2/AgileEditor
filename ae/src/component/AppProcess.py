@@ -8,11 +8,11 @@ from framework.FwComponent import FwComponent
 
 class AppProcess(FwComponent):
     def __init__(self):
-        pass
+        super(AppProcess, self).__init__()
 
     def onRegistered(self, manager):
         info = {'name':'app.run', 'help':'run as main application.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
         return True
 
     def onRequested(self, manager, serviceName, params):
@@ -20,14 +20,14 @@ class AppProcess(FwComponent):
             logging.debug("run application")
 
             # 命令分析
-            (isOK, results) = manager.requestService("command.parse", {'argv':params['argv']})
+            (isOK, results) = manager.request_service("command.parse", {'argv':params['argv']})
             if not isOK:
-                manager.requestService("command.help", None)
+                manager.request_service("command.help", None)
                 return (False, None)
             logging.debug("service's results: \"%s\"" % results)
 
             # 启动主画面。
-            (isOK, results) = manager.requestService("app.view", results)
+            (isOK, results) = manager.request_service("app.view", results)
             if not isOK:
                 return (False, None)
 

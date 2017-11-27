@@ -17,6 +17,7 @@ class AeMain(FwComponent):
     # ve_path string ve配置的路径
 
     def __init__(self):
+        super(AeMain, self).__init__()
 
         # 加载数据模型
         self.ve_path = os.path.expanduser(ModelWorkshop.DEFAULT_VE_CONFIG_PATH)
@@ -26,7 +27,7 @@ class AeMain(FwComponent):
         manager.load('model_workshop', self.workshop)
 
         info = {'name':'app.select_project', 'help':'select one project to start UI.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -60,7 +61,7 @@ class AeMain(FwComponent):
         # 如果没有传入打开某个项目，或者指定的项目不存在，那么就指定一个。
         if prj is None :
             # 需要让客户选择一个项目
-            isOK, results = FwManager.instance().requestService("dialog.project.open",
+            isOK, results = FwManager.instance().request_service("dialog.project.open",
                                         {'parent':None, 'workshop':self.workshop})
             if not isOK:
                 return
@@ -86,7 +87,7 @@ class AeMain(FwComponent):
         FwManager.instance().load('view_main', editorWin)
         # TODO 现在服务之间相互调用，已经出现先后顺序的问题，因为有的组件生成实例时，
         #      就需要调用服务。
-        FwManager.instance().requestService('ctrl.workshop.open_project', {'project':prj})
+        FwManager.instance().request_service('ctrl.workshop.open_project', {'project':prj})
 
         # - 显示画面
         editorWin.show_all()

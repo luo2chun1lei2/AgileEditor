@@ -88,8 +88,8 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
 
     def __init__(self, dir_path=None):
         # dir_path:string:文件夹的路径，如果没有设定，就是空的目录。
-
-        GObject.GObject.__init__(self)
+        super(FsTreeModel, self).__init__()
+        #GObject.GObject.__init__(self)
 
         # TODO:在TreeIter中只能保存Int类型的参数（放string不行吗？），所以需要用id将object类型转成int的一个索引号，
         # 然后在pool中保存，但是没有地方释放！
@@ -552,13 +552,13 @@ class ViewFsTree(FwComponent):
     # override component
     def onRegistered(self, manager):
         info = {'name':'view.fstree.get_view', 'help':'get the whole view.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'view.fstree.focus_file', 'help':'set focus to the given file.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'view.fstree.set_dir', 'help':'set file-tree path.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -616,7 +616,7 @@ class ViewFsTree(FwComponent):
             treeview.expand_row(tree_path, False)
         else:
             # 根据绝对路径显示名字。
-            FwManager.instance().requestService('ctrl.file.open', {'abs_file_path': abs_path})
+            FwManager.instance().request_service('ctrl.file.open', {'abs_file_path': abs_path})
 
     # event handle
     def on_fstree_row_button_release(self, tree_view, event_button):
@@ -838,7 +838,7 @@ class ViewFsTree(FwComponent):
         clipboard.set_text(file_path, -1)
 
     def _refresh_project(self):
-        FwManager.instance().requestService('ctrl.search.update_tags')
+        FwManager.instance().request_service('ctrl.search.update_tags')
 
     def _show_file(self, abs_file_path):
         # 将当前焦点切换到指定的文件上。

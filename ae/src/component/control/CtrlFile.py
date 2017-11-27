@@ -18,7 +18,7 @@ from component.view.ViewMenu import ViewMenu
 
 class CtrlFile(FwComponent):
     def __init__(self):
-        super(FwComponent, self).__init__()
+        super(CtrlFile, self).__init__()
 
     # override component
     def onRegistered(self, manager):
@@ -28,7 +28,7 @@ class CtrlFile(FwComponent):
                 {'name':'ctrl.file.save', 'help':'save current opened file.'},
                 {'name':'ctrl.file.save_as', 'help':'save current opened file as another name.'}
                 ]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         # register listening event.
         manager.register_event_listener('view.multi_editors.switch_page', self)
@@ -77,7 +77,7 @@ class CtrlFile(FwComponent):
                   'stock_id':Gtk.STOCK_NEW,
                   'service_name':'ctrl.file.new',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'FileMenu',
                   'menu_item_name':'FileOpen',
@@ -86,7 +86,7 @@ class CtrlFile(FwComponent):
                   'stock_id':Gtk.STOCK_OPEN,
                   'service_name':'ctrl.file.open',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'FileMenu',
                   'menu_item_name':'FileClose',
@@ -95,7 +95,7 @@ class CtrlFile(FwComponent):
                   'stock_id':Gtk.STOCK_CLOSE,
                   'service_name':'ctrl.file.close',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'FileMenu',
                   'menu_item_name':'FileSave',
@@ -104,7 +104,7 @@ class CtrlFile(FwComponent):
                   'stock_id':Gtk.STOCK_SAVE,
                   'service_name':'ctrl.file.save',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'FileMenu',
                   'menu_item_name':'FileSaveAs',
@@ -113,7 +113,7 @@ class CtrlFile(FwComponent):
                   'stock_id':Gtk.STOCK_SAVE_AS,
                   'service_name':'ctrl.file.save_as',
                   'in_toolbar':True}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         return True
 
@@ -128,7 +128,7 @@ class CtrlFile(FwComponent):
 
         logging.debug('start to save file.')
 
-        ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ide_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ide_editor is None:
             logging.debug('No file is being opened.')
             return ViewWindow.RLT_OK
@@ -162,23 +162,23 @@ class CtrlFile(FwComponent):
             logging.debug('ide save file to disk file.')
 
             # 重新整理TAGS
-            cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+            cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
             cur_prj.prepare()
 
             # 右边的TAG更新
             self._query_tags_by_file_and_refresh(ide_editor.ide_file.file_path)
 
-        FwManager.instance().requestService('view.main.set_status', {'status':ViewMenu.STATUS_FILE_OPEN})
+        FwManager.instance().request_service('view.main.set_status', {'status':ViewMenu.STATUS_FILE_OPEN})
 
         return ViewWindow.RLT_OK
 
     def _refresh_file_tag_list(self, tags):
         # 根据Tag的列表，更新文件对应的Tag列表
         # tags:[IdeOneTag]:Tag列表。
-        FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist':tags})
+        FwManager.instance().request_service('view.file_taglist.show_taglist', {'taglist':tags})
 
     def _query_tags_by_file_and_refresh(self, abs_file_path):
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._refresh_file_tag_list,
                           cur_prj.query_ctags_of_file, abs_file_path)
 
@@ -189,7 +189,7 @@ class CtrlFile(FwComponent):
         '''
         logging.debug("start to close file.")
 
-        ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ide_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ide_editor is None or ide_editor.ide_file is None:
             logging.debug('No file is being opened')
             return ViewWindow.RLT_OK
@@ -212,13 +212,13 @@ class CtrlFile(FwComponent):
                 return result
 
         # 关闭文件
-        abs_file_path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
-        FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': abs_file_path})
+        abs_file_path = FwManager.request_one('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
+        FwManager.instance().request_service('view.multi_editors.close_editor', {'abs_file_path': abs_file_path})
 
         # 关闭文件的tag列表。
-        FwManager.instance().requestService('view.file_taglist.show_taglist', {'taglist': []})
+        FwManager.instance().request_service('view.file_taglist.show_taglist', {'taglist': []})
 
-        FwManager.instance().requestService('view.main.set_status', {'status':ViewMenu.STATUS_FILE_NONE})
+        FwManager.instance().request_service('view.main.set_status', {'status':ViewMenu.STATUS_FILE_NONE})
 
         return ViewWindow.RLT_OK
 
@@ -230,8 +230,8 @@ class CtrlFile(FwComponent):
         '''
         logging.debug("ide save as other file.")
 
-        ide_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
-        old_file_path = FwManager.requestOneSth('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
+        ide_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
+        old_file_path = FwManager.request_one('abs_file_path', 'view.multi_editors.get_current_abs_file_path')
 
         if ide_editor.ide_file == None:
             logging.debug('No file is being opened')
@@ -264,13 +264,13 @@ class CtrlFile(FwComponent):
         shutil.copy(old_file_path, file_path)
 
         # 关闭原来的文件。
-        FwManager.instance().requestService('view.multi_editors.close_editor', {'abs_file_path': old_file_path})
+        FwManager.instance().request_service('view.multi_editors.close_editor', {'abs_file_path': old_file_path})
 
         # 打开指定的文件，并保存
-        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': file_path})
+        FwManager.instance().request_service('view.multi_editors.open_editor', {'abs_file_path': file_path})
 
         # 切换当前的状态
-        FwManager.instance().requestService('view.main.set_status', {'status':ViewMenu.STATUS_FILE_OPEN})
+        FwManager.instance().request_service('view.main.set_status', {'status':ViewMenu.STATUS_FILE_OPEN})
 
         return ViewWindow.RLT_OK
 
@@ -306,10 +306,10 @@ class CtrlFile(FwComponent):
             logging.debug("Cancel to open one file.")
             result = ViewWindow.RLT_CANCEL
 
-        FwManager.instance().requestService('view.main.set_status', {'status':ViewMenu.STATUS_FILE_OPEN})
+        FwManager.instance().request_service('view.main.set_status', {'status':ViewMenu.STATUS_FILE_OPEN})
 
         # 设定单词补全。
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         UtilEditor.set_completion(cur_prj)
 
         return result
@@ -318,13 +318,13 @@ class CtrlFile(FwComponent):
         '''
         @param abs_file_path: string: 切换到的文件名字
         '''
-        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
+        FwManager.instance().request_service('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
 
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
-        FwManager.instance().requestService('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
+        FwManager.instance().request_service('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
 
         # 分析标记
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         if cur_prj is not None:
             # tags = self.cur_prj.query_tags_by_file(abs_file_path)
             # self.ide_refresh_file_tag_list(tags)
@@ -332,33 +332,33 @@ class CtrlFile(FwComponent):
             pass
 
         # 显示文件的路径。
-        FwManager.instance().requestService('view.main.set_title', {'title':abs_file_path})
+        FwManager.instance().request_service('view.main.set_title', {'title':abs_file_path})
 
         # 在文件树那里同步
-        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
+        FwManager.instance().request_service('view.fstree.focus_file', {'abs_file_path':abs_file_path})
 
     def _switch_page(self, abs_file_path):
         # abs_file_path string 切换到的文件名字
-        FwManager.instance().requestService('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
+        FwManager.instance().request_service('view.multi_editors.open_editor', {'abs_file_path': abs_file_path})
 
-        view_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
         mdl_file = view_editor.ide_file
 
         # 初始化检索。
         # - 检索会影响到位置，这里只有在函数结尾再加上定位了。
-        FwManager.instance().requestService('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
-        FwManager.instance().requestService('view.menu.set_search_option',
+        FwManager.instance().request_service('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
+        FwManager.instance().request_service('view.menu.set_search_option',
                     {'search_text':mdl_file.file_search_key, 
                      'case_sensitive':mdl_file.file_search_case_sensitive, 
                      'is_word':mdl_file.file_search_is_word})
 
         # 分析标记
-        cur_prj = FwManager.requestOneSth('project', 'view.main.get_current_project')
+        cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         if cur_prj is not None:
             self._query_tags_by_file_and_refresh(abs_file_path)
 
         # 显示文件的路径。
-        FwManager.instance().requestService('view.main.set_title', {'title':abs_file_path})
+        FwManager.instance().request_service('view.main.set_title', {'title':abs_file_path})
 
         # 在文件树那里同步
-        FwManager.instance().requestService('view.fstree.focus_file', {'abs_file_path':abs_file_path})
+        FwManager.instance().request_service('view.fstree.focus_file', {'abs_file_path':abs_file_path})

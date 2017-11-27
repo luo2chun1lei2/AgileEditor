@@ -27,7 +27,7 @@ class CtrlEdit(FwComponent):
                 {'name':'ctrl.edit.delete_line', 'help':'delete the line allocated by cursor.'},
                 {'name':'ctrl.edit.select_all', 'help':'select all test in current edit file.'}
                 ]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -74,7 +74,7 @@ class CtrlEdit(FwComponent):
                   'accel':"<shift><control>Z",
                   'stock_id':Gtk.STOCK_REDO,
                   'service_name':'ctrl.edit.redo'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditUndo',
@@ -82,7 +82,7 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>Z",
                   'stock_id':Gtk.STOCK_UNDO,
                   'service_name':'ctrl.edit.undo'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditCut',
@@ -90,7 +90,7 @@ class CtrlEdit(FwComponent):
                   'accel':"",
                   'stock_id':Gtk.STOCK_CUT,
                   'service_name':'ctrl.edit.cut'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditCopy',
@@ -98,7 +98,7 @@ class CtrlEdit(FwComponent):
                   'accel':"",
                   'stock_id':Gtk.STOCK_COPY,
                   'service_name':'ctrl.edit.copy'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditPaste',
@@ -106,7 +106,7 @@ class CtrlEdit(FwComponent):
                   'accel':"",
                   'stock_id':Gtk.STOCK_PASTE,
                   'service_name':'ctrl.edit.paste'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditDeleteLine',
@@ -114,7 +114,7 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>D",
                   'stock_id':Gtk.STOCK_DELETE,
                   'service_name':'ctrl.edit.delete_line'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditSelectAll',
@@ -122,7 +122,7 @@ class CtrlEdit(FwComponent):
                   'accel':"",
                   'stock_id':Gtk.STOCK_SELECT_ALL,
                   'service_name':'ctrl.edit.select_all'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditComment',
@@ -130,7 +130,7 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>slash",
                   'stock_id':None,
                   'service_name':'ctrl.edit.comment'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditUncomment',
@@ -138,7 +138,7 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>question",
                   'stock_id':None,
                   'service_name':'ctrl.edit.uncomment'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditReplace',
@@ -146,13 +146,13 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>R",
                   'stock_id':None,
                   'service_name':'ctrl.edit.replace'}
-        manager.requestService("view.menu.add", params)
+        manager.request_service("view.menu.add", params)
 
         return True
 
     def _edit_comment(self):
         # 将选择的行变成“注释”
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -178,7 +178,7 @@ class CtrlEdit(FwComponent):
     def _edit_uncomment(self):
         # 将所在的行从“注释“变成正常代码
         # 将选择的行变成“注释”
-        ve_editor = FwManager.requestOneSth('editor', 'view.multi_editors.get_current_ide_editor')
+        ve_editor = FwManager.request_one('editor', 'view.multi_editors.get_current_ide_editor')
         if ve_editor is None:
             return
 
@@ -228,7 +228,7 @@ class CtrlEdit(FwComponent):
         # 看看是否已经选中了单词
         tag_name = UtilEditor.get_selected_text_or_word()
 
-        isOK, results = FwManager.instance().requestService('dialog.common.two_entry',
+        isOK, results = FwManager.instance().request_service('dialog.common.two_entry',
                                     {'title':"替换", 'entry1_label':"从", 'text1':tag_name,
                                      'entry2_label':"到", 'text2':""})
         response = results['response']

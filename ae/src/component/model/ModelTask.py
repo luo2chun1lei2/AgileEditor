@@ -6,7 +6,7 @@ import os, logging, threading
 
 from gi.repository import GLib, Gdk, Gtk
 
-class ModelTask:
+class ModelTask(object):
     # 需要完成的长时间任务，放在队列中执行。
     
     @staticmethod
@@ -59,3 +59,5 @@ class ModelTask:
         
         thread.start()
         
+    def __init__(self):
+        super(ModelTask, self).__init__()

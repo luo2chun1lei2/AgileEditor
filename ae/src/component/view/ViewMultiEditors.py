@@ -40,6 +40,8 @@ class ViewMultiEditors(FwComponent):
     # dic_editors [str, ViewEditor] 数组：文件路径（绝对），编辑器
 
     def __init__(self):
+        super(ViewMultiEditors, self).__init__()
+        
         self.styleScheme = None
 
         # 生成Tab page 类型的控件。
@@ -65,7 +67,7 @@ class ViewMultiEditors(FwComponent):
                 {'name':'view.multi_editors.get_current_ide_file', 'help':'show model of current file.'},
                 {'name':'view.multi_editors.change_editor_style', 'help':'change the style scheme of editors.'},
                 {'name':'view.multi_editors.change_editor_font', 'help':'change the font of editors.'}]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
         return True
 
     # override component
@@ -298,7 +300,7 @@ class ViewMultiEditors(FwComponent):
         editor.set_tab_width(4)  # tab宽度4
         editor.set_highlight_current_line(True)  # 高亮度显示当前行
 
-        isOK, results = FwManager.instance().requestService('model.workshop.getopt', {'key': 'font'})
+        isOK, results = FwManager.instance().request_service('model.workshop.getopt', {'key': 'font'})
         self._ide_set_font(editor, results['value'])  # 设置字体。
 
         # 左边的标记区域
@@ -347,7 +349,7 @@ class ViewMultiEditors(FwComponent):
         if self.styleScheme is None:
             # 可以利用 styleSchemeManager.get_scheme_ids() 得到所有的id
             # ['cobalt', 'kate', 'oblivion', 'solarized-dark', 'solarized-light', 'tango', 'classic']
-            isOK, results = FwManager.instance().requestService("model.workshop.getopt", {'key':"style"})
+            isOK, results = FwManager.instance().request_service("model.workshop.getopt", {'key':"style"})
 
             styleSchemeManager = GtkSource.StyleSchemeManager.get_default()
             styleScheme = styleSchemeManager.get_scheme(results['value'])

@@ -57,6 +57,7 @@ class ModelTag(object):
     def __init__(self, name, 
                  file_path=None, line_no=None, content=None,
                  tag_type=None, tag_scope=None):
+        super(ModelTag, self).__init__()
         self.tag_name = name
         self.tag_file_path = file_path
         self.tag_line_no = line_no
@@ -96,6 +97,7 @@ class ModelGTags(object):
     def __init__(self, project):
         # 初始化
         # project:ModelProject:项目对象。
+        super(ModelGTags, self).__init__()
         self.project = project
     
     def _get_tags_path(self):

@@ -6,11 +6,14 @@
 from gi.repository import Gtk
 from framework.FwManager import FwManager
 
-class UtilDialog:
+class UtilDialog(object):
+    
+    def __init__(self):
+        super(UtilDialog, self).__init__()
 
     @staticmethod
     def show_dialog_one_entry(title, label):
-        isOK, results = FwManager.instance().requestService('dialog.common.one_entry',
+        isOK, results = FwManager.instance().request_service('dialog.common.one_entry',
                                     {'title':title, 'entry_label':label})
         return results['response'], results['text']
 

@@ -83,6 +83,7 @@ class ModelProject(object):
 
     def __init__(self):
         # 初始化内部的属性
+        super(ModelProject, self).__init__()
 
         self.config_path = None
         self.prj_name = None
@@ -263,7 +264,7 @@ class ModelProject(object):
 
     def get_completion_provider(self):
         # 返回一个单词补全的提供者
-        isOK, results = FwManager.instance().requestService("util.word_complete.get_provider", {'project':self})
+        isOK, results = FwManager.instance().request_service("util.word_complete.get_provider", {'project':self})
         if isOK:
             return results['provider']
         else:

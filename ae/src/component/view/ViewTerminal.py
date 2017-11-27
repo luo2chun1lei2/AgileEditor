@@ -8,13 +8,15 @@ from framework.FwComponent import FwComponent
 
 class ViewTerminal(FwComponent):
     def __init__(self):
+        super(ViewTerminal, self).__init__()
+        
         self._create_view()
     
     # override component
     def onRegistered(self, manager):
         info = [{'name':'view.terminal.get_view', 'help':'get view of ternimal.'},
                 {'name':'view.terminal.init', 'help':'initialize the terminal.'}]
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
     

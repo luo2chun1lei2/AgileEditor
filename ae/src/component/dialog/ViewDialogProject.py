@@ -18,17 +18,17 @@ from framework.FwManager import FwManager
 class ViewDialogProject(FwComponent):
     # from FwBaseComponnet
     def __init__(self):
-        pass
+        super(ViewDialogProject, self).__init__()
 
     def onRegistered(self, manager):
         info = {'name':'dialog.project.new', 'help':'show dialog for adding new project.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'dialog.project.open', 'help':'show dialog for opening one project.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         info = {'name':'dialog.project.change', 'help':'show dialog for changing one project.'}
-        manager.registerService(info, self)
+        manager.register_service(info, self)
 
         return True
 
@@ -54,7 +54,8 @@ class ViewDialogProjectNew(Gtk.Dialog):
     # 有可能需要有多个路径，比如用于排斥，或者用于和其他项目进行引用。
 
     def __init__(self, parent):
-
+        super(ViewDialogProjectNew, self).__init__()
+        
         self.parent = parent
 
         Gtk.Dialog.__init__(self, "新建项目 ", parent, 0,
@@ -127,7 +128,8 @@ class ViewDialogProjectChange(Gtk.Dialog):
     # 修改Project的对话框
 
     def __init__(self, parent):
-
+        super(ViewDialogProjectChange, self).__init__()
+        
         self.parent = parent
 
         Gtk.Dialog.__init__(self, "修改项目 ", parent, 0,
@@ -209,7 +211,8 @@ class ViewDialogProjectOpen(Gtk.Dialog):
     REPONSE_TYPE_CHANGE_PRJ = 102
 
     def __init__(self, parent, ideWorkshop):
-
+        super(ViewDialogProjectOpen, self).__init__()
+        
         self.parent = parent
         self.ideWorkshop = ideWorkshop
         self.selected_project = None
@@ -344,12 +347,12 @@ class ViewDialogProjectOpen(Gtk.Dialog):
 
             elif response == ViewDialogProjectOpen.REPONSE_TYPE_NEW_PRJ:
                 # 创建一个新的对话框
-                isOK, results = FwManager.instance().requestService("dialog.project.new", {'parent':dialog})
+                isOK, results = FwManager.instance().request_service("dialog.project.new", {'parent':dialog})
                 prj_name = results['prj_name']
                 prj_src_dirs = results['prj_src_dirs']
                 if not prj_name is None:
                     # 发动“添加一个新的项目”的动作。
-                    FwManager.instance().requestService('model.project.new',
+                    FwManager.instance().request_service('model.project.new',
                             {'project_name':prj_name, 'source_pathes':prj_src_dirs})
 
                 # 更新当前画面。
@@ -367,7 +370,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
 
-                    FwManager.instance().requestService('model.project.delete',
+                    FwManager.instance().request_service('model.project.delete',
                             {'project':prj})
 
                 # 更新当前画面。
@@ -385,12 +388,12 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     selected_index = selected_pathes[0].get_indices()[0]
                     prj = dialog.ideWorkshop.projects[selected_index]
 
-                    isOK, results = FwManager.instance().requestService("dialog.project.change",
+                    isOK, results = FwManager.instance().request_service("dialog.project.change",
                                         {'parent':dialog, 'project':prj})
                     prj_name = results['prj_name']
                     prj_src_dirs = results['prj_src_dirs']
                     if not prj_name is None:
-                        FwManager.instance().requestService('model.project.change',
+                        FwManager.instance().request_service('model.project.change',
                             {'project':prj, 'project_name':prj_name, 'source_pathes':prj_src_dirs})
 
                 # 更新当前画面。
