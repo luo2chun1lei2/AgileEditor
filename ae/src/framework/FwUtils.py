@@ -31,7 +31,10 @@ def util_print_frame():
 
     stack = inspect.stack()
     frame = stack[2][0]
-    the_class = frame.f_locals["self"].__module__
+    if "self" in frame.f_locals:
+        the_class = str(frame.f_locals["self"].__module__)
+    else:
+        the_class = "Unknown"
     the_line = frame.f_lineno
     the_method = frame.f_code.co_name
-    print "=-> %s:%d/%s" % (str(the_class), the_line, the_method)
+    print "=-> %s:%d/%s" % (the_class, the_line, the_method)

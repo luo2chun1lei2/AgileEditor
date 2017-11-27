@@ -121,7 +121,7 @@ class FwManager(FwEventPipe, FwServiceCenter):
         '''
         isOK, results = FwManager.instance().request_service(service_name, params)
         if not isOK:
-            logging.error("Failed to get item(%s) of \"s\"" % service_name)
+            logging.error("Failed to get item(%s) of \"%s\"" % (item_name, service_name))
             return None
         return results[item_name]
 

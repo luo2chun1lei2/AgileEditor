@@ -34,16 +34,17 @@ class ViewDialogProject(FwComponent):
 
     # from FwBaseComponnet
     def onRequested(self, manager, serviceName, params):
+        window = FwManager.request_one("window", "view.main.get_window")
         if serviceName == "dialog.project.new":
-            prj_name, prj_src_dirs = ViewDialogProjectNew.show(params['parent'])
+            prj_name, prj_src_dirs = ViewDialogProjectNew.show(window)
             return (True, {'prj_name':prj_name, 'prj_src_dirs':prj_src_dirs})
 
         elif serviceName == "dialog.project.open":
-            prj = ViewDialogProjectOpen.show(params['parent'], params['workshop'])
+            prj = ViewDialogProjectOpen.show(window, params['workshop'])
             return (True, {'project':prj})
 
         elif serviceName == "dialog.project.change":
-            prj_name, prj_src_dirs = ViewDialogProjectChange.show(params['parent'], params['project'])
+            prj_name, prj_src_dirs = ViewDialogProjectChange.show(window, params['project'])
             return (True, {'prj_name':prj_name, 'prj_src_dirs':prj_src_dirs})
 
         else:

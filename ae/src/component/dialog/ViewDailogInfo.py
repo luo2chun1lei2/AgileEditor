@@ -40,14 +40,14 @@ class ViewDialogInfo(FwComponent):
     # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.info":
-            ViewDialogInfo.show(None)
+            ViewDialogInfo.show()
             return (True, None)
 
         else:
             return (False, None)
 
     @staticmethod
-    def show(window):
+    def show():
 
         authors = ['罗春雷', "luo2chun1lei2@icloud.com"]
 
@@ -60,6 +60,7 @@ class ViewDialogInfo(FwComponent):
         pixbuf = GdkPixbuf.Pixbuf.new_from_file(filename)
         transparent = pixbuf.add_alpha(True, 0xff, 0xff, 0xff)
 
+        window = FwManager.request_one("window", "view.main.get_window")
         about = Gtk.AboutDialog(parent=window,
                                 program_name='Agile Editor',
                                 version='0.3',

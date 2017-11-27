@@ -22,7 +22,7 @@ class AppProcess(FwComponent):
             # 命令分析
             (isOK, results) = manager.request_service("app.command.parse", {'argv':params['argv']})
             if not isOK:
-                manager.request_service("command.help", None)
+                manager.request_service("app.command.help", None)
                 return (False, None)
             logging.debug("service's results: \"%s\"" % results)
 

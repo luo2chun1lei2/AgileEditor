@@ -13,7 +13,7 @@ class AppArgs(FwComponent):
         info = {'name':'app.command.parse', 'help':'parse the command options, and return result.'}
         manager.register_service(info, self)
 
-        info = {'name':'command.help', 'help':'show command help information to console.'}
+        info = {'name':'app.command.help', 'help':'show command help information to console.'}
         manager.register_service(info, self)
 
         return True
@@ -27,7 +27,7 @@ class AppArgs(FwComponent):
                 return (False, None)
             return self._parseArgv(argv)
 
-        elif serviceName == "command.help":
+        elif serviceName == "app.command.help":
             return self._commandHelp()
 
         else:

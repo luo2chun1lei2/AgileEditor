@@ -28,7 +28,8 @@ class ViewDialogWorkshopSetting(FwComponent):
     def onRequested(self, manager, serviceName, params):
         if serviceName == "dialog.project.setting":
             # setting = {'style':?, 'font':?}
-            setting = DialogPreferences.show(params['parent'], params['setting'])
+            window = FwManager.request_one("window", "view.main.get_window")
+            setting = DialogPreferences.show(window, params['setting'])
             return (True, {'setting':setting})
 
         else:
