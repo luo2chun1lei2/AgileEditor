@@ -36,7 +36,7 @@ def init_components(manager):
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
     manager.register("app_view", AppView())
-    manager.register("ae_main", AeMain.get_instance())
+    manager.register("ae_main", AeMain())
     manager.register("dialog_info", ViewDialogInfo())
     manager.register("dialog_common", ViewDialogCommon())
     manager.register("dialog_project", ViewDialogProject())

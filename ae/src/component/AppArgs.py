@@ -13,7 +13,7 @@ class AppArgs(FwComponent):
         info = {'name':'command.parse', 'help':'parse the command options, and return result.'}
         manager.registerService(info, self)
 
-        info = {'name':'command.help', 'help':'show command help infomation to console.'}
+        info = {'name':'command.help', 'help':'show command help information to console.'}
         manager.registerService(info, self)
 
         return True
