@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 '''
-应用程序的主画面。
+应用程序的画面。
+主画面并不一定是Window，为了适应以后的扩展，需要有一个显示方面的总体组件。
 '''
 
 import logging
@@ -12,12 +13,12 @@ class AppView(FwComponent):
         super(AppView, self).__init__()
 
     def onRegistered(self, manager):
-        info = {'name':'app.view', 'help':'show the main view of application.'}
+        info = {'name':'app.view.show', 'help':'show the main view of application.'}
         manager.register_service(info, self)
         return True
 
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "app.view":
+        if serviceName == "app.view.show":
             logging.debug("show main view and into loop")
             manager.request_service('app.select_project',
                     {'want_lazy':params['want_lazy'],

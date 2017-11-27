@@ -7,6 +7,10 @@
 
 import sys, logging
 
+''' 提供的服务，组件并不是问题所在，服务才是。
+app.run/app.command.parse/app.view.show
+'''
+
 def load_components(manager):
     ''' 建立最开始的组件，然后注册。
     '''

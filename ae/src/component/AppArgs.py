@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 '''
-分析输入的命令。
+程序的命令组件，负责分析输入的命令，得到设置。
 '''
 import getopt, logging
 from framework.FwComponent import FwComponent
@@ -10,7 +10,7 @@ class AppArgs(FwComponent):
         super(AppArgs, self).__init__()
 
     def onRegistered(self, manager):
-        info = {'name':'command.parse', 'help':'parse the command options, and return result.'}
+        info = {'name':'app.command.parse', 'help':'parse the command options, and return result.'}
         manager.register_service(info, self)
 
         info = {'name':'command.help', 'help':'show command help information to console.'}
@@ -19,7 +19,7 @@ class AppArgs(FwComponent):
         return True
 
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "command.parse":
+        if serviceName == "app.command.parse":
             logging.debug("parse command")
             argv = params['argv']
             if argv is None:
