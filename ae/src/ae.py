@@ -9,7 +9,7 @@ import sys, logging
 
 ''' 提供的服务，组件并不是问题所在，服务才是。
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。
-    还需要：
+    还需要：[考虑ModelTags是否应该做成一个组件，方便以后替换成clang？]
 
     # 辅助用的对话框(OK)。
     dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
@@ -42,7 +42,7 @@ import sys, logging
     
     view.fstree.get_view/view.fstree.focus_file/view.fstree.set_dir [fstree实现太复杂，而且有太多bug，需要修改]
     
-    view.file_taglist.get_view/view.file_taglist.show_taglist [需要更加的高级clang，而不再使用global]
+    view.file_taglist.get_view/view.file_taglist.show_taglist
     [点击事件变成event]
     
     view.search_taglist.get_view/view.search_taglist.show_taglist
@@ -80,7 +80,7 @@ import sys, logging
     ctrl.search.find_in_files : find the matched word in files. [应该是在project中！]
     ctrl.search.find_in_files_again : find the matched word in files again.
     ctrl.search.find_path/ctrl.search.find_definition_input_by_dialog  [检索用的路径可以从多处获取，最好不要添加多余的命令和UI，避免用户迷惑]
-    ctrl.search.find_definition : find the definition of symbol. [也需要有dialog的]
+    ctrl.search.find_definition : find the definition of symbol. [也需要有dialog的] [需要更加的高级clang，而不再使用global]
     ctrl.search.find_reference : find the reference of symbol. [也需要有dialog的]
     ctrl.search.go_back_tag [配合jump_history，实现更强的跳转功能]
     ctrl.search.update_tags
