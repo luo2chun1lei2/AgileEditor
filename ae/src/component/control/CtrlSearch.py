@@ -375,10 +375,7 @@ class CtrlSearch(FwComponent):
 
     def _after_grep_in_files(self, tags):
         if len(tags) == 0:
-            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, "没有找到对应的定义。")
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.warn", {'message':"没有找到对应的定义。"})
 
         else:
             cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
@@ -418,10 +415,7 @@ class CtrlSearch(FwComponent):
 
     def _after_find_path(self, tags):
         if len(tags) == 0:
-            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO,
-                                       Gtk.ButtonsType.OK, "没有找到对应的定义。")
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.warn", {'message':"没有找到对应的文件路径。"})
 
         else:
             cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
@@ -453,9 +447,7 @@ class CtrlSearch(FwComponent):
 
         if len(tags) == 0:
             info = "没有找到对应\"" + tag_name + "\"的定义。"
-            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, info)
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.warn", {'message':info})
 
         else:
             cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
@@ -476,10 +468,7 @@ class CtrlSearch(FwComponent):
     def _after_search_reference(self, tag_name, tags):
         if len(tags) == 0:
             info = "没有找到对应\"" + tag_name + "\"的引用。"
-            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO, \
-                                       Gtk.ButtonsType.OK, info)
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.warn", {'message':info})
         else:
             cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
             FwManager.instance().request_service('view.search_taglist.show_taglist', {'taglist':tags, 'project':cur_prj})

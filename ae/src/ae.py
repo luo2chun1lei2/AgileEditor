@@ -14,9 +14,9 @@ import sys, logging
     # TODO 还是显示对话框没有parent，我已经取得了window？
     dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
     dialog.project.open/dialog.project.change/dialog.project.setting
-    [还有一堆通用的简单对话框（比如错误信息等），这里也应该变成统一的组件化]
+    dialog.msg.xxx 通用消息和问题类对话框。
     
-    util.word_complete.get_provider [孤独的工具类，是否应该将dialog也归于util里面？]
+    util.word_complete.get_provider
 
     # 应用程序级别的服务，模型是一个app，需要分析启动和设置，以及显示主画面。
     app.run/app.view.show/app.select_project [需要整理，选择一个项目成了画面的入口？][app是否综合为start/run/quit三个步骤?]
@@ -123,6 +123,7 @@ def load_components(manager):
     from component.control.CtrlWorshop import CtrlWorkshop
     from component.control.CtrlFile import CtrlFile
     from component.control.CtrlHelp import CtrlHelp
+    from component.dialog.ViewDialogMsg import ViewDialogMsg
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -132,6 +133,7 @@ def load_components(manager):
     manager.register("dialog_common", ViewDialogCommon())
     manager.register("dialog_project", ViewDialogProject())
     manager.register("dialog_project_setting", ViewDialogWorkshopSetting())
+    manager.register("dialog_msg", ViewDialogMsg())
     manager.register("word_complete", UtilWordComplete())
     manager.register("fs_treeview", ViewFsTree())
     manager.register("file_taglist", ViewFileTagList())
@@ -139,9 +141,9 @@ def load_components(manager):
     manager.register("multiple_editors", ViewMultiEditors())
     manager.register("terminal", ViewTerminal())
     manager.register("bookmarks", ViewBookmarks())
+    manager.register("jump_history", ModelJumpHistory())
     manager.register("ctrl_edit", CtrlEdit())
     manager.register("ctrl_search", CtrlSearch())
-    manager.register("jump_history", ModelJumpHistory())
     manager.register("ctrl_workshop", CtrlWorkshop())
     manager.register("ctrl_file", CtrlFile())
     manager.register("ctrl_help", CtrlHelp())

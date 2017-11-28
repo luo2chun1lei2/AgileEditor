@@ -89,7 +89,7 @@ class FsTreeModel(GObject.GObject, Gtk.TreeModel):
     def __init__(self, dir_path=None):
         # dir_path:string:文件夹的路径，如果没有设定，就是空的目录。
         super(FsTreeModel, self).__init__()
-        #GObject.GObject.__init__(self)
+        # GObject.GObject.__init__(self)
 
         # TODO:在TreeIter中只能保存Int类型的参数（放string不行吗？），所以需要用id将object类型转成int的一个索引号，
         # 然后在pool中保存，但是没有地方释放！
@@ -694,10 +694,7 @@ class ViewFsTree(FwComponent):
         # 新建文件
         new_file_path = os.path.join(file_path, name)
         if os.path.exists(new_file_path):
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-                                       Gtk.ButtonsType.CLOSE, "文件“%s”已经存在。" % new_file_path)
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.error", {'message':"文件“%s”已经存在。" % new_file_path})
             return
 
         f = open(new_file_path, 'w')
@@ -731,10 +728,7 @@ class ViewFsTree(FwComponent):
         # 新建文件
         new_file_path = os.path.join(file_path, name)
         if os.path.exists(new_file_path):
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-                                       Gtk.ButtonsType.CLOSE, "目录“%s”已经存在。" % new_file_path)
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.error", {'message':"目录“%s”已经存在。" % new_file_path})
             return
 
         os.mkdir(new_file_path)
@@ -753,13 +747,8 @@ class ViewFsTree(FwComponent):
         file_path = self._get_abs_file_path_by_iter(itr)
 
         # 需要确认！
-        dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.QUESTION,
-                                       Gtk.ButtonsType.YES_NO,
-                                       "删除文件“%s”！" % file_path)
-        reponse = dialog.run()
-        dialog.destroy()
-
-        if not reponse == Gtk.ResponseType.YES:
+        response = FwManager.instance().request_one('response', 'dialog.msg.question', {'message':"删除文件“%s”？" % file_path})
+        if not response == Gtk.ResponseType.YES:
             return
 
         # 删除文件
@@ -794,10 +783,7 @@ class ViewFsTree(FwComponent):
             return
 
         if os.path.exists(new_file_path):
-            dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-                                       Gtk.ButtonsType.CLOSE, "文件“%s”已经存在。" % new_file_path)
-            dialog.run()
-            dialog.destroy()
+            FwManager.instance().request_service("dialog.msg.error", {'message':"文件“%s”已经存在。" % new_file_path})
             return
 
         os.rename(file_path, new_file_path)

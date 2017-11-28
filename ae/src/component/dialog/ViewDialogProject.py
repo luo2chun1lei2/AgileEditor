@@ -56,7 +56,7 @@ class ViewDialogProjectNew(Gtk.Dialog):
 
     def __init__(self, parent):
         super(ViewDialogProjectNew, self).__init__()
-        
+
         self.parent = parent
 
         Gtk.Dialog.__init__(self, "新建项目 ", parent, 0,
@@ -130,7 +130,7 @@ class ViewDialogProjectChange(Gtk.Dialog):
 
     def __init__(self, parent):
         super(ViewDialogProjectChange, self).__init__()
-        
+
         self.parent = parent
 
         Gtk.Dialog.__init__(self, "修改项目 ", parent, 0,
@@ -213,7 +213,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
 
     def __init__(self, parent, ideWorkshop):
         super(ViewDialogProjectOpen, self).__init__()
-        
+
         self.parent = parent
         self.ideWorkshop = ideWorkshop
         self.selected_project = None
@@ -302,19 +302,6 @@ class ViewDialogProjectOpen(Gtk.Dialog):
         self.selected_project = self.ideWorkshop[path]
 
     @staticmethod
-    def _show_error(window, message):
-        # 显示错误消息
-        dialog = Gtk.MessageDialog(transient_for=window,
-                                   modal=True,
-                                   destroy_with_parent=True,
-                                   message_type=Gtk.MessageType.ERROR,
-                                   buttons=Gtk.ButtonsType.OK,
-                                   text=message)
-        dialog.run()
-
-        dialog.destroy()
-
-    @staticmethod
     def show(parent, ideWorkshop):
         # 显示画面，然后返回是被选中的项目。
         # 如果一个都没有选，就返回None
@@ -341,7 +328,7 @@ class ViewDialogProjectOpen(Gtk.Dialog):
                     # 还需要检查一下prj是否合法
                     if not prj.is_valid():
                         logging.error("This project is NOT valid.")
-                        ViewDialogProjectOpen._show_error(dialog, "This project is NOT valid.")
+                        FwManager.instance().request_service("dialog.msg.error", {'message':"This project is NOT valid."})
                         continue
 
                 break

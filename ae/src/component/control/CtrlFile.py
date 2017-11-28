@@ -198,10 +198,7 @@ class CtrlFile(FwComponent):
 
         # 根据是否被修改了，询问是否需要保存。
         if ide_editor.editor.get_buffer().get_modified():
-            dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.QUESTION, \
-                                       Gtk.ButtonsType.YES_NO, "文件已经被改变，是否保存？")
-            response = dialog.run()
-            dialog.destroy()
+            response = FwManager.instance().request_one('response', 'dialog.msg.question', {'message':"文件已经被改变，是否保存？"})
             if response == Gtk.ResponseType.YES:
                 needSave = True
 
@@ -348,8 +345,8 @@ class CtrlFile(FwComponent):
         # - 检索会影响到位置，这里只有在函数结尾再加上定位了。
         FwManager.instance().request_service('ctrl.search.init', {'text_buffer':view_editor.editor.get_buffer()})
         FwManager.instance().request_service('view.menu.set_search_option',
-                    {'search_text':mdl_file.file_search_key, 
-                     'case_sensitive':mdl_file.file_search_case_sensitive, 
+                    {'search_text':mdl_file.file_search_key,
+                     'case_sensitive':mdl_file.file_search_case_sensitive,
                      'is_word':mdl_file.file_search_is_word})
 
         # 分析标记
