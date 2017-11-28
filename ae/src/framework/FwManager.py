@@ -111,10 +111,10 @@ class FwManager(FwEventPipe, FwServiceCenter):
             return self.components[component_name]
         else:
             return None
-    
+
     #############################################
     # Service Extension
-    
+
     @staticmethod
     def request_one(item_name, service_name, params=None):
         ''' 方便函数，允许只根据服务得到一个选项的结果。
@@ -127,28 +127,32 @@ class FwManager(FwEventPipe, FwServiceCenter):
 
     #############################################
     # for DEBUG
-    def show_components(self, needStr=False):
-        ''' 显示目前的组件信息
+    def show_components(self, need_str=False):
+        ''' 显示目前的组件信息，按照“name”排序。
+        @return if need_str is True, then return string
+                if need_str is False, then print string and return None.
         '''
         text = "components:\n"
-        for name, cmpt in self.components.items():
+        for name, cmpt in sorted(self.components.items()):
             text += "\t%s : %s\n" % (name, type(cmpt).__module__)
 
-        if needStr:
+        if need_str:
             return text
         else:
             print text
             return None
 
-    def show_services(self, needStr=False):
-        ''' 显示目前注册的服务信息。
+    def show_services(self, need_str=False):
+        ''' 显示目前注册的服务信息。按照 service.info['name']排序。
+        @return if need_str is True, then return string
+                if need_str is False, then print string and return None.
         '''
         text = "services:\n"
-        for service in self.services:
+        for service in sorted(self.services, key=lambda x:x.info['name']):
             info = service.info
             text += "\t%s : %s\n" % (info['name'], info['help'])
 
-        if needStr:
+        if need_str:
             return text
         else:
             print text

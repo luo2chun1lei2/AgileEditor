@@ -1,4 +1,4 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 '''
 提供Service功能。
 '''
@@ -22,13 +22,13 @@ class _FwServiceItem(object):
 class FwServiceCenter(object):
     ''' 服务中心，允许FwService可以注册服务、调用服务等。
     '''
-    
+
     def __init__(self):
-        # [服务的信息]: [<_FwServiceItem>]
         super(FwServiceCenter, self).__init__()
-        
+
+        # [服务的信息]: [<_FwServiceItem>]
         self.services = []
-    
+
     #################################################
     # 服务参数必须包括
     # "name": string: 服务的标志名字，建议用“xx.xx” 来表示。
