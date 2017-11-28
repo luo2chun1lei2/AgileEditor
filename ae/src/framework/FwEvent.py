@@ -24,7 +24,7 @@ class FwEventPipe(object):
     def __init__(self):
         # events {event_name, [FwListener]}
         super(FwEventPipe, self).__init__()
-        
+
         self.events = OrderedDict()
 
     ###################################
@@ -59,7 +59,7 @@ class FwEventPipe(object):
 
     ###################################
     # 内部方法。
-    def send_event(self, event_name, params):
+    def send_event(self, event_name, params=None):
         if not event_name in self.events:
             logging.debug("Nobody listen this event(%s)." % event_name)
             return True  # this is not a error.

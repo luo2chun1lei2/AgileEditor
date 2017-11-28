@@ -45,7 +45,7 @@ class ViewMenu(FwComponent):
 
     def __init__(self, window):
         super(ViewMenu, self).__init__()
-        
+
         # 附件检索的控件
         self.search_entry = None
         self.actions = []
@@ -225,6 +225,15 @@ class ViewMenu(FwComponent):
         tool_item = Gtk.ToolItem()
         tool_item.add(hbox)
         self.toolbar.insert(tool_item, -1)  # 加在最后
+
+        # 添加进度条
+        tool_item = Gtk.SeparatorToolItem()
+        self.toolbar.insert(tool_item, -1)
+
+        progress = FwManager.request_one('view', 'view.progress.get_view')
+        tool_item = Gtk.ToolItem()
+        tool_item.add(progress)
+        self.toolbar.insert(tool_item, -1)
 
         # 快捷菜单
         window.add_accel_group(self.uimanager.get_accel_group())

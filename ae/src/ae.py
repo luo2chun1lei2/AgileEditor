@@ -9,6 +9,7 @@ import sys, logging
 
 ''' 提供的服务，组件并不是问题所在，服务才是。
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。
+    还需要：
 
     # 辅助用的对话框(OK)。
     dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
@@ -123,6 +124,7 @@ def load_components(manager):
     from component.control.CtrlFile import CtrlFile
     from component.control.CtrlHelp import CtrlHelp
     from component.dialog.ViewDialogMsg import ViewDialogMsg
+    from component.view.ViewPogress import ViewProgress
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -146,6 +148,7 @@ def load_components(manager):
     manager.register("ctrl_workshop", CtrlWorkshop())
     manager.register("ctrl_file", CtrlFile())
     manager.register("ctrl_help", CtrlHelp())
+    manager.register("view_progress", ViewProgress())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

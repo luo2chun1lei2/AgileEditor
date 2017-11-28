@@ -26,7 +26,7 @@ class ViewDialogMsg(FwComponent):
             self._show_msg(None, params['message'], Gtk.MessageType.INFO)
             return (True, None)
         if serviceName == "dialog.msg.warn":
-            self._show_msg(None, params['message'], Gtk.MessageType.WARN)
+            self._show_msg(None, params['message'], Gtk.MessageType.WARNING)
             return (True, None)
 
         if serviceName == "dialog.msg.question":

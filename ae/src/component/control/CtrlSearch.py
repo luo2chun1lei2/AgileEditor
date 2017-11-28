@@ -370,7 +370,7 @@ class CtrlSearch(FwComponent):
     def _grep_in_files(self, pattern):
         # 执行检索
         cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
-        ModelTask.execute_with_spinner(None, self._after_grep_in_files,
+        ModelTask.execute(self._after_grep_in_files,
                           cur_prj.query_grep_tags, pattern, False)
 
     def _after_grep_in_files(self, tags):

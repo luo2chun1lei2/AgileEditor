@@ -33,6 +33,7 @@ encoding//src/component/view/ViewFileTagList.py=utf-8
 encoding//src/component/view/ViewFsTree.py=utf-8
 encoding//src/component/view/ViewMenu.py=utf-8
 encoding//src/component/view/ViewMultiEditors.py=utf-8
+encoding//src/component/view/ViewPogress.py=utf-8
 encoding//src/component/view/ViewSearchTagList.py=utf-8
 encoding//src/component/view/ViewTerminal.py=utf-8
 encoding//src/component/view/ViewWindow.py=utf-8

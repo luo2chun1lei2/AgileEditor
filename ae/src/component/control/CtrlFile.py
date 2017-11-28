@@ -41,10 +41,10 @@ class CtrlFile(FwComponent):
             rlt = self._new_file()
             return (True, {'result': rlt})
         elif serviceName == 'ctrl.file.open':
-            if 'abs_file_path' in params:
-                rlt = self._open_file(params['abs_file_path'])
-            else:
+            if params is None or 'abs_file_path' not in params:
                 rlt = self._open_file()
+            else:
+                rlt = self._open_file(params['abs_file_path'])
             return (True, {'result': rlt})
         elif serviceName == 'ctrl.file.close':
             rlt = self._close_file()
