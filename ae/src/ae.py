@@ -11,7 +11,6 @@ import sys, logging
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。
 
     # 辅助用的对话框(OK)。
-    # TODO 还是显示对话框没有parent，我已经取得了window？
     dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
     dialog.project.open/dialog.project.change/dialog.project.setting
     dialog.msg.xxx 通用消息和问题类对话框。
