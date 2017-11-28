@@ -93,6 +93,8 @@ import sys, logging
     ctrl.file.new /ctrl.file.open/ctrl.file.close/ctrl.file.save/ctrl.file.save_as
     [少一个rename，再加一个统计（大小、修改时间等）] [缺少关闭所有文件，或者其他文件等操作]
     
+    ctrl.help.about
+    
 '''
 
 def load_components(manager):
@@ -120,6 +122,7 @@ def load_components(manager):
     from component.model.ModelJumpHistory import ModelJumpHistory
     from component.control.CtrlWorshop import CtrlWorkshop
     from component.control.CtrlFile import CtrlFile
+    from component.control.CtrlHelp import CtrlHelp
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -141,6 +144,7 @@ def load_components(manager):
     manager.register("jump_history", ModelJumpHistory())
     manager.register("ctrl_workshop", CtrlWorkshop())
     manager.register("ctrl_file", CtrlFile())
+    manager.register("ctrl_help", CtrlHelp())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

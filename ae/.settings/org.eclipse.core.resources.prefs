@@ -6,6 +6,7 @@ encoding//src/component/AppView.py=utf-8
 encoding//src/component/__init__.py=utf-8
 encoding//src/component/control/CtrlEdit.py=utf-8
 encoding//src/component/control/CtrlFile.py=utf-8
+encoding//src/component/control/CtrlHelp.py=utf-8
 encoding//src/component/control/CtrlSearch.py=utf-8
 encoding//src/component/control/CtrlWorshop.py=utf-8
 encoding//src/component/control/__init__.py=utf-8
