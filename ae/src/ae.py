@@ -47,8 +47,7 @@ import sys, logging
     
     view.search_taglist.get_view/view.search_taglist.show_taglist
     
-    view.multi_editors.get_view/view.multi_editors.show_taglist [没有人用，而且实现也不对！]
-    view.multi_editors.open_editor/view.multi_editors.close_editor
+    view.multi_editors.get_view/view.multi_editors.open_editor/view.multi_editors.close_editor
     [下面获取属性的服务太多，应该写成一个，减少复杂性]
     view.multi_editors.get_editor_by_path : get current editor by path.
     view.multi_editors.get_current_editor : get current editor.

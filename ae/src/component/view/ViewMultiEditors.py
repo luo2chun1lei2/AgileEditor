@@ -41,7 +41,7 @@ class ViewMultiEditors(FwComponent):
 
     def __init__(self):
         super(ViewMultiEditors, self).__init__()
-        
+
         self.styleScheme = None
 
         # 生成Tab page 类型的控件。
@@ -57,7 +57,6 @@ class ViewMultiEditors(FwComponent):
     def onRegistered(self, manager):
         # TODO get 类型的服务太多，而且重复了，所以应该将属于editors的功能移入到这里类中，然后做一个封装！
         info = [{'name':'view.multi_editors.get_view', 'help':'get view of multiple editors.'},
-                {'name':'view.multi_editors.show_taglist', 'help':'show tag list in view.'},
                 {'name':'view.multi_editors.open_editor', 'help':'open one editor.'},
                 {'name':'view.multi_editors.close_editor', 'help':'close one editor.'},
                 {'name':'view.multi_editors.get_editor_by_path', 'help':'get current editor by path.'},
@@ -74,9 +73,6 @@ class ViewMultiEditors(FwComponent):
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.multi_editors.get_view":
             return (True, {'view': self.get_tab_page()})
-        elif serviceName == "view.multi_editors.show_taglist":
-            self.set_model(params['taglist'], params['project'])
-            return True, None
         elif serviceName == "view.multi_editors.open_editor":
             self.show_editor(params['abs_file_path'])
             return True, None
