@@ -36,7 +36,7 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find_definition', 'help':'find the definition of symbol.'},
                 {'name':'ctrl.search.find_reference', 'help':'find the reference of symbol.'},
                 {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'},
-                {'name':'ctrl.search.update_tags', 'help':'go back to the previous tag.'},
+                {'name':'ctrl.search.update_tags', 'help':'update the tags by newest project status.'},
                 {'name':'ctrl.search.show_bookmark', 'help':'show a bookmark.'},
                 {'name':'ctrl.search.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
                 ]

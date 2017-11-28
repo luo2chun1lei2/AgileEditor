@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 '''
 控制台。
+TODO 1, 控制台应该可以设定scheme以及字体大小等。
+    2, 还可以发送命令，以及获取命令的结果。
 '''
 from gi.repository import Gtk, GLib, Pango, Vte
 
@@ -9,29 +11,29 @@ from framework.FwComponent import FwComponent
 class ViewTerminal(FwComponent):
     def __init__(self):
         super(ViewTerminal, self).__init__()
-        
+
         self._create_view()
-    
+
     # override component
     def onRegistered(self, manager):
-        info = [{'name':'view.terminal.get_view', 'help':'get view of ternimal.'},
+        info = [{'name':'view.terminal.get_view', 'help':'get view of terminal.'},
                 {'name':'view.terminal.init', 'help':'initialize the terminal.'}]
         manager.register_service(info, self)
 
         return True
-    
+
     # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.terminal.get_view":
             return (True, {'view': self._get_view()})
-        
+
         elif serviceName == "view.terminal.init":
             self._init_ternimal(params['dir'])
             return (True, None)
 
         else:
             return (False, None)
-    
+
     def _create_view(self):
         # 控制台
         self.terminal = Vte.Terminal()
@@ -47,10 +49,10 @@ class ViewTerminal(FwComponent):
         self.scrl_terminal.set_hexpand(True)
         self.scrl_terminal.set_vexpand(True)
         self.scrl_terminal.add(self.terminal)
-    
+
     def _get_view(self):
         return self.scrl_terminal
-    
+
     def _init_ternimal(self, dir_path):
         if hasattr(self.terminal, "spawn_sync"):  # 2.91
             self.terminal.spawn_sync(
