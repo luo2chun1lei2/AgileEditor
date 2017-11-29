@@ -154,7 +154,7 @@ def load_components(manager):
     manager.register("ctrl_file", CtrlFile())
     manager.register("ctrl_help", CtrlHelp())
     manager.register("view_progress", ViewProgress())
-    manager.register("model_tags_global", ModelTagsGlobal(None))
+    manager.register("model_tags_global", ModelTagsGlobal())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

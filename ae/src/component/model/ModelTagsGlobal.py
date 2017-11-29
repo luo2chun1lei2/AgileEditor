@@ -97,12 +97,12 @@ class ModelTagsGlobal(FwComponent):
     #         需要修改：参考库的路径是固定的，另外如何设定相关性。
     cmd_env = {'GTAGSLIBPATH':'/home/luocl/workshop/src/emu/soter/'}
 
-    def __init__(self, project):
+    def __init__(self):
         # 初始化
-        # project:ModelProject:项目对象。
 
         super(ModelTagsGlobal, self).__init__()
-        self.project = project
+        # project:ModelProject:项目对象。
+        self.project = None
         
     # override component
     def onRegistered(self, manager):
@@ -112,15 +112,28 @@ class ModelTagsGlobal(FwComponent):
                 {'name':'model.tags.find_symbol_in_project', 'help':'find the symbol in project.'},
                 {'name':'model.tags.find_symbol_in_file', 'help':'find the reference.'},
                 {'name':'model.tags.find_file', 'help':'find the file by pattern.'},
-                {'name':'model.tags.find_reference', 'help':'find the reference.'},
+                {'name':'model.tags.find_symbol_with_prefix_in_project', 'help':'find the symbol with prefix in project.'},
                 ]
         manager.register_service(info, self)
     
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "ctrl.edit.comment":
-            self._edit_comment()
+        if serviceName == "model.tags.update":
+            self.project = params['project'] # ModelProject
+            self.prepare()
             return (True, None)
+        elif serviceName == "model.tags.find_defination":
+            return (True, {'results':self.query_defination_tags(params['text'])})  # [ModelTag]
+        elif serviceName == "model.tags.find_reference":
+            return (True, {'results':self.query_reference_tags(params['text'])})  # [ModelTag]
+        elif serviceName == "model.tags.find_symbol_in_project":
+            return (True, {'results':self.query_grep_tags(params['text'], params['ignore_case'])})  # [ModelTag]
+        elif serviceName == "model.tags.find_symbol_in_file":
+            return (True, {'results':self.query_ctags_of_file(params['path'])})  # [ModelTag]
+        elif serviceName == "model.tags.find_file":
+            return (True, {'results':self.query_grep_filepath(params['text'], params['ignore_case'])})  # [ModelTag]
+        elif serviceName == "model.tags.find_symbol_with_prefix_in_project":
+            return (True, {'results':self.query_prefix_tags(params['text'])})  # [ModelTag]
         else:
             return False, None
 

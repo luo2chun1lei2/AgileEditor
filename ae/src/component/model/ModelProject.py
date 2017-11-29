@@ -90,8 +90,6 @@ class ModelProject(object):
         self.src_dirs = []
         self.bookmarks = []
 
-        self.prj_tags = ModelTagsGlobal(self)
-
     def is_valid(self):
         # 检查这个项目是否有效
         # return:Bool:
@@ -216,50 +214,50 @@ class ModelProject(object):
         # 进行预处理，在项目的配置打开后。
         # 如果Tag文件存在，则生成。如果已经存在，则更新。
 
-        return self.prj_tags.prepare()
+        FwManager.instance().request_service('model.tags.update', {'project':self})
+        return True
 
     def query_ctags_of_file(self, file_path):
         # 查询指定文件中的所有CTAG
         # file_path:string:文件的路径
         # return:[string]:tag信息的数组
-        return self.prj_tags.query_ctags_of_file(file_path)
+        return FwManager.request_one('results', 'model.tags.find_symbol_in_file', {'path':file_path})
 
     def query_defination_tags(self, name):
         # 查询某个定义所在的TAG信息
         # name:string:要查询的名字
         # return:name, [string]:name, tag信息的数组
-        return name, self.prj_tags.query_defination_tags(name)
+        return name, FwManager.request_one('results', 'model.tags.find_defination', {'text':name})
 
     def query_reference_tags(self, name):
         # 查询某个名字的引用
         # name:string:要查询的名字
         # return:name, [string]:name, tag信息的数组
-        return name, self.prj_tags.query_reference_tags(name)
+        #return name, self.prj_tags.query_reference_tags(name)
+        return name, FwManager.request_one('results', 'model.tags.find_reference', {'text':name})
 
     def get_completion_tags(self, prefix):
         # 根据前缀，查询到什么Tag符合要求。
         # prefix string 前缀，比如“do_w”，查询符合条件[do_w.*]的tag名字。
         # return [IdeOneTag] 包含名字的数组，如果没有符合的，就长度为空。
-        return self.prj_tags.query_prefix_tags(prefix)
-
+        return FwManager.request_one('results', 'model.tags.find_symbol_with_prefix_in_project', {'text':prefix})
+    
     def query_grep_tags(self, pattern, ignoreCase):
         # 根据pattern查询TAG
         # pattern:string:名字的模式
         # ignoreCase:bool:是否忽略大小写
         # return:[string]:Tag信息的数组
-        return self.prj_tags.query_grep_tags(pattern, ignoreCase)
+        return FwManager.request_one('results', 
+                'model.tags.find_symbol_in_project', {'text':pattern, 'ignore_case': ignoreCase})
 
     def query_grep_filepath(self, pattern, ignoreCase=False):
         # 根据模式查找文件
         # pattern:string:文件名字的模式
         # ignoreCase:bool:是否忽略大小写
         # return:[string]:Tag信息的数组
-        return self.prj_tags.query_grep_filepath(pattern, ignoreCase)
+        return FwManager.request_one('results', 
+                'model.tags.find_file', {'text':pattern, 'ignore_case': ignoreCase})
 
     def get_completion_provider(self):
         # 返回一个单词补全的提供者
-        isOK, results = FwManager.instance().request_service("util.word_complete.get_provider", {'project':self})
-        if isOK:
-            return results['provider']
-        else:
-            return None
+        return FwManager.request_one('provider', "util.word_complete.get_provider", {'project':self})
