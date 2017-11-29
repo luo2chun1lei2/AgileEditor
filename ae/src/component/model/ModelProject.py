@@ -218,12 +218,6 @@ class ModelProject(object):
 
         return self.prj_tags.prepare()
 
-    def query_tags_by_file(self, file_path):
-        # 查询指定文件中的所有TAG
-        # file_path:string:文件的路径
-        # return:[string]:tag信息的数组
-        return self.prj_tags.query_tags_by_file(file_path)
-
     def query_ctags_of_file(self, file_path):
         # 查询指定文件中的所有CTAG
         # file_path:string:文件的路径

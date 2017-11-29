@@ -323,8 +323,6 @@ class CtrlFile(FwComponent):
         # 分析标记
         cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         if cur_prj is not None:
-            # tags = self.cur_prj.query_tags_by_file(abs_file_path)
-            # self.ide_refresh_file_tag_list(tags)
             # 在switch page时，会引发switch事件，调用_switch_page，会重新查询tags。
             pass
 

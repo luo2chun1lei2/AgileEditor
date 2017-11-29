@@ -43,8 +43,9 @@ Global的问题:
 
 import os, subprocess, re, logging
 from framework.FwUtils import *
+from framework.FwComponent import FwComponent
 
-class ModelTag(object):
+class ModelTag(object): # TODO 为了可以切换成其他的实现，将此类放到独立的文件中。
     ''' 一个Tag的信息。
     tag_name:string:tag的名字
     tag_file_path:string:绝对文件路径
@@ -87,7 +88,7 @@ class GtProcess(object):
         p = subprocess.Popen(p_cmd, shell=True, cwd=self.work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdoutput, erroutput) = p.communicate()
 
-class ModelTagsGlobal(object):
+class ModelTagsGlobal(FwComponent):
     ''' 使用GNU Global工具来分析代码，生成Tags文件。
     '''
 
@@ -99,9 +100,29 @@ class ModelTagsGlobal(object):
     def __init__(self, project):
         # 初始化
         # project:ModelProject:项目对象。
-        
+
         super(ModelTagsGlobal, self).__init__()
         self.project = project
+        
+    # override component
+    def onRegistered(self, manager):
+        info = [{'name':'model.tags.update', 'help':'update the tags on the newest state.'},
+                {'name':'model.tags.find_defination', 'help':'find the defination.'},
+                {'name':'model.tags.find_reference', 'help':'find the reference.'},
+                {'name':'model.tags.find_symbol_in_project', 'help':'find the symbol in project.'},
+                {'name':'model.tags.find_symbol_in_file', 'help':'find the reference.'},
+                {'name':'model.tags.find_file', 'help':'find the file by pattern.'},
+                {'name':'model.tags.find_reference', 'help':'find the reference.'},
+                ]
+        manager.register_service(info, self)
+    
+    # override component
+    def onRequested(self, manager, serviceName, params):
+        if serviceName == "ctrl.edit.comment":
+            self._edit_comment()
+            return (True, None)
+        else:
+            return False, None
 
     def _get_tags_path(self):
         # 返回Tags文件应该在的目录
@@ -112,7 +133,7 @@ class ModelTagsGlobal(object):
         else:
             return None
 
-    def has_tags(self):
+    def _has_tags(self):
         # 判断是否有Tags文件。
         # return:Bool:
         path = self._get_tags_path()
@@ -122,12 +143,12 @@ class ModelTagsGlobal(object):
     def prepare(self):
         # 如果Tags已经存在了，就更新，否则生成。
         path = self._get_tags_path()
-        if self.has_tags():
-            self.rebuild()
+        if self._has_tags():
+            self._rebuild()
         else:
-            self.build()
+            self._build()
 
-    def build(self):
+    def _build(self):
         # 生成对应的Tags
         try:
             # 将obj/目录排斥在外部，在~/.globalrc中定义。
@@ -140,34 +161,12 @@ class ModelTagsGlobal(object):
         except IOError as err:
             logging.error("IOError: %s" % err)
 
-
-    def rebuild(self):
+    def _rebuild(self):
         # 如果文件更新了，就重新更新Tags。
         pargs = [ 'global', '-u' ]
 
         gtp = GtProcess(self.project.src_dirs[0])
         gtp.run_rebuild_process(pargs, self.cmd_env)
-
-    def query_tags_by_file(self, file_path):
-        # 查询指定文件的Tags: global -f <file_path>
-        # return:[string]:Tag列表。
-
-        # gtags的模式：tag_name line_no file_path line_content
-        # cscope的模式：file_path tag_name line_no line_content
-        # ctags的模式：tag_name file_path line_no
-        # ctags-x的模式： tag_name line_no file_path line_content
-        # grep的模式：file_path:line_no:line_content
-
-        # -a:绝对路径（容易定位)
-        p_cmd = 'global -a --result cscope -f ' + file_path
-        wsdir = self.project.src_dirs[0]
-        logging.debug('cmd:%s, cwd:%s' % (p_cmd, wsdir))
-        p = subprocess.Popen(p_cmd, shell=True, cwd=wsdir, env=self.cmd_env,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        (stdoutput, erroutput) = p.communicate()
-
-        return self._parse_file_tags_result(stdoutput)
 
     def _parse_file_tags_result(self, text):
         # 分析文件内部的Tag的结果
