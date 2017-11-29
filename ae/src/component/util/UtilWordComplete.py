@@ -11,7 +11,6 @@ from gi.repository import GObject, Gtk, Gdk, GtkSource
 
 from framework.FwUtils import *
 from framework.FwComponent import FwComponent
-from component.model.ModelTags import ModelGTags
 
 class UtilWordComplete(FwComponent):
     def __init__(self):

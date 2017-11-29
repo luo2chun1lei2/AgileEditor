@@ -8,7 +8,7 @@ import os, logging
 import ConfigParser
 
 from framework.FwUtils import *
-from component.model.ModelTags import ModelGTags, ModelTag
+from component.model.ModelTagsGlobal import ModelTagsGlobal, ModelTag
 from framework.FwManager import FwManager
 
 class ModelProject(object):
@@ -90,7 +90,7 @@ class ModelProject(object):
         self.src_dirs = []
         self.bookmarks = []
 
-        self.prj_tags = ModelGTags(self)
+        self.prj_tags = ModelTagsGlobal(self)
 
     def is_valid(self):
         # 检查这个项目是否有效

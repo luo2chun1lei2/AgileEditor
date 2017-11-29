@@ -13,6 +13,7 @@ import sys, logging
     【所有的组件在初始化时，最好不要依赖其他的组件，比如menu，应该可以独立的初始化，这样，就从设计上避免了初始化顺序问题，但是顺序问题还是要讨论的】
     【还需要探讨可以实现多个同类型组件的实例，供不同的用途的问题】
     【用clang替换global需要赶快制作】
+    【editor切换时，文件内检索和跳转有冲突】
 
     # 辅助用的对话框(OK)。
     dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new

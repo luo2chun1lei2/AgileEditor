@@ -1,12 +1,13 @@
 # -*- coding:utf-8 -*-
 
-# 操纵Tag相关的处理。
-# 整体分析采用Global（gtags）来实现，而文件内部则准备使用idutils来实现。
-#
-# Global的问题:
-# 1, 只能有一个代码目录，所以必须将代码集中在一起。
-# 2, 不能指定Tags等文件所在的目录，所以Tags文件必须在代码目录的开始。
-# 3, 使用ctag来更加详细的管理tag。
+''' 操纵Tag相关的处理。
+整体分析采用Global（gtags）来实现，而文件内部则准备使用idutils来实现。
+
+Global的问题:
+1, 只能有一个代码目录，所以必须将代码集中在一起。
+2, 不能指定Tags等文件所在的目录，所以Tags文件必须在代码目录的开始。
+3, 使用ctag来更加详细的管理tag。
+'''
 
 # ctags的type
 # C
@@ -40,8 +41,6 @@
 #     v  variable definitions
 #     x  external and forward variable declarations [off]
 
-# 每个ModelProject对应一个IdeTags。
-
 import os, subprocess, re, logging
 from framework.FwUtils import *
 
@@ -67,14 +66,15 @@ class ModelTag(object):
         self.tag_scope = tag_scope
 
 class GtProcess(object):
-    ''' TODO 后台更新的进程，和其他的global不一样，是必须同步完成的，为什么不能改成异步的？
+    ''' 仅限此文件内使用。 
+    TODO 后台更新的进程，和其他的global不一样，是同步完成的，能不能改成异步的？
     '''
-    # work_dir:string:命令的工作目录。
 
     def __init__(self, work_dir):
         # 建立进行实例，注册回调事件。
         # wdir:string:工作目录。
 
+        # work_dir:string:命令的工作目录。
         self.work_dir = work_dir
 
     def run_rebuild_process(self, pargs, cmd_env):
@@ -87,9 +87,9 @@ class GtProcess(object):
         p = subprocess.Popen(p_cmd, shell=True, cwd=self.work_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdoutput, erroutput) = p.communicate()
 
-class ModelGTags(object):
-    # 使用GNU Global工具来分析代码，生成Tags文件。
-    # project:[string]:代码的路径数组。
+class ModelTagsGlobal(object):
+    ''' 使用GNU Global工具来分析代码，生成Tags文件。
+    '''
 
     # 命令的环境变量：
     # TODO: GTAGSLIBPATH 是 global命令支持设定GTAGS联合查询，但是可能需要在项目管理上，可以设定相关性。
@@ -99,7 +99,8 @@ class ModelGTags(object):
     def __init__(self, project):
         # 初始化
         # project:ModelProject:项目对象。
-        super(ModelGTags, self).__init__()
+        
+        super(ModelTagsGlobal, self).__init__()
         self.project = project
 
     def _get_tags_path(self):

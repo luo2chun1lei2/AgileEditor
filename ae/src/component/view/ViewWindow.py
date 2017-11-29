@@ -17,7 +17,7 @@ from framework.FwManager import FwManager
 from component.model.ModelWorkshop import ModelWorkshop
 from component.model.ModelTask import ModelTask
 from component.view.ViewMenu import ViewMenu
-from component.model.ModelTags import ModelTag
+from component.model.ModelTagsGlobal import ModelTag
 from component.util.UtilEditor import UtilEditor
 from component.util.UtilDialog import UtilDialog
 

@@ -139,7 +139,7 @@ class UtilEditor(object):
         # 根据当前编辑器的当前光标位置，生成一个bookmark
         # return:ModelTag:书签
 
-        from component.model.ModelTags import ModelTag
+        from component.model.ModelTagsGlobal import ModelTag
 
         text_buf = UtilEditor.get_editor_buffer()
 
