@@ -9,10 +9,9 @@ import sys, logging
 
 ''' 提供的服务，组件并不是问题所在，服务才是。
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。
-    还需要：[考虑ModelTags是否应该做成一个组件，方便以后替换成clang？]
+    还需要：【用clang替换global需要赶快制作】
     【所有的组件在初始化时，最好不要依赖其他的组件，比如menu，应该可以独立的初始化，这样，就从设计上避免了初始化顺序问题，但是顺序问题还是要讨论的】
     【还需要探讨可以实现多个同类型组件的实例，供不同的用途的问题】
-    【用clang替换global需要赶快制作】
     【editor切换时，文件内检索和跳转有冲突】
 
     # 辅助用的对话框(OK)。
@@ -77,7 +76,7 @@ import sys, logging
       所以应该建立一个source search的组件，实现底层的source navigator，方便以后替换。】
     ctrl.search.init [不如变成设置检索的参数]
     ctrl.search.goto_line/ctrl.search.jump_to [goto_line 和 jump_to 是否重复了？]
-    ctrl.search.find [实际上是为了跳转到search entry控件，这里服务和工作不符]
+    ctrl.search.focus_on_entry
     ctrl.search.find_text : begin to find text.
     ctrl.search.find_next : find the next matched word.
     ctrl.search.find_prev : find the previous matched word.

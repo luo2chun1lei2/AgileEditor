@@ -25,7 +25,7 @@ class CtrlSearch(FwComponent):
         info = [{'name':'ctrl.search.init', 'help':'initialize the search context.'},  # TODO 这里是否是一个服务，还应该是监听事件，应该仔细考虑！
                 {'name':'ctrl.search.goto_line', 'help': 'goto the given line and focus on editor.'},
                 {'name':'ctrl.search.jump_to', 'help':'Jump to ? line.'},
-                {'name':'ctrl.search.find', 'help':'get the selected word and focus on search textbox.'},  # This is NOT direct finding function.
+                {'name':'ctrl.search.focus_on_entry', 'help':'get the selected word and focus on search textbox.'},  # This is NOT direct finding function.
                 {'name':'ctrl.search.find_text', 'help':'begin to find text.'},
                 {'name':'ctrl.search.find_next', 'help':'find the next matched word.'},
                 {'name':'ctrl.search.find_prev', 'help':'find the previous matched word.'},
@@ -50,7 +50,7 @@ class CtrlSearch(FwComponent):
         if serviceName == "ctrl.search.jump_to":
             self._jump_to_line()
             return (True, None)
-        elif serviceName == 'ctrl.search.find':
+        elif serviceName == 'ctrl.search.focus_on_entry':
             self._get_word_and_jump_to_search_box()
             return (True, None)
         elif serviceName == 'ctrl.search.find_text':
@@ -128,7 +128,7 @@ class CtrlSearch(FwComponent):
                   'title':None,
                   'accel':"<control>F",
                   'stock_id':Gtk.STOCK_FIND,
-                  'service_name':'ctrl.search.find'}
+                  'service_name':'ctrl.search.focus_on_entry'}
         manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
