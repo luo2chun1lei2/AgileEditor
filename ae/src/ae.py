@@ -63,7 +63,7 @@ import sys, logging
     
     控制类的服务，它实现的是UI，里面会操作Model和View，也不仅限于此。
     - 和文本编辑相关的操作
-    ctrl.edit.redo/ctrl.edit.undo
+    ctrl.edit.redo/ctrl.edit.undo 【redo和undo好像总是运行不正常，如果修改了多个文件后，按下undo时】
     ctrl.edit.cut/ctrl.edit.copy/ctrl.edit.paste
     ctrl.edit.comment/ctrl.edit.uncomment
     ctrl.edit.replace/ctrl.edit.delete_line/ctrl.edit.select_all [select all是否应该放到 ctrl.search 中?]
