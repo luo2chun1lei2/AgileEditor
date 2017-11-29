@@ -82,12 +82,12 @@ import sys, logging
     ctrl.search.find_prev : find the previous matched word.
     ctrl.search.find_in_files : find the matched word in files. [应该是在project中！]
     ctrl.search.find_in_files_again : find the matched word in files again.
-    ctrl.search.find_path  [检索用的路径可以从多处获取，最好不要添加多余的命令和UI，避免用户迷惑]
+    ctrl.search.find_path
     ctrl.search.find_definition/ctrl.search.find_definition_need_input
     ctrl.search.find_reference/ctrl.search.find_reference_need_input
     ctrl.search.go_back_tag [配合jump_history，实现更强的跳转功能]
     ctrl.search.update_tags
-    ctrl.search.show_bookmark/ctrl.search.make_bookmark [缺少删除操作]
+    ctrl.search.show_bookmark/ctrl.search.make_bookmark [这部分的服务和 view.bookmark.add_bookmark的主导关系需要颠倒一下。]
     - 和workshop、project相关的操作。
     ctrl.workshop.preference : set preference of workshop.
     ctrl.workshop.new_project/ctrl.workshop.open_project/ctrl.workshop.close_project/ctrl.workshop.app_quit
