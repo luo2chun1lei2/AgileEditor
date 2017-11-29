@@ -194,6 +194,9 @@ class ViewMultiEditors(FwComponent):
 
             # - 状态栏
             status_bar = Gtk.Statusbar.new()
+            # 通过设置 margin，改变高度。
+            status_bar.set_margin_top(0)
+            status_bar.set_margin_bottom(0)
             editor.get_buffer().connect("changed", self.on_buffer_changed, status_bar)  # 为了显示状态栏
             editor.get_buffer().connect("mark-set", self.on_buffer_mark_set, status_bar)  # 为了显示状态栏
 
@@ -224,15 +227,23 @@ class ViewMultiEditors(FwComponent):
     def on_buffer_changed(self, src_buf, statusbar):
         mark = src_buf.get_mark("insert")
         location = src_buf.get_iter_at_mark(mark)
-        self._ide_show_status(statusbar, location.get_line() + 1, location.get_line_offset() + 1)
+        line_end = location.copy()
+        if not line_end.ends_line():
+            line_end.forward_to_line_end()
+        self._ide_show_status(statusbar, location.get_line() + 1, src_buf.get_line_count(),
+                              location.get_line_offset() + 1, line_end.get_line_offset() + 1)
 
     def on_buffer_mark_set(self, src_buf, location, mark, statusbar):
         if mark.get_name() == "insert":
-            self._ide_show_status(statusbar, location.get_line() + 1, location.get_line_offset() + 1)
+            line_end = location.copy()
+            if not line_end.ends_line():
+                line_end.forward_to_line_end()
+            self._ide_show_status(statusbar, location.get_line() + 1, src_buf.get_line_count(),
+                                  location.get_line_offset() + 1, line_end.get_line_offset() + 1)
 
-    def _ide_show_status(self, statusbar, row, column):
+    def _ide_show_status(self, statusbar, row, total_row, column, total_column):
         statusbar.pop(0)
-        msg = 'Line %4d, Column %3d' % (row, column)
+        msg = 'Line %4d/%4d, Column %3d/%3d' % (row, total_row, column, total_column)
         statusbar.push(0, msg)
 
     def _ide_only_open_file(self, ide_file, file_path, editor):
