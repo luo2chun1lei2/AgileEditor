@@ -89,6 +89,8 @@ class UtilEditor(object):
         如果都无法达到，就返回None 
         '''
         text_buf = UtilEditor.get_editor_buffer()
+        if text_buf is None: # 如果当前没有打开的编辑器
+            return None
         selection = text_buf.get_selection_bounds()
 
         text = None

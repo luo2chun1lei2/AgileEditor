@@ -32,9 +32,10 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find_in_files', 'help':'find the matched word in files.'},
                 {'name':'ctrl.search.find_in_files_again', 'help':'find the matched word in files again.'},
                 {'name':'ctrl.search.find_path', 'help':'find the match path.'},
-                {'name':'ctrl.search.find_definition_input_by_dialog', 'help':'show dialog to get the symbol, and then find the definition.'},
                 {'name':'ctrl.search.find_definition', 'help':'find the definition of symbol.'},
+                {'name':'ctrl.search.find_definition_need_input', 'help':'show dialog to get the symbol, and then find the definition.'},
                 {'name':'ctrl.search.find_reference', 'help':'find the reference of symbol.'},
+                {'name':'ctrl.search.find_reference_need_input', 'help':'show dialog to get the symbol, and then find the reference.'},
                 {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'},
                 {'name':'ctrl.search.update_tags', 'help':'update the tags by newest project status.'},
                 {'name':'ctrl.search.show_bookmark', 'help':'show a bookmark.'},
@@ -73,14 +74,17 @@ class CtrlSearch(FwComponent):
         elif serviceName == 'ctrl.search.find_path':
             self._find_path_with_dialog()
             return (True, None)
-        elif serviceName == 'ctrl.search.find_definition_input_by_dialog':
-            self._find_defination_by_dialog()
-            return (True, None)
         elif serviceName == 'ctrl.search.find_definition':
             self._find_defination()
             return (True, None)
+        elif serviceName == 'ctrl.search.find_definition_need_input':
+            self._find_defination_by_dialog()
+            return (True, None)
         elif serviceName == 'ctrl.search.find_reference':
             self._find_reference()
+            return (True, None)
+        elif serviceName == 'ctrl.search.find_reference_need_input':
+            self._find_reference_by_dialog()
             return (True, None)
         elif serviceName == 'ctrl.search.go_back_tag':
             self._go_back_tag()
@@ -168,19 +172,19 @@ class CtrlSearch(FwComponent):
         manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
-                  'menu_item_name':'SearchDialogDefinition',
-                  'title':'Find definition by dialog',
-                  'accel':"<control>F3",
-                  'stock_id':Gtk.STOCK_FIND,
-                  'service_name':'ctrl.search.find_definition_input_by_dialog'}
-        manager.request_service("view.menu.add", params)
-
-        params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchDefinition',
                   'title':'Definition',
                   'accel':"F3",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_definition'}
+        manager.request_service("view.menu.add", params)
+        
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchDefinitionNeedInput',
+                  'title':'Definition with Dialog',
+                  'accel':"<control>F3",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_definition_need_input'}
         manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
@@ -189,6 +193,14 @@ class CtrlSearch(FwComponent):
                   'accel':"F4",
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_reference'}
+        manager.request_service("view.menu.add", params)
+        
+        params = {'menu_name':'SearchMenu',
+                  'menu_item_name':'SearchReferenceNeedInput',
+                  'title':'Reference with Dialog',
+                  'accel':"<control>F4",
+                  'stock_id':Gtk.STOCK_FIND,
+                  'service_name':'ctrl.search.find_reference_need_input'}
         manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'SearchMenu',
@@ -427,7 +439,7 @@ class CtrlSearch(FwComponent):
 
     def _find_defination_by_dialog(self):
         ''' 查找定义 '''
-        response, tag_name = UtilDialog.show_dialog_one_entry("检索一个TAG", '名字')
+        response, tag_name = UtilDialog.show_dialog_one_entry("查找定义", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 
@@ -436,7 +448,10 @@ class CtrlSearch(FwComponent):
     def _find_defination(self):
         ''' 查找定义 '''
         tag_name = UtilEditor.get_selected_text_or_word()
-        self._search_defination(tag_name)
+        if tag_name is None:
+            self._find_defination_by_dialog()
+        else:
+            self._search_defination(tag_name)
 
     def _search_defination(self, tag_name):
         cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
@@ -456,11 +471,25 @@ class CtrlSearch(FwComponent):
                 ''' 直接跳转。 '''
                 tag = tags[0]
                 self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+                
+    def _find_reference_by_dialog(self):
+        ''' 查找定义 '''
+        response, tag_name = UtilDialog.show_dialog_one_entry("查找引用", '名字')
+        if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
+            return
+
+        self._search_reference(tag_name)
 
     def _find_reference(self):
         ''' 查找引用
         '''
         tag_name = UtilEditor.get_selected_text_or_word()
+        if tag_name is None:
+            self._find_reference_by_dialog()
+        else:
+            self._search_reference(tag_name)
+            
+    def _search_reference(self, tag_name):
         cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._after_search_reference,
                           cur_prj.query_reference_tags, tag_name)
