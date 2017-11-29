@@ -10,6 +10,9 @@ import sys, logging
 ''' 提供的服务，组件并不是问题所在，服务才是。
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。
     还需要：[考虑ModelTags是否应该做成一个组件，方便以后替换成clang？]
+    【所有的组件在初始化时，最好不要依赖其他的组件，比如menu，应该可以独立的初始化，这样，就从设计上避免了初始化顺序问题，但是顺序问题还是要讨论的】
+    【还需要探讨可以实现多个同类型组件的实例，供不同的用途的问题】
+    【用clang替换global需要赶快制作】
 
     # 辅助用的对话框(OK)。
     dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
