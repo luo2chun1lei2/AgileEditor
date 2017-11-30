@@ -19,6 +19,7 @@ encoding//src/component/dialog/__init__.py=utf-8
 encoding//src/component/model/ModelFile.py=utf-8
 encoding//src/component/model/ModelJumpHistory.py=utf-8
 encoding//src/component/model/ModelProject.py=utf-8
+encoding//src/component/model/ModelTagsClang.py=utf-8
 encoding//src/component/model/ModelTagsGlobal.py=utf-8
 encoding//src/component/model/ModelTask.py=utf-8
 encoding//src/component/model/ModelWorkshop.py=utf-8

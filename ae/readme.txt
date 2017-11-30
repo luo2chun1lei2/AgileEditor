@@ -4,6 +4,8 @@
 还有什么没做完：
 -----------------
 
+【下一阶段，努力将此编辑器变成类似Source Insight的工具，可以管理、分析、导引代码等】
+
 * 整理服务和事件，形成统一、完整的命名体系，以及方便的注册和使用方案。
 * VeiwMenu 没有做到完全自动化。还有动态加载组件导致的服务提供有先后的问题。
 * 动态加载组件，比如遍历一个列表或者文件夹，就可以加载所有的组件。
@@ -40,7 +42,21 @@ cp ./doc/global/examples/gtags.conf etc/
 
 5, 快捷键参考 gdkkeysyms.h 中的GDK_KEY_XXX 设定。
   需要安装 libgtk-3-dev。
-
+  
+6, vim 的complete和代码分析用 YouCompleteMe(http://valloric.github.io/YouCompleteMe)，
+  如果其不认识的语言用 omnifunc，此为完全补全工具，但是不如YCM是基于代码的分析得到补全信息。
+  clang分析代码时，需要编译选项，GNU编译器参考 Bear(https://github.com/rizsotto/Bear).
+  YCM内部的clang部分是用C++实现的，而不是用Python。
+  有几个问题：1，补全功能实际上应该分析的是正在编辑的数据。
+  2，代码分析也是一个重点。
+  
+7, clang的python调用方法，参考
+	Ubuntu 10.04 用 clang 3.8.
+	http://blog.csdn.net/wangtua/article/details/77426883 clang的python接口（一） 
+	http://blog.csdn.net/wangtua/article/details/78612331 clang的python接口教程（二）
+	python的接口binding，在 “https://github.com/llvm-mirror/clang/tree/master/bindings/python/clang”，查看 cindex.py 文件就可以了，
+	里面有说明。
+	 
 计划
 ----
 
