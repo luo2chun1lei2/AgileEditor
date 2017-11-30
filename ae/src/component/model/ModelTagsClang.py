@@ -23,7 +23,7 @@ def main(file_path, type_name):
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
     index = clang.cindex.Index.create()
-    tu = index.parse(file_path)
+    tu = index.parse(file_path, args=["-I/home/luocl/myprojects/abc"])
     print 'Translation unit:', tu.spelling
     find_typerefs(tu.cursor, type_name)
 

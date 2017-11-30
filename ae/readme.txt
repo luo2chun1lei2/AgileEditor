@@ -50,12 +50,21 @@ cp ./doc/global/examples/gtags.conf etc/
   有几个问题：1，补全功能实际上应该分析的是正在编辑的数据。
   2，代码分析也是一个重点。
   
-7, clang的python调用方法，参考
+  clang的python调用方法，参考
 	Ubuntu 10.04 用 clang 3.8.
 	http://blog.csdn.net/wangtua/article/details/77426883 clang的python接口（一） 
 	http://blog.csdn.net/wangtua/article/details/78612331 clang的python接口教程（二）
 	python的接口binding，在 “https://github.com/llvm-mirror/clang/tree/master/bindings/python/clang”，查看 cindex.py 文件就可以了，
 	里面有说明。
+	
+	http://hao.jobbole.com/clang-static-analyzer/ Mac上的基于clang的静态代码检查工具(http://clang-analyzer.llvm.org/)。
+
+  经过调查，目前只有YouCompleteMe是基于Clang的语法解析工具，但是
+  1，不是独立的工具。
+  2，不是用于代码分析的，是用于补齐(Complete)的，但是有 goto defination/reference这些功能。
+  3，是C++编写的。
+  现在可以实现的方案是根据YMC编写一个Server，然后利用IPC通信，获得各种信息。
+	
 	 
 计划
 ----
