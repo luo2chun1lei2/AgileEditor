@@ -326,5 +326,6 @@ class ViewMenu(FwComponent):
         FwManager.instance().request_service('ctrl.search.find_text',
                     {'need_jump':need_jump.need, 'search_text':search_text, 'need_case_sensitive':need_case_sensitive, 'need_search_is_word':need_search_is_word})
 
+        # TODO 不用need_jump，而是用“之前的检索选项是否相同”
         if need_jump.need is False:
             need_jump.need = True
