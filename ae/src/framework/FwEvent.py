@@ -96,3 +96,20 @@ class FwEventPipe(object):
 
         events.remove(listener)
         return True
+
+    def show_events(self, need_str=False):
+        ''' 显示目前消息。按照 events['name']排序。
+        @return if need_str is True, then return string
+                if need_str is False, then print string and return None.
+        '''
+        text = "events:\n"
+        for name, listeners in sorted(sorted(self.events.items())):
+            text += "\t%s\n" % (name)
+            for l in listeners:
+                text += '\t\t%s\n' % type(l).__module__
+
+        if need_str:
+            return text
+        else:
+            print text
+            return None

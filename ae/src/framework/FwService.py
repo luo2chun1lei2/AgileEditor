@@ -87,3 +87,19 @@ class FwServiceCenter(object):
         util_print_frame()
         return (False, None)
 
+    # for debug and test
+    def show_services(self, need_str=False):
+        ''' 显示目前注册的服务信息。按照 service.info['name']排序。
+        @return if need_str is True, then return string
+                if need_str is False, then print string and return None.
+        '''
+        text = "services:\n"
+        for service in sorted(self.services, key=lambda x:x.info['name']):
+            info = service.info
+            text += "\t%s : %s\n" % (info['name'], info['help'])
+
+        if need_str:
+            return text
+        else:
+            print text
+            return None

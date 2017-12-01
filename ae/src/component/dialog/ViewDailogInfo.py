@@ -41,7 +41,8 @@ class ViewDialogInfo(FwComponent):
 
         componentInfo = FwManager.instance().show_components(True)
         serviceInfo = FwManager.instance().show_services(True)
-        documentors = ["------------------------------", componentInfo, serviceInfo]
+        event_info = FwManager.instance().show_events(True)
+        documentors = ["=========================", componentInfo, serviceInfo, event_info]
 
         dirname = os.path.abspath(os.path.dirname(__file__))
         filename = os.path.join(dirname, '', '../../ae.png')
@@ -50,7 +51,7 @@ class ViewDialogInfo(FwComponent):
 
         window = FwManager.request_one("window", "view.main.get_window")
         about = Gtk.AboutDialog(parent=window,
-                                program_name='Agile Editor',
+                                program_name='敏捷编辑器：Agile Editor',
                                 version='0.3',
                                 copyright='(C) 2017 罗春雷',
                                 license_type=Gtk.License.GPL_3_0,
@@ -60,7 +61,7 @@ class ViewDialogInfo(FwComponent):
                                 documenters=documentors,
                                 logo=transparent,
                                 title='关于敏捷编辑器')
-
+        about.set_resizable(True)  # 可以改变大小
         about.connect('response', ViewDialogInfo._widget_destroy)
         about.show()
 

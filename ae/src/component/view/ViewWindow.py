@@ -112,6 +112,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # 创建画面。
 
         # TODO 下面的布局太乱，应该清晰化和通用化。
+        # TODO 在__init__已经调用了，这里不应该调用父类的__init__方法.
         Gtk.Window.__init__(self, title=self.PROGRAM_NAME)
 
         # 这个不能缺少，当不是最大时，这个是第一推荐尺寸。
