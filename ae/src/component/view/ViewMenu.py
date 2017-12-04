@@ -9,8 +9,11 @@ from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
 class NeedJump:
-    def __init__(self, need):
-        self.need = need
+    def __init__(self, count):
+        ''' count 是需要跳过的次数，因为有三个检索的控件，如果改变了其中的值，
+        就会引发“changed”事件，如果三个都改变了，那么就会引发三次，所以这里是个计数器。
+        '''
+        self.count = count
 
 # 菜单的设定。
 MENU_CONFIG = """
@@ -204,7 +207,7 @@ class ViewMenu(FwComponent):
         self.toolbar = self.uimanager.get_widget("/ToolBar")
 
         # - 加入额外的检索Bar
-        self.need_jump = NeedJump(True)
+        self.need_jump = NeedJump(0)
 
         self.search_entry = Gtk.SearchEntry()
         self.id_1 = self.search_entry.connect("search-changed", self.on_search_options_changed, self.need_jump)
@@ -309,12 +312,21 @@ class ViewMenu(FwComponent):
         # 解决方法是引发事件的动作，放入一个 Object(不能是普通的数据)，然后在 on_search_options_changed 函数中，
         # 发送了信息后，再把此标志位改过来。
 
-        self.need_jump.need = False
-
+        self.need_jump.count = 0
+        
         if search_text is None:
-            self.search_entry.set_text("")
+            text = ""
         else:
-            self.search_entry.set_text(search_text)
+            text = search_text
+        
+        if text != self.search_entry.get_text():
+            self.need_jump.count += 1
+        if case_sensitive != self.search_case_sensitive.get_active():
+            self.need_jump.count += 1
+        if is_word != self.search_is_word.get_active():
+            self.need_jump.count += 1 
+
+        self.search_entry.set_text(text)
         self.search_case_sensitive.set_active(case_sensitive)
         self.search_is_word.set_active(is_word)
 
@@ -323,9 +335,14 @@ class ViewMenu(FwComponent):
         need_case_sensitive = self.search_case_sensitive.get_active()
         need_search_is_word = self.search_is_word.get_active()
 
+        if need_jump.count==0:
+            jump = True
+            logging.info("Need Jump.")
+        else:
+            jump = False
         FwManager.instance().request_service('ctrl.search.find_text',
-                    {'need_jump':need_jump.need, 'search_text':search_text, 'need_case_sensitive':need_case_sensitive, 'need_search_is_word':need_search_is_word})
+                    {'need_jump':jump, 'search_text':search_text, 'need_case_sensitive':need_case_sensitive, 'need_search_is_word':need_search_is_word})
 
         # TODO 不用need_jump，而是用“之前的检索选项是否相同”
-        if need_jump.need is False:
-            need_jump.need = True
+        if need_jump.count > 0:
+            need_jump.count -= 1
