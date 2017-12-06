@@ -6,7 +6,7 @@
 import logging
 from gi.repository import Gtk, Gdk, GObject, GLib
 
-from component.model.ModelTagsGlobal import ModelTag
+from component.model.ModelTag import ModelTag
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
@@ -22,7 +22,7 @@ class ViewSearchTagList(FwComponent):
 
     def __init__(self):
         super(ViewSearchTagList, self).__init__()
-        
+
         vbox = Gtk.VBox(spacing=0)
 
         ###############################

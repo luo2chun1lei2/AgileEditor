@@ -44,27 +44,7 @@ Global的问题:
 import os, subprocess, re, logging
 from framework.FwUtils import *
 from framework.FwComponent import FwComponent
-
-class ModelTag(object): # TODO 为了可以切换成其他的实现，将此类放到独立的文件中。
-    ''' 一个Tag的信息。
-    tag_name:string:tag的名字
-    tag_file_path:string:绝对文件路径
-    tag_line_no:int:对应代码的行数
-    tag_content:string:所在行的内容（不一定存在）
-    tag_type:string:类型，可以通过ctags --list-kinds 来显示。
-    tag_scope:string:tag所在的类，和上面的没有关系。
-    '''
-
-    def __init__(self, name,
-                 file_path=None, line_no=None, content=None,
-                 tag_type=None, tag_scope=None):
-        super(ModelTag, self).__init__()
-        self.tag_name = name
-        self.tag_file_path = file_path
-        self.tag_line_no = line_no
-        self.tag_content = content
-        self.tag_type = tag_type
-        self.tag_scope = tag_scope
+from ModelTag import ModelTag
 
 class GtProcess(object):
     ''' 仅限此文件内使用。 
@@ -103,7 +83,7 @@ class ModelTagsGlobal(FwComponent):
         super(ModelTagsGlobal, self).__init__()
         # project:ModelProject:项目对象。
         self.project = None
-        
+
     # override component
     def onRegistered(self, manager):
         info = [{'name':'model.tags.update', 'help':'update the tags on the newest state.'},
@@ -115,11 +95,11 @@ class ModelTagsGlobal(FwComponent):
                 {'name':'model.tags.find_symbol_with_prefix_in_project', 'help':'find the symbol with prefix in project.'},
                 ]
         manager.register_service(info, self)
-    
+
     # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "model.tags.update":
-            self.project = params['project'] # ModelProject
+            self.project = params['project']  # ModelProject
             self.prepare()
             return (True, None)
         elif serviceName == "model.tags.find_defination":

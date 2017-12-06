@@ -13,15 +13,9 @@ import os, shutil, re, logging
 from gi.repository import Gtk, Gdk, GtkSource, GLib
 
 from framework.FwManager import FwManager
-
-from component.model.ModelWorkshop import ModelWorkshop
-from component.model.ModelTask import ModelTask
-from component.view.ViewMenu import ViewMenu
-from component.model.ModelTagsGlobal import ModelTag
-from component.util.UtilEditor import UtilEditor
-from component.util.UtilDialog import UtilDialog
-
 from framework.FwComponent import FwComponent
+
+from component.view.ViewMenu import ViewMenu
 
 class ViewWindow(Gtk.Window, FwComponent):
 

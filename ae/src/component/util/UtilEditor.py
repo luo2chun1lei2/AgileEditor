@@ -10,7 +10,7 @@ from gi.repository import Gio, Gtk, Gdk, GtkSource
 from framework.FwManager import FwManager
 
 class UtilEditor(object):
-    
+
     def __init__(self):
         super(UtilEditor, self).__init__()
 
@@ -89,7 +89,7 @@ class UtilEditor(object):
         如果都无法达到，就返回None 
         '''
         text_buf = UtilEditor.get_editor_buffer()
-        if text_buf is None: # 如果当前没有打开的编辑器
+        if text_buf is None:  # 如果当前没有打开的编辑器
             return None
         selection = text_buf.get_selection_bounds()
 
@@ -139,7 +139,7 @@ class UtilEditor(object):
         # 根据当前编辑器的当前光标位置，生成一个bookmark
         # return:ModelTag:书签
 
-        from component.model.ModelTagsGlobal import ModelTag
+        from component.model.ModelTag import ModelTag
 
         text_buf = UtilEditor.get_editor_buffer()
 
