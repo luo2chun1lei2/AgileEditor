@@ -25,7 +25,8 @@ class CtrlEdit(FwComponent):
                 {'name':'ctrl.edit.uncomment', 'help':'make selected code to uncomment.'},
                 {'name':'ctrl.edit.replace', 'help':'replace the selected text by other text.'},
                 {'name':'ctrl.edit.delete_line', 'help':'delete the line allocated by cursor.'},
-                {'name':'ctrl.edit.select_all', 'help':'select all test in current edit file.'}
+                {'name':'ctrl.edit.select_all', 'help':'select all test in current edit file.'},
+                {'name':'ctrl.edit.note', 'help':'show dialog note.'},
                 ]
         manager.register_service(info, self)
 
@@ -62,6 +63,13 @@ class CtrlEdit(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.edit.undo':
             UtilEditor.edit_undo()
+            return (True, None)
+        elif serviceName == 'ctrl.edit.note':
+            # TODO 尝试将copy、edit、past放在一起运行，但是运行各种问题，所以目前就手动copy和paste。
+            # FwManager.instance().request_service('ctrl.edit.copy')
+            is_ok, results = FwManager.instance().request_service('dialog.note')
+            # if is_ok and results['response'] == Gtk.ResponseType.OK:
+            #    FwManager.instance().request_service('ctrl.edit.paste')
             return (True, None)
         else:
             return (False, None)
@@ -146,6 +154,13 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>R",
                   'stock_id':None,
                   'service_name':'ctrl.edit.replace'}
+
+        params = {'menu_name':'EditMenu',
+                  'menu_item_name':'EditNote',
+                  'title':"Note",
+                  'accel':"F10",
+                  'stock_id':None,
+                  'service_name':'ctrl.edit.note'}
         manager.request_service("view.menu.add", params)
 
         return True

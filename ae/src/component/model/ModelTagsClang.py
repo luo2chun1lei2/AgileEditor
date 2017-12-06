@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 '''
 利用clang分析代码，实现ModelTags模块。
+目前正在实验中，距离完成还非常的遥远。
 '''
 import sys, os, logging, clang.cindex
 

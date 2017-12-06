@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 
-# 执行任务的模型。
+''' 启动新的线程，在后台运行。完成后，会调用回调方法。
+'''
 
 import os, logging, threading
 

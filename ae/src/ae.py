@@ -112,6 +112,9 @@ def load_components(manager):
     from component.dialog.ViewDialogCommon import ViewDialogCommon
     from component.dialog.ViewDialogProject import ViewDialogProject
     from component.dialog.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
+    from component.dialog.ViewDialogMsg import ViewDialogMsg
+    from component.dialog.ViewDialogInfo import ViewDialogInfo
+    from component.dialog.ViewDialogNote import ViewDialogNote
     from component.util.UtilWordComplete import UtilWordComplete
     from component.view.ViewFsTree import ViewFsTree
     from component.view.ViewFileTagList import ViewFileTagList
@@ -120,16 +123,14 @@ def load_components(manager):
     from component.view.AeMain import AeMain
     from component.view.ViewMultiEditors import ViewMultiEditors
     from component.view.ViewBookmarks import ViewBookmarks
-    from component.control.CtrlEdit import CtrlEdit
-    from component.control.CtrlSearch import CtrlSearch
     from component.model.ModelJumpHistory import ModelJumpHistory
+    from component.model.ModelTagsGlobal import ModelTagsGlobal
     from component.control.CtrlWorshop import CtrlWorkshop
     from component.control.CtrlFile import CtrlFile
     from component.control.CtrlHelp import CtrlHelp
-    from component.dialog.ViewDialogMsg import ViewDialogMsg
-    from component.dialog.ViewDialogInfo import ViewDialogInfo
     from component.view.ViewPogress import ViewProgress
-    from component.model.ModelTagsGlobal import ModelTagsGlobal
+    from component.control.CtrlEdit import CtrlEdit
+    from component.control.CtrlSearch import CtrlSearch
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -141,6 +142,7 @@ def load_components(manager):
     manager.register("dialog_project_setting", ViewDialogWorkshopSetting())
     manager.register("dialog_msg", ViewDialogMsg())
     manager.register("dialog_info", ViewDialogInfo())
+    manager.register("dialog_note", ViewDialogNote())
     manager.register("word_complete", UtilWordComplete())
     manager.register("fs_treeview", ViewFsTree())
     manager.register("file_taglist", ViewFileTagList())
@@ -156,8 +158,6 @@ def load_components(manager):
     manager.register("ctrl_help", CtrlHelp())
     manager.register("view_progress", ViewProgress())
     manager.register("model_tags_global", ModelTagsGlobal())
-
-
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 
