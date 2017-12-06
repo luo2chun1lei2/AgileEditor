@@ -46,20 +46,21 @@ class ViewMenu(FwComponent):
      STATUS_FILE_OPEN_CHANGED,  # 项目已经打开，文件打开状态，且已经有了修改。
     ) = range(4)
 
-    def __init__(self, window):
+    def __init__(self):
         super(ViewMenu, self).__init__()
 
         # 附件检索的控件
         self.search_entry = None
         self.actions = []
 
-        self._create_menu(window)
+        self._create_menu()
 
     # from component
     def onRegistered(self, manager):
         info = [{'name':'view.menu.add', 'help':'add item in menu.'},
                 {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
-                {'name':'view.menu.set_search_option', 'help':'set option of search.'}
+                {'name':'view.menu.set_search_option', 'help':'set option of search.'},
+                {'name':'view.menu.get_self', 'help':'TODO'}
                 ]
         manager.register_service(info, self)
 
@@ -76,6 +77,8 @@ class ViewMenu(FwComponent):
         elif serviceName == 'view.menu.set_search_option':
             self._set_search_options(params['search_text'], params['case_sensitive'], params['is_word'])
             return (True, None)
+        elif serviceName == 'view.menu.get_self':
+            return (True, {'self': self})
         else:
             return (False, None)
 
@@ -186,7 +189,7 @@ class ViewMenu(FwComponent):
     def get_status(self):
         return self.menu_status
 
-    def _create_menu(self, window):
+    def _create_menu(self):
         # 创建菜单和工具栏
 
         # 主菜单
@@ -239,7 +242,7 @@ class ViewMenu(FwComponent):
         self.toolbar.insert(tool_item, -1)
 
         # 快捷菜单
-        window.add_accel_group(self.uimanager.get_accel_group())
+        # window.add_accel_group(self.uimanager.get_accel_group())
 
         # 下面的弹出菜单
         # eventbox = Gtk.EventBox()
@@ -313,18 +316,18 @@ class ViewMenu(FwComponent):
         # 发送了信息后，再把此标志位改过来。
 
         self.need_jump.count = 0
-        
+
         if search_text is None:
             text = ""
         else:
             text = search_text
-        
+
         if text != self.search_entry.get_text():
             self.need_jump.count += 1
         if case_sensitive != self.search_case_sensitive.get_active():
             self.need_jump.count += 1
         if is_word != self.search_is_word.get_active():
-            self.need_jump.count += 1 
+            self.need_jump.count += 1
 
         self.search_entry.set_text(text)
         self.search_case_sensitive.set_active(case_sensitive)
@@ -335,7 +338,7 @@ class ViewMenu(FwComponent):
         need_case_sensitive = self.search_case_sensitive.get_active()
         need_search_is_word = self.search_is_word.get_active()
 
-        if need_jump.count==0:
+        if need_jump.count == 0:
             jump = True
             logging.info("Need Jump.")
         else:

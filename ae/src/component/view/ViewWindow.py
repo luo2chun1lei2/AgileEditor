@@ -115,7 +115,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         # # 重要控件
 
         # 菜单和工具栏
-        self.ide_menu = ViewMenu(self)
+        self.ide_menu = FwManager.request_one('self', 'view.menu.get_self')
 
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
