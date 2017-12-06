@@ -8,7 +8,6 @@ import os, logging
 from gi.repository import Gtk, GdkPixbuf
 
 from framework.FwComponent import FwComponent
-from component.view.ViewMenu import ViewMenu
 from framework.FwManager import FwManager
 
 class ViewDialogAbout(FwComponent):
@@ -20,7 +19,7 @@ class ViewDialogAbout(FwComponent):
 
     # override component
     def onRegistered(self, manager):
-        info = {'name':'dialog.about', 'help':'show application information dialog.'}
+        info = {'name':'dialog.about', 'help':'show application about dialog.'}
         manager.register_service(info, self)
 
         return True
@@ -39,10 +38,7 @@ class ViewDialogAbout(FwComponent):
 
         authors = ['罗春雷', "luo2chun1lei2@icloud.com"]
 
-        componentInfo = FwManager.instance().show_components(True)
-        serviceInfo = FwManager.instance().show_services(True)
-        event_info = FwManager.instance().show_events(True)
-        documentors = ["=========================", componentInfo, serviceInfo, event_info]
+        documentors = ["罗春雷"]
 
         dirname = os.path.abspath(os.path.dirname(__file__))
         filename = os.path.join(dirname, '', '../../ae.png')

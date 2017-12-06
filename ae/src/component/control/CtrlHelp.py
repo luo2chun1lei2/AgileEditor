@@ -12,9 +12,8 @@ class CtrlHelp(FwComponent):
 
     # override component
     def onRegistered(self, manager):
-        info = {'name':'ctrl.help.about', 'help':'show about information.'}
-        manager.register_service(info, self)
-
+        ''' 目前此组件没有自己的service，因为加入的菜单可以直接调用对应的service，不需要此组件协调。
+        '''
         return True
 
     # override component
@@ -23,17 +22,20 @@ class CtrlHelp(FwComponent):
                   'menu_item_name':'HelpAbout',
                   'title':"About",
                   'accel':"<Alt>H",
-                  'stock_id':Gtk.STOCK_INFO,
+                  'stock_id':Gtk.STOCK_ABOUT,
                   'service_name':'dialog.about'}
+        manager.request_service("view.menu.add", params)
+
+        params = {'menu_name':'HelpMenu',
+                  'menu_item_name':'HelpInfo',
+                  'title':"Information",
+                  'accel':"<Alt>I",
+                  'stock_id':Gtk.STOCK_INFO,
+                  'service_name':'dialog.info'}
         manager.request_service("view.menu.add", params)
 
         return True
 
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "ctrl.help.about":
-            manager.request_service('dialog.about')
-            return (True, None)
-
-        else:
             return (False, None)

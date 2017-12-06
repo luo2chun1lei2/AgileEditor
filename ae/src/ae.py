@@ -2,21 +2,20 @@
 # -*- coding:utf-8 -*-
 
 '''
-0.3版本的ae入口。
+ae入口。
 '''
 
 import sys, logging
 
 ''' 提供的服务，组件并不是问题所在，服务才是。
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。
-    还需要：【用clang替换global需要赶快制作】
+    还需要：【用clang替换global需要很多的修改，这里放在最后】
     【所有的组件在初始化时，最好不要依赖其他的组件，比如menu，应该可以独立的初始化，这样，就从设计上避免了初始化顺序问题，但是顺序问题还是要讨论的】
     【还需要探讨可以实现多个同类型组件的实例，供不同的用途的问题】
     【editor切换时，文件内检索和跳转有冲突：
     1，search_entry输入时，必须根据输入而检索内容。
     2，当切换编辑文件时，还需要还原原来检索的情况。
     3，并且对应的检索内容需要修改，必然会发生search_entry的输入事件，如果内容相同，则不会发生事件。】
-    【About的Credits是显示有多少参与，而不是调试信息，应该提供另外的对话框显示。】
 
     # 辅助用的对话框(OK)。
     dialog.about/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
@@ -99,9 +98,6 @@ import sys, logging
     - 和文件相关的操作，和上面的ws、prj操作从层次上来说，并无太多不同。
     ctrl.file.new /ctrl.file.open/ctrl.file.close/ctrl.file.save/ctrl.file.save_as
     [少一个rename，再加一个统计（大小、修改时间等）] [缺少关闭所有文件，或者其他文件等操作]
-    
-    ctrl.help.about
-    
 '''
 
 def load_components(manager):
@@ -131,6 +127,7 @@ def load_components(manager):
     from component.control.CtrlFile import CtrlFile
     from component.control.CtrlHelp import CtrlHelp
     from component.dialog.ViewDialogMsg import ViewDialogMsg
+    from component.dialog.ViewDialogInfo import ViewDialogInfo
     from component.view.ViewPogress import ViewProgress
     from component.model.ModelTagsGlobal import ModelTagsGlobal
 
@@ -138,11 +135,12 @@ def load_components(manager):
     manager.register("command_parser", AppArgs())
     manager.register("app_view", AppView())
     manager.register("ae_main", AeMain())
-    manager.register("dialog_info", ViewDialogAbout())
+    manager.register("dialog_about", ViewDialogAbout())
     manager.register("dialog_common", ViewDialogCommon())
     manager.register("dialog_project", ViewDialogProject())
     manager.register("dialog_project_setting", ViewDialogWorkshopSetting())
     manager.register("dialog_msg", ViewDialogMsg())
+    manager.register("dialog_info", ViewDialogInfo())
     manager.register("word_complete", UtilWordComplete())
     manager.register("fs_treeview", ViewFsTree())
     manager.register("file_taglist", ViewFileTagList())
@@ -158,6 +156,8 @@ def load_components(manager):
     manager.register("ctrl_help", CtrlHelp())
     manager.register("view_progress", ViewProgress())
     manager.register("model_tags_global", ModelTagsGlobal())
+
+
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 
