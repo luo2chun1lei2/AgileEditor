@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-''' 显示帮助信息。
+''' 显示"关于"信息。
 '''
 
 import os, logging
@@ -11,24 +11,24 @@ from framework.FwComponent import FwComponent
 from component.view.ViewMenu import ViewMenu
 from framework.FwManager import FwManager
 
-class ViewDialogInfo(FwComponent):
-    ''' 显示“关于”信息的对话框
+class ViewDialogAbout(FwComponent):
+    ''' 显示“关于”信息的对话框，内部主要是开发者、网站、版本信息等等。
     '''
 
     def __init__(self):
-        super(ViewDialogInfo, self).__init__()
+        super(ViewDialogAbout, self).__init__()
 
     # override component
     def onRegistered(self, manager):
-        info = {'name':'dialog.info', 'help':'show application information dialog.'}
+        info = {'name':'dialog.about', 'help':'show application information dialog.'}
         manager.register_service(info, self)
 
         return True
 
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "dialog.info":
-            ViewDialogInfo._show()
+        if serviceName == "dialog.about":
+            ViewDialogAbout._show()
             return (True, None)
 
         else:
@@ -62,7 +62,7 @@ class ViewDialogInfo(FwComponent):
                                 logo=transparent,
                                 title='关于敏捷编辑器')
         about.set_resizable(True)  # 可以改变大小
-        about.connect('response', ViewDialogInfo._widget_destroy)
+        about.connect('response', ViewDialogAbout._widget_destroy)
         about.show()
 
     @staticmethod

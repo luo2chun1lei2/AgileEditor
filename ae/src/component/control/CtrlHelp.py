@@ -24,7 +24,7 @@ class CtrlHelp(FwComponent):
                   'title':"About",
                   'accel':"<Alt>H",
                   'stock_id':Gtk.STOCK_INFO,
-                  'service_name':'dialog.info'}
+                  'service_name':'dialog.about'}
         manager.request_service("view.menu.add", params)
 
         return True
@@ -32,7 +32,7 @@ class CtrlHelp(FwComponent):
     # override component
     def onRequested(self, manager, serviceName, params):
         if serviceName == "ctrl.help.about":
-            manager.request_service('dialog.info')
+            manager.request_service('dialog.about')
             return (True, None)
 
         else:

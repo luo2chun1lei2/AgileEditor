@@ -19,7 +19,7 @@ import sys, logging
     【About的Credits是显示有多少参与，而不是调试信息，应该提供另外的对话框显示。】
 
     # 辅助用的对话框(OK)。
-    dialog.info/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
+    dialog.about/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new
     dialog.project.open/dialog.project.change/dialog.project.setting
     dialog.msg.xxx 通用消息和问题类对话框。
     
@@ -112,7 +112,7 @@ def load_components(manager):
     from component.AppProcess import AppProcess
     from component.AppView import AppView
     from component.AppArgs import AppArgs
-    from component.dialog.ViewDailogInfo import ViewDialogInfo
+    from component.dialog.ViewDailogAbout import ViewDialogAbout
     from component.dialog.ViewDialogCommon import ViewDialogCommon
     from component.dialog.ViewDialogProject import ViewDialogProject
     from component.dialog.ViewDialogWorkshopSetting import ViewDialogWorkshopSetting
@@ -138,7 +138,7 @@ def load_components(manager):
     manager.register("command_parser", AppArgs())
     manager.register("app_view", AppView())
     manager.register("ae_main", AeMain())
-    manager.register("dialog_info", ViewDialogInfo())
+    manager.register("dialog_info", ViewDialogAbout())
     manager.register("dialog_common", ViewDialogCommon())
     manager.register("dialog_project", ViewDialogProject())
     manager.register("dialog_project_setting", ViewDialogWorkshopSetting())
