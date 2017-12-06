@@ -60,7 +60,8 @@ class ViewMenu(FwComponent):
         info = [{'name':'view.menu.add', 'help':'add item in menu.'},
                 {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
                 {'name':'view.menu.set_search_option', 'help':'set option of search.'},
-                {'name':'view.menu.get_self', 'help':'TODO'}
+                {'name':'view.menu.get_self', 'help':'TODO'},
+                {'name':'view.menu.set_accel', 'help':'TODO'}
                 ]
         manager.register_service(info, self)
 
@@ -79,6 +80,11 @@ class ViewMenu(FwComponent):
             return (True, None)
         elif serviceName == 'view.menu.get_self':
             return (True, {'self': self})
+        elif serviceName == 'view.menu.set_accel':
+            # 快捷菜单
+            # window = FwManager.request_one('window', 'view.main.get_window')
+            window = params['window']
+            window.add_accel_group(self.uimanager.get_accel_group())
         else:
             return (False, None)
 
@@ -240,9 +246,6 @@ class ViewMenu(FwComponent):
         tool_item = Gtk.ToolItem()
         tool_item.add(progress)
         self.toolbar.insert(tool_item, -1)
-
-        # 快捷菜单
-        # window.add_accel_group(self.uimanager.get_accel_group())
 
         # 下面的弹出菜单
         # eventbox = Gtk.EventBox()

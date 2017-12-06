@@ -116,6 +116,7 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         # 菜单和工具栏
         self.ide_menu = FwManager.request_one('self', 'view.menu.get_self')
+        FwManager.instance().request_service('view.menu.set_accel', {'window':self})
 
         # 保存项目用的各种列表的Notebook
         self.nbPrj = Gtk.Notebook()
