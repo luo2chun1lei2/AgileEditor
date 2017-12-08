@@ -2,15 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * comment1
- */
+/** comment1 */
 void my_print(const char *p)
 {
-	// comment2
-	printf(p);
+	printf(p); /// comment2
 }
 
+/// main comment
 int main()
 {
 	int v = 10;
