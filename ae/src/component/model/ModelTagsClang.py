@@ -8,6 +8,10 @@
 ** 代码在 "/usr/share/pyshared/pygraphviz"
  node's attributes: http://www.graphviz.org/doc/info/attrs.html
  label中可以加入中文，只是需要 u""。
+** 可以用 c-index-test-3.8 -test-load-source all test.cpp | grep test.cpp，检查 test.cpp 内部的AST。
+** statement 是语句，独立工作，完成后也没有没有返回值，比如 函数声明、赋值语句等。
+   expression 是表达式，比如一个运算公式“x*x + x*2 + 1”,比如函数调用，会有返回值，供其他使用。
+   一般来说，statement包含 expression。
 '''
 import sys, os, logging, subprocess
 import tempfile  # create temp files.
@@ -18,6 +22,10 @@ from clang import cindex
 class Visitor(object):
     def __init__(self):
         super(Visitor, self).__init__()
+
+    def start(self):
+        ''' 开始，做准备用的。 '''
+        pass
 
     def process(self, parent_cursor, parent_result, cursor, level):
         ''' 接受节点进行处理
@@ -33,10 +41,17 @@ class Visitor(object):
         return True
 
 class VisitorGraph(Visitor):
-    def __init__(self, file_name):
+    ''' 遍历Cursor，并用Graphviz显示节点关系。
+    '''
+    def __init__(self, file_name, func_name):
+        '''
+        @param file_name: string: 文件的名字[必须]
+        @param func_name: string: 函数的名字[可选]
+        '''
         super(VisitorGraph, self).__init__()
 
         self.file_name = file_name
+        self.func_name = func_name
 
         # 生成临时文件。
         fd, self.path = tempfile.mkstemp(suffix='.png')
@@ -51,42 +66,76 @@ class VisitorGraph(Visitor):
         self.num = 1
 
     # override from Visitor
+    def start(self):
+#         if self.func_name is None:
+#             # 如果函数名字空，那么解析所有的节点。
+#             self.found = True
+#         else:
+#             # 如果名字不为空，那么碰到函数定义再解析。
+#             self.found = False
+        pass
+
+    # override from Visitor
     def process(self, parent_cursor, parent_result, cursor, level):
-        node_no = self._add_2_graph(parent_result, cursor, level)
-        return True, node_no
+        result = self._add_2_graph(parent_result, cursor, level)
+        return True, result
 
     # override from Visitor
     def finish(self):
         ''' 遍历节点完成 '''
-        self.show()
+        self._show()
         return True
 
     def _add_2_graph(self, parent_result, cursor, level):
+        ''' 必须是指定的文件，include进来的，不算。
+        @return (int:层级, bool:是否匹配检索需要)
+        '''
+        if parent_result is None:
+            parent_no = 0
+            parent_found = False
+        else:
+            parent_no, parent_found = parent_result
 
-#         if cursor.kind == cindex.CursorKind.st:
-#             return False, None
+        # 查看是否是指定的文件
         if cursor.location.file is None or self.file_name != cursor.location.file.name:
-            return 0
+            # 不是
+            return 0, False
 
-        shape = 'record'
-        if cursor.kind == cindex.CursorKind.IF_STMT:
-            shape = 'triangle'
+        # 查看是否是指定的函数。
+        found = False
+        if parent_found == True:
+            found = True
+        else:
+            if self.func_name is None:
+                # 如果函数名字空，那么解析所有的节点。
+                found = True
+            else:
+                # 如果函数名字不是空，那么需要比对是否定义和名字是否相等。
+                if cursor.kind.is_declaration() and cursor.spelling == self.func_name:
+                    logging.info("find declaration %s" % self.func_name)
+                    found = True
 
-        # extent 是cursor的代码范围(SourceRange)，start和end都是SourceLocation
-        # cursor.type 是语法分析后得到的节点的语法类型（比如int），如果有的话。
-        e = cursor.extent
-        self.graph.add_node(self.num, shape=shape, fontcolor='white', color='black', fillcolor='royalblue1', style='filled',
-                            label="%s, %d:%d~%d:%d, %s" % (cursor.kind, e.start.line, e.start.column, e.end.line, e.end.column, cursor.spelling))
+        if found:
+            # 需要绘制
+            shape = 'record'
+            if cursor.kind == cindex.CursorKind.IF_STMT:
+                shape = 'diamond'
 
-        # cursor.location(SourceLocation) 是cursor的起始位置，包括文件名字之类的，但不是范围。offset距离文件头的偏移位置。
-        # l = cursor.location
-        # logging.info("file=%s, line=%d, column=%d, offset=%d" % (l.file, l.line, l.column, l.offset))
-        logging.info("%d, %s, %s, %s" % (cursor.location.line, cursor.spelling, cursor.displayname, cursor.brief_comment))
+            # extent 是cursor的代码范围(SourceRange)，start和end都是SourceLocation
+            # cursor.type 是语法分析后得到的节点的语法类型（比如int），如果有的话。
+            e = cursor.extent
+            self.graph.add_node(self.num, shape=shape, fontcolor='white', color='black', fillcolor='royalblue1', style='filled',
+                                label="%s, %d:%d~%d:%d, %s" % (cursor.kind.name, e.start.line, e.start.column, e.end.line, e.end.column, cursor.spelling))
 
-        self.graph.add_edge(parent_result, self.num)
+            # cursor.location(SourceLocation) 是cursor的起始位置，包括文件名字之类的，但不是范围。offset距离文件头的偏移位置。
+            # l = cursor.location
+            # logging.info("file=%s, line=%d, column=%d, offset=%d" % (l.file, l.line, l.column, l.offset))
+            logging.info("%d, %s, %s, %s" % (cursor.location.line, cursor.spelling, cursor.displayname, cursor.brief_comment))
+
+            self.graph.add_edge(parent_no, self.num)
+
         self.num += 1
-
-        return self.num - 1
+        return self.num - 1, found
 
     def _print(self, cursor, level):
         # if cursor.kind == cindex.CursorKind.TRANSLATION_UNIT:
@@ -94,7 +143,7 @@ class VisitorGraph(Visitor):
         print '-' * level + '%s, %s [line=%s, col=%s]' % \
             (cursor.kind, cursor.spelling, cursor.location.line, cursor.location.column)
 
-    def show(self):
+    def _show(self):
         ''' 显示整个节点树 '''
 
         # 可以显示出来，或者保存成文件。
@@ -105,7 +154,7 @@ class VisitorGraph(Visitor):
         # 显示为图形，并打开。(也可以用dot命令将 *.dot 文件变成图片，然后显示处理，dot文件可以认为矢量的。)
         self.graph.layout('dot')  # layout with default (neato), dot is directed graphs.
         self.graph.draw(self.path)  # draw png
-        # subprocess.call('eog %s' % self.path, shell=True, executable="/bin/bash")
+        subprocess.call('eog %s' % self.path, shell=True, executable="/bin/bash")
 
 def travel_source(parent_cursor, parent_result, cursor, visitor, level):
     """ 分析指定的cursor内的代码，用层级显示节点之间的包含关系。
@@ -228,9 +277,33 @@ def main(file_path, type_name):
     # 检索文件中的节点和 type_name 相关的。
     # find_typerefs(tu.cursor, type_name, 0)
 
+def analysis_code(file_path, args, func_name=None):
+    ''' 分析代码，并显示代码的AST。
+    @param file_path: string: module's path
+    @param args: [sring]: compilation arguments, such as "["-I/home/luocl/myprojects/abc"]"
+    @param func_name: string: function's name
+    '''
+    # 生成核心的Index实例
+    index = clang.cindex.Index.create()
+    # 用Index分析代码，这里是一个文件。
+    tu = index.parse(file_path, args)
+
+    # 分析代码
+    visitor = VisitorGraph(file_path, func_name)
+    visitor.start()
+    travel_source(None, None, tu.cursor, visitor, 0)
+
 if __name__ == "__main__":
     # set the level of log.
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
+    ''' 设计方案：
+    1，可以显示任一函数或者文件的内部的节点图。
+    2，可以分析其中一个函数的运行路线。
+    3，建立某个子系统的状态切换是否正确。
+    4，根据运行路线，核对是否状态切换正确。
+    '''
+
     # Usage: call with <file_name: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
-    main("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", 'my_print')
+    # main("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", 'my_print')
+    analysis_code("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", ["-I/home/luocl/myprojects/abc"], 'test_print')
