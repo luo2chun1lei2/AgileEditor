@@ -262,13 +262,35 @@ def travel_node_tree(node):
     
     for child in node.children:
         travel_node_tree(child)
+        
+def show_crusor_tree():
+    ''' 显示cursor的图 '''
+    visitor = VisitorGraph("/home/luocl/myprojects/AgileEditor/ae/test/test.cpp",
+                           'test_mem', ["-I/home/luocl/myprojects/abc"])
+    analysis_code(visitor)
     
+def process_source():
+    # 分析代码得到一个节点树
+    # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
+    visitor = VisitorTree("/home/luocl/myprojects/AgileEditor/ae/test/test.cpp",
+                           'test_mem', ["-I/home/luocl/myprojects/abc"])
+    root_node = analysis_code(visitor)
+    
+    # 遍历节点树，显示节点树的信息。
+    travel_node_tree(root_node)
+    
+    # 找到需要的函数定义
+    
+    # 显示函数的AST关系图。
+    
+    # 分析此函数的所有的路径。
+    
+    # 显示其中一条路径的调用关系图
+    
+    # 计算每个路径的结果。
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
-    # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
-    visitor = VisitorTree("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp",
-                           'test_mem', ["-I/home/luocl/myprojects/abc"])
-    node = analysis_code(visitor)
-    
-    travel_node_tree(node)
+    #show_crusor_tree()
+    process_source()

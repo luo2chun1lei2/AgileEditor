@@ -306,4 +306,4 @@ if __name__ == "__main__":
 
     # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
     # main("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", 'my_print')
-    analysis_code("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", ["-I/home/luocl/myprojects/abc"], 'test_print')
+    analysis_code("/home/luocl/myprojects/AgileEditor/ae/test/test.cpp", ["-I/home/luocl/myprojects/abc"], 'test_print')
