@@ -18,12 +18,15 @@ import sys, os, logging, subprocess, tempfile
 import clang.cindex as cindex
 import pygraphviz as pgv
 
+''' #################################################################
+    Cursor
+'''
+
 class Visitor(object):
-    def __init__(self, file_path, func_name, args):
+    def __init__(self, file_path, args):
         super(Visitor, self).__init__()
         
         self.file_path = file_path
-        self.func_name = func_name
         self.args = args
 
     def start(self):
@@ -51,7 +54,8 @@ class VisitorGraph(Visitor):
         @param file_path: string: 文件的名字[必须]
         @param func_name: string: 函数的名字[可选]
         '''
-        super(VisitorGraph, self).__init__(file_path, func_name, args)
+        super(VisitorGraph, self).__init__(file_path, args)
+        self.func_name = func_name
 
         # 创建Graph
         self.graph = pgv.AGraph(directed=True)
@@ -102,7 +106,7 @@ class VisitorGraph(Visitor):
             else:
                 # 如果函数名字不是空，那么需要比对是否定义和名字是否相等。
                 if cursor.kind.is_declaration() and cursor.spelling == self.func_name:
-                    logging.info("find declaration %s" % self.func_name)
+                    logging.debug("find declaration %s" % self.func_name)
                     found = True
 
         if found:
@@ -120,7 +124,8 @@ class VisitorGraph(Visitor):
             # cursor.location(SourceLocation) 是cursor的起始位置，包括文件名字之类的，但不是范围。offset距离文件头的偏移位置。
             # l = cursor.location
             # logging.info("file=%s, line=%d, column=%d, offset=%d" % (l.file, l.line, l.column, l.offset))
-            logging.info("%d, %s, %s, %s" % (cursor.location.line, cursor.spelling, cursor.displayname, cursor.brief_comment))
+            logging.info("%s %d:%d %s" % \
+                (cursor.kind.name, cursor.location.line, cursor.location.column, cursor.spelling))
 
             self.graph.add_edge(parent_no, self.num)
 
@@ -165,6 +170,16 @@ class VisitorGraph(Visitor):
         os.close(fd)
         return path
     
+def show_crusor_tree():
+    ''' 显示cursor的图 '''
+    visitor = VisitorGraph("/home/luocl/myprojects/AgileEditor/ae/test/test.cpp",
+                           'test_mem', ["-I/home/luocl/myprojects/abc"])
+    analysis_code(visitor)
+    
+''' #################################################################
+    节点
+'''
+    
 class Node(object):
     ''' 节点（包括指向父节点和子节点等），为了方便能够计算运行流程。
     '''
@@ -176,6 +191,9 @@ class Node(object):
         self.children = []
         # 自己对应的cursor(cindex.Cursor)
         self.cursor = cursor
+        
+        # 供每个功能建立自己的属性。在此外不保证保留数据和清理数据。
+        self.properties = {}
     
     def add_child_node(self, node):
         self.children.append(node)
@@ -191,10 +209,10 @@ class Node(object):
                  self.cursor.spelling)
     
 class VisitorTree(Visitor):
-    ''' 生成新的节点树
+    ''' 遍历整个Cursor生成Node Tree。
     '''
-    def __init__(self, file_path, func_name, args):
-        super(VisitorTree, self).__init__(file_path, func_name, args)
+    def __init__(self, file_path, args):
+        super(VisitorTree, self).__init__(file_path, args)
 
     def start(self):
         ''' 开始，做准备用的。 '''
@@ -250,44 +268,148 @@ def analysis_code(visitor):
     tu = index.parse(visitor.file_path, visitor.args)
 
     # 分析代码
-    
     visitor.start() # 开始函数
     travel_source(None, None, tu.cursor, visitor, 0)
     return visitor.finish() # 结束函数
-    
-def travel_node_tree(node):
+
+class NodeVisitor(object):
+    def __init__(self):
+        super(NodeVisitor, self).__init__()
+        
+    def process(self, node):
+        pass
+
+def travel_node_tree(node, visitor):
     ''' 遍历节点树
     '''
-    logging.info("node %s" % node.info())
+    visitor.process(node)
     
     for child in node.children:
-        travel_node_tree(child)
+        travel_node_tree(child, visitor)
+
+def show_node_tree(node):
+    class NodeVisitorInfo(NodeVisitor):
+        def __init__(self):
+            super(NodeVisitorInfo, self).__init__()
+            
+        def process(self, node):
+            logging.info("node %s" % node.info())
+            
+    travel_node_tree(node, NodeVisitorInfo())
+    
+def find_node_of_func(node, func_name):
+    '''
+    @param func_name: string: function name
+    '''
+    class NodeVisitorFind(NodeVisitor):
+        def __init__(self, func_name):
+            super(NodeVisitorFind, self).__init__()
+            self.func_name = func_name
+            self.found = None
+            
+        def process(self, node):
+            cursor = node.cursor
+            if cursor is not None:
+                if cursor.kind.is_declaration() and cursor.spelling == self.func_name:
+                    logging.debug("found declaration.")
+                    # 因为函数的定义和声明在这里都是声明，所以需要看此节点的子节点是否有COMPOUND_STMT，
+                    # 就是函数定义的大括号，如果没有这个就可以认为没有定义。
+                    for child in node.children:
+                        if child.cursor.kind == cindex.CursorKind.COMPOUND_STMT:
+                            self.found = node
+            
+    visitor = NodeVisitorFind(func_name)
+    travel_node_tree(node, visitor)
+    return visitor.found
+
+def show_node_graph(node):
+    ''' 显示节点的graph '''
+    if node is None:
+        return
+    
+    class NodeVisitorGraphviz(NodeVisitor):
+        def __init__(self):
+            super(NodeVisitorGraphviz, self).__init__()
+            
+            self.graph = pgv.AGraph(directed=True)
+            self.graph.graph_attr['epsilon'] = '0.001'
+            
+            # 作为graphviz的每个节点的标号，必须是唯一的。
+            self.num = 1
+            
+        def process(self, node):
+            shape = 'record'
+            cursor = node.cursor
+            e = cursor.extent
+            
+            if cursor.kind == cindex.CursorKind.IF_STMT:
+                shape = 'diamond'
+            
+            no = self._create_no()
+            node.properties['no'] = no
+            
+            # 添加节点
+            self.graph.add_node(no, shape=shape, fontcolor='white', color='black', fillcolor='royalblue1', style='filled',
+                                label="%s, %d:%d~%d:%d, %s" % (cursor.kind.name, e.start.line, e.start.column, e.end.line, e.end.column, cursor.spelling))
+            
+            # 添加节点之间的边。
+            if 'no' in node.parent.properties:
+                parent_no = node.parent.properties['no']
+            else:
+                parent_no = 0
+            self.graph.add_edge(parent_no, no)
+            
+        def _create_no(self):
+            self.num += 1
+            return self.num
         
-def show_crusor_tree():
-    ''' 显示cursor的图 '''
-    visitor = VisitorGraph("/home/luocl/myprojects/AgileEditor/ae/test/test.cpp",
-                           'test_mem', ["-I/home/luocl/myprojects/abc"])
-    analysis_code(visitor)
+        def _create_tmpfile(self, suffix):
+            # 生成临时文件。
+            fd, path = tempfile.mkstemp(suffix = (".%s" % suffix))
+            os.close(fd)
+            return path
+         
+        def show(self):
+            path = self._create_tmpfile('svg')
+            self.graph.layout('dot')
+            self.graph.draw(path, format='svg')
+            subprocess.call('eog %s' % path, shell=True, executable="/bin/bash")
+        
+    visitor = NodeVisitorGraphviz()
+    travel_node_tree(node, visitor)
+    
+    visitor.show()
     
 def process_source():
     # 分析代码得到一个节点树
     # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
     visitor = VisitorTree("/home/luocl/myprojects/AgileEditor/ae/test/test.cpp",
-                           'test_mem', ["-I/home/luocl/myprojects/abc"])
+                           ["-I/home/luocl/myprojects/abc"])
     root_node = analysis_code(visitor)
     
     # 遍历节点树，显示节点树的信息。
-    travel_node_tree(root_node)
+    show_node_tree(root_node)
     
     # 找到需要的函数定义
-    
+    found_node = find_node_of_func(root_node, "test_mem")
+    if found_node is None:
+        logging.error("Don't find function declaration.")
+        sys.exit(1)
+    else:
+        logging.info("found function defination: %s" % found_node.info())
+        
     # 显示函数的AST关系图。
+    show_node_graph(found_node)
     
     # 分析此函数的所有的路径。
     
     # 显示其中一条路径的调用关系图
     
     # 计算每个路径的结果。
+
+''' #################################################################
+    main
+'''
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
