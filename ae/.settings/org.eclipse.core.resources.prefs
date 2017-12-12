@@ -18,6 +18,7 @@ encoding//src/component/dialog/ViewDialogNote.py=utf-8
 encoding//src/component/dialog/ViewDialogProject.py=utf-8
 encoding//src/component/dialog/ViewDialogWorkshopSetting.py=utf-8
 encoding//src/component/dialog/__init__.py=utf-8
+encoding//src/component/model/ModelCheckSource.py=utf-8
 encoding//src/component/model/ModelFile.py=utf-8
 encoding//src/component/model/ModelJumpHistory.py=utf-8
 encoding//src/component/model/ModelProject.py=utf-8
