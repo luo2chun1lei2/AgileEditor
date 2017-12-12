@@ -380,6 +380,56 @@ def show_node_graph(node):
     
     visitor.show()
     
+def clean_node_tree(node):
+    ''' 清理node tree中的properties。 '''
+    class NodeVisitorClean(NodeVisitor):
+        def __init__(self):
+            super(NodeVisitorClean, self).__init__()
+            
+        def process(self, node):
+            node.properties.clear()
+            
+    travel_node_tree(node, NodeVisitorClean())
+    
+class NodePath(object):
+    ''' 建立Node的Path路径。 '''
+    def __init__(self):
+        super(NodePath, self).__init__()
+        # 节点列表 [Node]
+        self.nodes = []
+
+def find_path_of_node(node):
+    ''' 根据node找到可能的path
+    1, 简单的算法是只要是分支，就算两个分支。循环算一个分支。
+       调用子函数不管。
+    2，复杂的算法是根据输入的值，来判断是否真的可以走到这些分支。
+        循环类似。调用子函数需要到内部分析。
+        还允许对函数进行标记。
+    '''
+    
+    if node is None:
+        return
+    
+    class NodeVisitorFindPathes(NodeVisitor):
+        ''' 遍历NodeTree，找到里面所有的Path '''
+        def __init__(self):
+            super(NodeVisitorFindPathes, self).__init__()
+            self.pathes = []
+            
+        def process(self, node):
+            pass
+         
+        def show(self):
+            path = self._create_tmpfile('svg')
+            self.graph.layout('dot')
+            self.graph.draw(path, format='svg')
+            subprocess.call('eog %s' % path, shell=True, executable="/bin/bash")
+        
+    visitor = NodeVisitorFindPathes()
+    travel_node_tree(node, visitor)
+    
+    return visitor.pathes
+    
 def process_source():
     # 分析代码得到一个节点树
     # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
@@ -399,9 +449,15 @@ def process_source():
         logging.info("found function defination: %s" % found_node.info())
         
     # 显示函数的AST关系图。
-    show_node_graph(found_node)
+    # show_node_graph(found_node)
+    
+    clean_node_tree(root_node)
     
     # 分析此函数的所有的路径。
+    pathes = find_path_of_node(found_node)
+    if len(pathes) == 0:
+        logging.error("Cannot find one path.")
+        sys.exit(1)
     
     # 显示其中一条路径的调用关系图
     
