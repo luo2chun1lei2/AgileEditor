@@ -45,12 +45,12 @@ class VisitorGraph(Visitor):
     '''
     def __init__(self, file_name, func_name):
         '''
-        @param file_name: string: 文件的名字[必须]
+        @param file_path: string: 文件的名字[必须]
         @param func_name: string: 函数的名字[可选]
         '''
         super(VisitorGraph, self).__init__()
 
-        self.file_name = file_name
+        self.file_path = file_name
         self.func_name = func_name
 
         # 生成临时文件。
@@ -97,7 +97,7 @@ class VisitorGraph(Visitor):
             parent_no, parent_found = parent_result
 
         # 查看是否是指定的文件
-        if cursor.location.file is None or self.file_name != cursor.location.file.name:
+        if cursor.location.file is None or self.file_path != cursor.location.file.name:
             # 不是
             return 0, False
 
@@ -304,6 +304,6 @@ if __name__ == "__main__":
     4，根据运行路线，核对是否状态切换正确。
     '''
 
-    # Usage: call with <file_name: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
+    # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
     # main("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", 'my_print')
     analysis_code("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", ["-I/home/luocl/myprojects/abc"], 'test_print')

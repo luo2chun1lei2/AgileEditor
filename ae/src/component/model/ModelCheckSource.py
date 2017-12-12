@@ -19,8 +19,12 @@ import clang.cindex as cindex
 import pygraphviz as pgv
 
 class Visitor(object):
-    def __init__(self):
+    def __init__(self, file_path, func_name, args):
         super(Visitor, self).__init__()
+        
+        self.file_path = file_path
+        self.func_name = func_name
+        self.args = args
 
     def start(self):
         ''' 开始，做准备用的。 '''
@@ -36,21 +40,18 @@ class Visitor(object):
         return True, None
 
     def finish(self):
-        ''' 遍历节点完成 '''
-        return True
+        ''' 遍历节点完成，自行决定返回值 '''
+        return None
 
 class VisitorGraph(Visitor):
     ''' 遍历Cursor，并用Graphviz显示节点关系。
     '''
-    def __init__(self, file_name, func_name):
+    def __init__(self, file_path, func_name, args):
         '''
-        @param file_name: string: 文件的名字[必须]
+        @param file_path: string: 文件的名字[必须]
         @param func_name: string: 函数的名字[可选]
         '''
-        super(VisitorGraph, self).__init__()
-
-        self.file_name = file_name
-        self.func_name = func_name
+        super(VisitorGraph, self).__init__(file_path, func_name, args)
 
         # 创建Graph
         self.graph = pgv.AGraph(directed=True)
@@ -62,12 +63,6 @@ class VisitorGraph(Visitor):
 
     # override from Visitor
     def start(self):
-#         if self.func_name is None:
-#             # 如果函数名字空，那么解析所有的节点。
-#             self.found = True
-#         else:
-#             # 如果名字不为空，那么碰到函数定义再解析。
-#             self.found = False
         pass
 
     # override from Visitor
@@ -78,8 +73,8 @@ class VisitorGraph(Visitor):
     # override from Visitor
     def finish(self):
         ''' 遍历节点完成 '''
-        self._show('dot')
-        return True
+        self._show()
+        return None
 
     def _add_2_graph(self, parent_result, cursor, level):
         ''' 必须是指定的文件，include进来的，不算。
@@ -92,7 +87,7 @@ class VisitorGraph(Visitor):
             parent_no, parent_found = parent_result
 
         # 查看是否是指定的文件
-        if cursor.location.file is None or self.file_name != cursor.location.file.name:
+        if cursor.location.file is None or self.file_path != cursor.location.file.name:
             # 不是
             return 0, False
 
@@ -169,6 +164,64 @@ class VisitorGraph(Visitor):
         fd, path = tempfile.mkstemp(suffix = (".%s" % suffix))
         os.close(fd)
         return path
+    
+class Node(object):
+    ''' 节点（包括指向父节点和子节点等），为了方便能够计算运行流程。
+    '''
+    def __init__(self, parent_node, cursor):
+        super(Node, self).__init__()
+        # 父节点(Node)
+        self.parent = parent_node
+        # 自己的子节点([Node])
+        self.children = []
+        # 自己对应的cursor(cindex.Cursor)
+        self.cursor = cursor
+    
+    def add_child_node(self, node):
+        self.children.append(node)
+        
+    def info(self):
+        if self.parent is None:
+            return "This is root node."
+        else:
+            e = self.cursor.extent
+            return '%s %d:%d~%d:%d %s' % \
+                (self.cursor.kind.name, 
+                 e.start.line, e.start.column, e.end.line, e.end.column, 
+                 self.cursor.spelling)
+    
+class VisitorTree(Visitor):
+    ''' 生成新的节点树
+    '''
+    def __init__(self, file_path, func_name, args):
+        super(VisitorTree, self).__init__(file_path, func_name, args)
+
+    def start(self):
+        ''' 开始，做准备用的。 '''
+        # 根节点
+        self.root = Node(None, None)
+
+    def process(self, parent_cursor, parent_result, cursor, level):
+        ''' 接受节点进行处理
+        @param parent_cursor: Cursor: 父节点
+        @param cursor: Cursor: 当前的节点
+        @param level: int: 陷入的层次
+        @return (is_continue:bool:True,继续进行，False,不再继续深入, result:object:附带结果，传给下面的节点) 。
+        '''
+        parent_node = parent_result
+        
+        node = Node(parent_node, cursor)
+        if parent_node is None:
+            # 首节点可能没有parent node。
+            node = self.root
+        else:
+            parent_node.add_child_node(node)
+        
+        return True, node
+
+    def finish(self):
+        ''' 遍历节点完成 '''
+        return self.root
 
 def travel_source(parent_cursor, parent_result, cursor, visitor, level):
     """ 分析指定的cursor内的代码，用层级显示节点之间的包含关系。
@@ -184,11 +237,8 @@ def travel_source(parent_cursor, parent_result, cursor, visitor, level):
     # Recurse for children of this cursor
     for c in cursor.get_children():
         travel_source(cursor, result, c, visitor, level + 1)
-
-    if level == 0:
-        visitor.finish()
     
-def analysis_code(file_path, args, func_name=None):
+def analysis_code(visitor):
     ''' 分析代码，并显示代码的AST。
     @param file_path: string: module's path
     @param args: [sring]: compilation arguments, such as "["-I/home/luocl/myprojects/abc"]"
@@ -197,15 +247,28 @@ def analysis_code(file_path, args, func_name=None):
     # 生成核心的Index实例
     index = cindex.Index.create()
     # 用Index分析代码，这里是一个文件。
-    tu = index.parse(file_path, args)
+    tu = index.parse(visitor.file_path, visitor.args)
 
     # 分析代码
-    visitor = VisitorGraph(file_path, func_name)
-    visitor.start()
+    
+    visitor.start() # 开始函数
     travel_source(None, None, tu.cursor, visitor, 0)
-
+    return visitor.finish() # 结束函数
+    
+def travel_node_tree(node):
+    ''' 遍历节点树
+    '''
+    logging.info("node %s" % node.info())
+    
+    for child in node.children:
+        travel_node_tree(child)
+    
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
-    # Usage: call with <file_name: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
-    analysis_code("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp", ["-I/home/luocl/myprojects/abc"], 'test_print')
+    # Usage: call with <file_path: string: 需要分析的文件的路径> <type_name: string: 程序中具体的类型名字>
+    visitor = VisitorTree("/home/luocl/myprojects/AgileEditor/ae/src/test.cpp",
+                           'test_mem', ["-I/home/luocl/myprojects/abc"])
+    node = analysis_code(visitor)
+    
+    travel_node_tree(node)
