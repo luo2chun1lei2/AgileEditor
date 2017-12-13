@@ -18,7 +18,8 @@ int main()
 /// test for malloc and free.
 void test_mem()
 {
-	char * p = (char *)malloc(4*8);
+	int count = 12 + 4 * 8;
+	char * p = (char *)malloc(count);
 	
 	p[3] = '0';
 	

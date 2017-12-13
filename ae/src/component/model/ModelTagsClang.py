@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 '''
-用clang分析代码，生成代码调用流程图。
+用clang分析代码，可以用于标记查询和单词补全。
+目前在技术调查，实现难度高，工作量大。
+
 ？？ 为什么不在 文本编辑 中直接绘制？？
 * 为了使用graphviz，需要安装“python-pygraphviz”，参考网站“http://pygraphviz.github.io/”
 ** 例子在 “/usr/share/doc/python-pygraphviz/examples/”
