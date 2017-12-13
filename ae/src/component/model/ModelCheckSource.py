@@ -4,6 +4,8 @@
 '''
 技术研究：
     1，clang分析代码。采用“clang.cindex"，是libclang的python接口。
+        Clang之语法抽象语法树AST ： https://www.cnblogs.com/zhangke007/p/4714245.html
+        clang static analyzer源码分析（一）～ （五） ： http://blog.csdn.net/dashuniuniu/article/category/6013535
     2，graphviz来显示流程和关系。
       为了使用graphviz，需要安装“python-pygraphviz”，参考网站“http://pygraphviz.github.io/”。
       为了显示 dot 文件，需要安装 "xdot" 程序。
