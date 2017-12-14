@@ -102,7 +102,7 @@ class FwEventPipe(object):
         @return if need_str is True, then return string
                 if need_str is False, then print string and return None.
         '''
-        text = "events:\n"
+        text = ""
         for name, listeners in sorted(sorted(self.events.items())):
             text += "\t%s\n" % (name)
             for l in listeners:

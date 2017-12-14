@@ -93,7 +93,7 @@ class FwServiceCenter(object):
         @return if need_str is True, then return string
                 if need_str is False, then print string and return None.
         '''
-        text = "services:\n"
+        text = ""
         for service in sorted(self.services, key=lambda x:x.info['name']):
             info = service.info
             text += "\t%s : %s\n" % (info['name'], info['help'])

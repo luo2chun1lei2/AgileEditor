@@ -132,7 +132,7 @@ class FwManager(FwEventPipe, FwServiceCenter):
         @return if need_str is True, then return string
                 if need_str is False, then print string and return None.
         '''
-        text = "components:\n"
+        text = ""
         for name, cmpt in sorted(self.components.items()):
             text += "\t%s : %s\n" % (name, type(cmpt).__module__)
 
