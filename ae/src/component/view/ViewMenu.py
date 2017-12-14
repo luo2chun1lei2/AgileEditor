@@ -343,7 +343,7 @@ class ViewMenu(FwComponent):
 
         if need_jump.count == 0:
             jump = True
-            logging.info("Need Jump.")
+            logging.debug("Need Jump.")
         else:
             jump = False
         FwManager.instance().request_service('ctrl.search.find_text',
