@@ -58,6 +58,7 @@ class ViewMenu(FwComponent):
     # from component
     def onRegistered(self, manager):
         info = [{'name':'view.menu.add', 'help':'add item in menu.'},
+                {'name':'view.menu.add_toolbar', 'help':'add item in tool bar.'},
                 {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
                 {'name':'view.menu.set_search_option', 'help':'set option of search.'},
                 {'name':'view.menu.get_self', 'help':'TODO'},
@@ -71,6 +72,9 @@ class ViewMenu(FwComponent):
     def onRequested(self, manager, serviceName, params):
         if serviceName == "view.menu.add":
             self._add_menu_item(params)
+            return (True, None)
+        if serviceName == "view.menu.add_toolbar":
+            self._add_toolbar_item(params)
             return (True, None)
         elif serviceName == "view.menu.set_and_jump_to_search_textbox":
             self._jump_to_search_textbox_and_set_text(params['text'])
@@ -132,6 +136,12 @@ class ViewMenu(FwComponent):
             strMenu = """ <toolbar name='ToolBar'>
                         <toolitem action='%s' /></toolbar>""" % (menuItemName)
             self.uimanager.add_ui_from_string(strMenu)
+    
+    def _add_toolbar_item(self, params):
+        # 添加进度条
+        tool_item = Gtk.ToolItem()
+        tool_item.add(params['view'])
+        self.toolbar.insert(tool_item, -1)
 
     def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
         pass

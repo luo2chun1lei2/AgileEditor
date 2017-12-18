@@ -132,6 +132,8 @@ def load_components(manager):
     from component.control.CtrlEdit import CtrlEdit
     from component.control.CtrlSearch import CtrlSearch
     from component.view.ViewMenu import ViewMenu
+    from component.view.ViewSearchHistory import ViewSearchHistory
+    from component.model.ModelSearchHistory import ModelSearchHistory
 
     manager.register("app_process", AppProcess())
     manager.register("command_parser", AppArgs())
@@ -160,6 +162,8 @@ def load_components(manager):
     manager.register("view_progress", ViewProgress())
     manager.register("model_tags_global", ModelTagsGlobal())
     manager.register("view_menu", ViewMenu())
+    manager.register("view_search_history", ViewSearchHistory())
+    manager.register("model_search_history", ModelSearchHistory())
 
     # 这里用 manager.register 函数，在mng.run中，都需要调用 manager.load 函数。
 

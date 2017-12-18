@@ -15,6 +15,12 @@ from component.util.UtilDialog import UtilDialog
 from component.view.ViewWindow import ViewWindow
 
 class CtrlSearch(FwComponent):
+    
+    ACT_DEFINITION = 'definition'
+    ACT_REFERENCE = 'reference'
+    ACT_GREP = 'grep'
+    ACT_PATH = 'path'
+    
     def __init__(self):
         super(CtrlSearch, self).__init__()
         self.search_setting = None
@@ -40,6 +46,9 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.update_tags', 'help':'update the tags by newest project status.'},
                 {'name':'ctrl.search.show_bookmark', 'help':'show a bookmark.'},
                 {'name':'ctrl.search.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
+                {'name':'ctrl.search_history.push', 'help': 'push one search action into one queue.'},
+                {'name':'ctrl.search_history.pop', 'help': 'pop one search action from one queue.'},
+                {'name':'ctrl.search_history.do_action', 'help': 'process one search action.'},
                 ]
         manager.register_service(info, self)
 
@@ -109,6 +118,17 @@ class CtrlSearch(FwComponent):
             # 其他控件发送过来此信息后，需要让编辑器获取焦点。
             self._editor_set_focus()
             return True, None
+        elif serviceName == "ctrl.search_history.push":
+            FwManager.instance().request_service('model.search_history.push', params)
+            return (True, None)
+        elif serviceName == "ctrl.search_history.pop":
+            tag = params['tag']  # ModelTag
+            self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
+            self._editor_set_focus()
+            return (True, None)
+        elif serviceName == "ctrl.search_history.do_action":
+            self._process_search_action(params['action_id'], params['text'])
+            return (True, None)
         else:
             return (False, None)
 
@@ -377,6 +397,8 @@ class CtrlSearch(FwComponent):
                 return
 
         self.last_search_pattern = pattern  # 记录最新的检索
+        
+        self._save_search_action(CtrlSearch.ACT_GREP, pattern)
         self._grep_in_files(pattern)
 
     def _grep_in_files(self, pattern):
@@ -418,6 +440,7 @@ class CtrlSearch(FwComponent):
         if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
             return
 
+        self._save_search_action(CtrlSearch.ACT_PATH, pattern)
         self._find_path(pattern)
 
     def _find_path(self, pattern):
@@ -442,8 +465,9 @@ class CtrlSearch(FwComponent):
         response, tag_name = UtilDialog.show_dialog_one_entry("查找定义", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
-
-        self._search_defination(tag_name)
+        
+        self._save_search_action(CtrlSearch.ACT_DEFINITION, tag_name)
+        self._search_definition(tag_name)
 
     def _find_defination(self):
         ''' 查找定义 '''
@@ -451,9 +475,10 @@ class CtrlSearch(FwComponent):
         if tag_name is None:
             self._find_defination_by_dialog()
         else:
-            self._search_defination(tag_name)
+            self._save_search_action(self, CtrlSearch.ACT_DEFINITION, tag_name)
+            self._search_definition(tag_name)
 
-    def _search_defination(self, tag_name):
+    def _search_definition(self, tag_name):
         cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._after_search_defination,
                           cur_prj.query_defination_tags, tag_name)
@@ -478,6 +503,7 @@ class CtrlSearch(FwComponent):
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 
+        self._save_search_action(self, CtrlSearch.ACT_REFERENCE, tag_name)
         self._search_reference(tag_name)
 
     def _find_reference(self):
@@ -487,6 +513,7 @@ class CtrlSearch(FwComponent):
         if tag_name is None:
             self._find_reference_by_dialog()
         else:
+            self._save_search_action(self, CtrlSearch.ACT_REFERENCE, tag_name)
             self._search_reference(tag_name)
             
     def _search_reference(self, tag_name):
@@ -545,3 +572,19 @@ class CtrlSearch(FwComponent):
         ''' 获取焦点 '''
         editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         editor.grab_focus()
+        
+    def _save_search_action(self, action_id, text):
+        ''' 记录检索动作。 '''
+        params = {'action_id':action_id, 'text':text}
+        FwManager.instance().request_service("ctrl.search_history.push", params)
+        
+    def _process_search_action(self, action_id, text):
+        ''' 根据检索动作，重新检索。 '''
+        if action_id == CtrlSearch.ACT_DEFINITION:
+            self._search_definition(text)
+        elif action_id == CtrlSearch.ACT_REFERENCE:
+            self._search_reference(text)
+        elif action_id == CtrlSearch.ACT_GREP:
+            self._grep_in_files(text)
+        elif action_id == CtrlSearch.ACT_PATH:
+            self._find_path(text)
