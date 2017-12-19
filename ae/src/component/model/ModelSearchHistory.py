@@ -12,7 +12,7 @@ class ModelSearchHistory(FwComponent):
         # 记录 = [SearchAction]
         self.search_actions = []
         self.current_index = -1
-        
+
     # override component
     def onRegistered(self, manager):
         info = [{'name':'model.search_history.push', 'help':'push one search action into history.'},
@@ -40,11 +40,21 @@ class ModelSearchHistory(FwComponent):
             return (False, None)
 
     def _push(self, params):
+        if len(self.search_actions) > 1:
+            # If search action is same with first one, then ignore.
+            first = self.search_actions[0]
+            if first['action_id'] == params['action_id'] and first['text'] == params['text']:
+                return
+
         self.search_actions.insert(0, {'action_id':params['action_id'], 'text':params['text']})
-        
+
+        #  if history items count > 20, remove the oldest.
+        if len(self.search_actions) > 20:
+            del self.search_actions[20]
+
         FwManager.instance().send_event('model.search_history.changed', {'list': self.search_actions})
-        
+
     def _pop(self, action):
         action = self.search_actions.pop()
-        
+
         return action

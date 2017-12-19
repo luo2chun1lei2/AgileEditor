@@ -15,12 +15,12 @@ from component.util.UtilDialog import UtilDialog
 from component.view.ViewWindow import ViewWindow
 
 class CtrlSearch(FwComponent):
-    
+
     ACT_DEFINITION = 'definition'
     ACT_REFERENCE = 'reference'
     ACT_GREP = 'grep'
     ACT_PATH = 'path'
-    
+
     def __init__(self):
         super(CtrlSearch, self).__init__()
         self.search_setting = None
@@ -198,7 +198,7 @@ class CtrlSearch(FwComponent):
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_definition'}
         manager.request_service("view.menu.add", params)
-        
+
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchDefinitionNeedInput',
                   'title':'Definition with Dialog',
@@ -214,7 +214,7 @@ class CtrlSearch(FwComponent):
                   'stock_id':Gtk.STOCK_FIND,
                   'service_name':'ctrl.search.find_reference'}
         manager.request_service("view.menu.add", params)
-        
+
         params = {'menu_name':'SearchMenu',
                   'menu_item_name':'SearchReferenceNeedInput',
                   'title':'Reference with Dialog',
@@ -397,7 +397,7 @@ class CtrlSearch(FwComponent):
                 return
 
         self.last_search_pattern = pattern  # 记录最新的检索
-        
+
         self._save_search_action(CtrlSearch.ACT_GREP, pattern)
         self._grep_in_files(pattern)
 
@@ -465,7 +465,7 @@ class CtrlSearch(FwComponent):
         response, tag_name = UtilDialog.show_dialog_one_entry("查找定义", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
-        
+
         self._save_search_action(CtrlSearch.ACT_DEFINITION, tag_name)
         self._search_definition(tag_name)
 
@@ -475,7 +475,7 @@ class CtrlSearch(FwComponent):
         if tag_name is None:
             self._find_defination_by_dialog()
         else:
-            self._save_search_action(self, CtrlSearch.ACT_DEFINITION, tag_name)
+            self._save_search_action(CtrlSearch.ACT_DEFINITION, tag_name)
             self._search_definition(tag_name)
 
     def _search_definition(self, tag_name):
@@ -496,14 +496,14 @@ class CtrlSearch(FwComponent):
                 ''' 直接跳转。 '''
                 tag = tags[0]
                 self._goto_file_line(tag.tag_file_path, tag.tag_line_no)
-                
+
     def _find_reference_by_dialog(self):
         ''' 查找定义 '''
         response, tag_name = UtilDialog.show_dialog_one_entry("查找引用", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 
-        self._save_search_action(self, CtrlSearch.ACT_REFERENCE, tag_name)
+        self._save_search_action(CtrlSearch.ACT_REFERENCE, tag_name)
         self._search_reference(tag_name)
 
     def _find_reference(self):
@@ -513,9 +513,9 @@ class CtrlSearch(FwComponent):
         if tag_name is None:
             self._find_reference_by_dialog()
         else:
-            self._save_search_action(self, CtrlSearch.ACT_REFERENCE, tag_name)
+            self._save_search_action(CtrlSearch.ACT_REFERENCE, tag_name)
             self._search_reference(tag_name)
-            
+
     def _search_reference(self, tag_name):
         cur_prj = FwManager.request_one('project', 'view.main.get_current_project')
         ModelTask.execute(self._after_search_reference,
@@ -572,12 +572,12 @@ class CtrlSearch(FwComponent):
         ''' 获取焦点 '''
         editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         editor.grab_focus()
-        
+
     def _save_search_action(self, action_id, text):
         ''' 记录检索动作。 '''
         params = {'action_id':action_id, 'text':text}
         FwManager.instance().request_service("ctrl.search_history.push", params)
-        
+
     def _process_search_action(self, action_id, text):
         ''' 根据检索动作，重新检索。 '''
         if action_id == CtrlSearch.ACT_DEFINITION:
