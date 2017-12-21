@@ -65,11 +65,11 @@ class CtrlEdit(FwComponent):
             UtilEditor.edit_undo()
             return (True, None)
         elif serviceName == 'ctrl.edit.note':
-            # TODO 尝试将copy、edit、past放在一起运行，但是运行各种问题，所以目前就手动copy和paste。
-            # FwManager.instance().request_service('ctrl.edit.copy')
+            # TODO 尝试将copy、edit、past放在一起运行，但是最后的粘贴不正确。
+            FwManager.instance().request_service('ctrl.edit.copy')
             is_ok, results = FwManager.instance().request_service('dialog.note')
-            # if is_ok and results['response'] == Gtk.ResponseType.OK:
-            #    FwManager.instance().request_service('ctrl.edit.paste')
+#             if is_ok and results['response'] == Gtk.ResponseType.OK:
+#                 FwManager.instance().request_service('ctrl.edit.paste')
             return (True, None)
         else:
             return (False, None)
