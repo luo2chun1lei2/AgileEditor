@@ -32,14 +32,15 @@ class ViewFileTagList (FwComponent):
 
         # 显示标题
         label = Gtk.Label(label='Tag List')
-        # isOK, color = Gdk.Color.parse("White")
-        # label.modify_bg(Gtk.StateType.NORMAL, color)
+        label.override_background_color(Gtk.StateFlags.NORMAL, Gdk.RGBA(0.82, 0.82, 0.82, 1.0))  # 设置背景色。
+        label.set_margin_top(0)
+        label.set_margin_bottom(0)
         vbox.pack_start(label, False, False, 0)
 
         # Tag列表包含在一个ScrollWindow中。
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        sw.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
         # 生成数据模型(空的)
         self.model = self._create_model([])
@@ -56,6 +57,9 @@ class ViewFileTagList (FwComponent):
         sw.add(treeview)
 
         vbox.pack_start(sw, True, True, 0)
+
+        # 这里请求自己的大小，在放入父容器时，shrink需要等于False，否则此设定将被忽略。
+        vbox.set_size_request(200, 0)
 
         # 设定需要传出的控件。
         self.view = vbox

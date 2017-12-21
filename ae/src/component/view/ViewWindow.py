@@ -130,7 +130,7 @@ class ViewWindow(Gtk.Window, FwComponent):
         view = FwManager.request_one('view', 'view.multi_editors.get_view')
         panedEdtiorAndTagList.pack1(view, resize=True, shrink=True)
         view = FwManager.request_one('view', 'view.file_taglist.get_view')
-        panedEdtiorAndTagList.pack2(view, resize=False, shrink=True)
+        panedEdtiorAndTagList.pack2(view, resize=False, shrink=False)
 
         view = FwManager.request_one('view', 'view.search_taglist.get_view')
         self.nbPrj.append_page(view, Gtk.Label("检索"))
