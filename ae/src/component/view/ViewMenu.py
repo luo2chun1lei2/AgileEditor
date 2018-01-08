@@ -111,20 +111,18 @@ class ViewMenu(FwComponent):
 
         # 添加到Toolbar上
         if 'in_toolbar' in params:
-            # tool_item = Gtk.ToolItem()
-            # self.toolbar.insert(tool_item, -1)
             strMenu = """ <toolbar name='ToolBar'>
                         <toolitem action='%s' /></toolbar>""" % (menuItemName)
             self.uimanager.add_ui_from_string(strMenu)
 
     def _add_toolbar_item(self, params):
         # 添加进度条
+        view = params['view']
+        if view.get_parent() is not None:
+            return
         tool_item = Gtk.ToolItem()
-        tool_item.add(params['view'])
+        tool_item.add(view)
         self.toolbar.insert(tool_item, -1)
-
-    def on_stub_menu_func(self, widget, action, param=None, param2=None, param3=None):
-        pass
 
     def set_status(self, status):
         ''' 目前无法实现此status的切换，所以暂时不再使用
@@ -204,15 +202,6 @@ class ViewMenu(FwComponent):
 
         # 工具栏供
         self.toolbar = self.uimanager.get_widget("/ToolBar")
-
-        # 添加进度条
-        tool_item = Gtk.SeparatorToolItem()
-        self.toolbar.insert(tool_item, -1)
-
-        progress = FwManager.request_one('view', 'view.progress.get_view')
-        tool_item = Gtk.ToolItem()
-        tool_item.add(progress)
-        self.toolbar.insert(tool_item, -1)
 
         # 下面的弹出菜单
         # eventbox = Gtk.EventBox()

@@ -159,9 +159,9 @@ def load_components(manager):
     manager.register("ctrl_workshop", CtrlWorkshop())
     manager.register("ctrl_file", CtrlFile())
     manager.register("ctrl_help", CtrlHelp())
-    manager.register("view_progress", ViewProgress())
     manager.register("model_tags_global", ModelTagsGlobal())
     manager.register("view_menu", ViewMenu())
+    manager.register("view_progress", ViewProgress())
     manager.register("view_search_history", ViewSearchHistory())
     manager.register("model_search_history", ModelSearchHistory())
 

@@ -14,9 +14,6 @@ class ViewProgress(FwComponent):
 
     # from FwBaseComponnet
     def onRegistered(self, manager):
-        info = {'name':'view.progress.get_view', 'help':'get the view of progress bar.'}
-        manager.register_service(info, self)
-
         manager.register_event_listener('task.progress.start', self)
         manager.register_event_listener('task.progress.stop', self)
 
@@ -24,10 +21,7 @@ class ViewProgress(FwComponent):
 
     # override component
     def onRequested(self, manager, serviceName, params):
-        if serviceName == "view.progress.get_view":
-            return (True, {'view': self.view})
-        else:
-            return False, None
+        return False, None
 
     # override FwListener
     def on_listened(self, event_name, params):
@@ -39,8 +33,15 @@ class ViewProgress(FwComponent):
         else:
             return False
 
+    # override component
+    def onSetup(self, manager):
+        # Add tool item.
+        params = {'view':self.view}
+        manager.request_service("view.menu.add_toolbar", params)
+
+        return True
+
     def _init_view(self):
         ''' 这里使用spinner，是因为无法预料时间。如果可以预料，可以用 progress bar。 
         '''
         self.view = Gtk.Spinner.new()
-
