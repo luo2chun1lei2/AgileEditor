@@ -61,8 +61,8 @@ class ViewMenu(FwComponent):
                 {'name':'view.menu.add_toolbar', 'help':'add item in tool bar.'},
                 {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
                 {'name':'view.menu.set_search_option', 'help':'set option of search.'},
-                {'name':'view.menu.get_self', 'help':'TODO'},
-                {'name':'view.menu.set_accel', 'help':'TODO'}
+                {'name':'view.menu.get_self', 'help':'get the menu.'},
+                {'name':'view.menu.set_accel', 'help':'set accelerator keys.'}
                 ]
         manager.register_service(info, self)
 
@@ -86,7 +86,6 @@ class ViewMenu(FwComponent):
             return (True, {'self': self})
         elif serviceName == 'view.menu.set_accel':
             # 快捷菜单
-            # window = FwManager.request_one('window', 'view.main.get_window')
             window = params['window']
             window.add_accel_group(self.uimanager.get_accel_group())
         else:
@@ -225,15 +224,15 @@ class ViewMenu(FwComponent):
         self.need_jump = NeedJump(0)
 
         self.search_entry = Gtk.SearchEntry()
-        self.id_1 = self.search_entry.connect("search-changed", self.on_search_options_changed, self.need_jump)
+        self.search_entry.connect("search-changed", self.on_search_options_changed, self.need_jump)
 
         self.search_case_sensitive = Gtk.CheckButton.new_with_label("区分大小写")
         self.search_case_sensitive.set_active(True)
-        self.id_2 = self.search_case_sensitive.connect("toggled", self.on_search_options_changed, self.need_jump)
+        self.search_case_sensitive.connect("toggled", self.on_search_options_changed, self.need_jump)
 
         self.search_is_word = Gtk.CheckButton.new_with_label("单词")
         self.search_is_word.set_active(False)
-        self.id_3 = self.search_is_word.connect("toggled", self.on_search_options_changed, self.need_jump)
+        self.search_is_word.connect("toggled", self.on_search_options_changed, self.need_jump)
 
         hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 1)
         hbox.pack_start(self.search_entry, True, True, 10)
