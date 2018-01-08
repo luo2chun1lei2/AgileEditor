@@ -408,14 +408,20 @@ class CtrlSearch(FwComponent):
 
     def _find_in_files(self, pattern=None):
         ''' 在项目的文件中查找，不是寻找定义。 '''
+        result_options = None
         if pattern is None:
-            response, pattern = UtilDialog.show_dialog_one_entry("在文件中检索", '模式')
+            options = [{'label':'单词', 'name':'is_word'}]
+            response, pattern, result_options = UtilDialog.show_dialog_one_entry("在文件中检索", '模式', options)
             if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
                 return
+        if result_options is not None:
+            for opt in result_options:
+                if opt['name'] == 'is_word' and opt['value'] == True:
+                    pattern = '\\<%s\\>' % pattern
 
         self.last_search_pattern = pattern  # 记录最新的检索
-
         self._save_search_action(CtrlSearch.ACT_GREP, pattern)
+
         self._grep_in_files(pattern)
 
     def _grep_in_files(self, pattern):

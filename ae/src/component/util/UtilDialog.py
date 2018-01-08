@@ -1,21 +1,25 @@
 # -*- coding:utf-8 -*-
 '''
 工具类：dialog相关的函数
+TODO: 有存在的意义吗？ 放入ViewDialogCommon不是更加好吗？
 '''
 
 from gi.repository import Gtk
 from framework.FwManager import FwManager
 
 class UtilDialog(object):
-    
+
     def __init__(self):
         super(UtilDialog, self).__init__()
 
     @staticmethod
-    def show_dialog_one_entry(title, label):
+    def show_dialog_one_entry(title, label, options=None):
         isOK, results = FwManager.instance().request_service('dialog.common.one_entry',
-                                    {'title':title, 'entry_label':label})
-        return results['response'], results['text']
+                                    {'title':title, 'entry_label':label, 'options':options})
+        if 'result_options' in results and results['result_options'] is not None:
+            return results['response'], results['text'], results['result_options']
+        else:
+            return results['response'], results['text']
 
     @staticmethod
     def add_filters(dialog):
@@ -40,5 +44,4 @@ class UtilDialog(object):
 #         filter_any.set_name("Any files")
 #         filter_any.add_pattern("*")
 #         dialog.add_filter(filter_any)
-
 
