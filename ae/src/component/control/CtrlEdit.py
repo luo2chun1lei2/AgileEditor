@@ -154,6 +154,7 @@ class CtrlEdit(FwComponent):
                   'accel':"<control>R",
                   'stock_id':None,
                   'service_name':'ctrl.edit.replace'}
+        manager.request_service("view.menu.add", params)
 
         params = {'menu_name':'EditMenu',
                   'menu_item_name':'EditNote',
