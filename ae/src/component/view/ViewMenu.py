@@ -119,11 +119,7 @@ class ViewMenu(FwComponent):
         self.uimanager.add_ui_from_string(strMenu)
 
         action = Gtk.Action(menuItemName, title, title, stock_id)
-        if serviceName == 'ctrl.search.find_prev' or serviceName == 'ctrl.search.find_next':
-            # TODO 这是两个特例，破坏了菜单实现的一致性，需要仔细研究怎么处理！
-            action.connect("activate", self.on_menuitem_active_with_search_text, serviceName)
-        else:
-            action.connect("activate", self.on_menuitem_active_send_service, serviceName)
+        action.connect("activate", self.on_menuitem_active_send_service, serviceName)
         if not accel is None:
             actionGroup.add_action_with_accel(action, accel)
 
@@ -136,7 +132,7 @@ class ViewMenu(FwComponent):
             strMenu = """ <toolbar name='ToolBar'>
                         <toolitem action='%s' /></toolbar>""" % (menuItemName)
             self.uimanager.add_ui_from_string(strMenu)
-    
+
     def _add_toolbar_item(self, params):
         # 添加进度条
         tool_item = Gtk.ToolItem()
@@ -318,10 +314,6 @@ class ViewMenu(FwComponent):
         ''' 通用的菜单 Active 函数，发送service'''
         logging.debug("Common process of one menu item and send service.")
         FwManager.instance().request_service(service, None)
-
-    def on_menuitem_active_with_search_text(self, widget, service):
-        search_text = self.search_entry.get_text()
-        FwManager.instance().request_service(service, {'text':search_text})
 
     def _set_search_options(self, search_text, case_sensitive, is_word):
         # 在此设置检索用的项目，想让 编辑器 显示检索项目，但是还不能跳转。下面是解决方法：（不优美）

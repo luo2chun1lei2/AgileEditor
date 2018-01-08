@@ -66,10 +66,10 @@ class CtrlSearch(FwComponent):
             self._find_text(params['need_jump'], params['search_text'], params['need_case_sensitive'], params['need_search_is_word'])
             return (True, None)
         elif serviceName == 'ctrl.search.find_next':
-            self._find_next(params['text'])
+            self._find_next()
             return (True, None)
         elif serviceName == 'ctrl.search.find_prev':
-            self._find_prev(params['text'])
+            self._find_prev()
             return (True, None)
         elif serviceName == 'ctrl.search.init':
             self._search_init(params['text_buffer'])
@@ -276,7 +276,7 @@ class CtrlSearch(FwComponent):
 
         FwManager.instance().request_service('view.menu.set_and_jump_to_search_textbox', {'text': text})
 
-    def _find_next(self, search_text):
+    def _find_next(self):
         '''
         如果当前编辑器中有选中的文字，则直接显示对话框。
         对话框中的文字，缺省被选中，可以被全文粘贴。
@@ -287,9 +287,9 @@ class CtrlSearch(FwComponent):
         if view_editor is None:
             return
 
-        self._search_text_next(view_editor.editor.get_buffer(), search_text)
+        self._search_text_next(view_editor.editor.get_buffer())
 
-    def _find_prev(self, search_text):
+    def _find_prev(self):
         '''
         如果当前编辑器中有选中的文字，则直接显示对话框。
         对话框中的文字，缺省被选中，可以被全文粘贴。
@@ -300,11 +300,9 @@ class CtrlSearch(FwComponent):
         if view_editor is None:
             return
 
-        self._search_text_prev(view_editor.editor.get_buffer(), search_text)
+        self._search_text_prev(view_editor.editor.get_buffer())
 
-    def _search_text_next(self, text_buffer, search_text):
-        # search_text 是无用的。
-
+    def _search_text_next(self, text_buffer):
         # -从新位置查找
         mark = text_buffer.get_insert()
         ite = text_buffer.get_iter_at_mark(mark)
@@ -319,9 +317,7 @@ class CtrlSearch(FwComponent):
             text_buffer.move_mark_by_name("selection_bound", start_iter)
             text_buffer.move_mark_by_name("insert", end_iter)
 
-    def _search_text_prev(self, text_buffer, search_text):
-        # search_text 是无用的。
-
+    def _search_text_prev(self, text_buffer):
         # -从新位置查找
         mark = text_buffer.get_insert()
         ite = text_buffer.get_iter_at_mark(mark)
