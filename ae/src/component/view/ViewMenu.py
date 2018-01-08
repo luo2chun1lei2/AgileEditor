@@ -8,13 +8,6 @@ from gi.repository import Gtk, Gdk, GtkSource
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
 
-class NeedJump:
-    def __init__(self, count):
-        ''' count 是需要跳过的次数，因为有三个检索的控件，如果改变了其中的值，
-        就会引发“changed”事件，如果三个都改变了，那么就会引发三次，所以这里是个计数器。
-        '''
-        self.count = count
-
 # 菜单的设定。
 MENU_CONFIG = """
 <ui>
@@ -59,8 +52,6 @@ class ViewMenu(FwComponent):
     def onRegistered(self, manager):
         info = [{'name':'view.menu.add', 'help':'add item in menu.'},
                 {'name':'view.menu.add_toolbar', 'help':'add item in tool bar.'},
-                {'name':'view.menu.set_and_jump_to_search_textbox', 'help':'jump to search textbox and set text.'},
-                {'name':'view.menu.set_search_option', 'help':'set option of search.'},
                 {'name':'view.menu.get_self', 'help':'get the menu.'},
                 {'name':'view.menu.set_accel', 'help':'set accelerator keys.'}
                 ]
@@ -75,12 +66,6 @@ class ViewMenu(FwComponent):
             return (True, None)
         if serviceName == "view.menu.add_toolbar":
             self._add_toolbar_item(params)
-            return (True, None)
-        elif serviceName == "view.menu.set_and_jump_to_search_textbox":
-            self._jump_to_search_textbox_and_set_text(params['text'])
-            return (True, None)
-        elif serviceName == 'view.menu.set_search_option':
-            self._set_search_options(params['search_text'], params['case_sensitive'], params['is_word'])
             return (True, None)
         elif serviceName == 'view.menu.get_self':
             return (True, {'self': self})
@@ -220,29 +205,6 @@ class ViewMenu(FwComponent):
         # 工具栏供
         self.toolbar = self.uimanager.get_widget("/ToolBar")
 
-        # - 加入额外的检索Bar
-        self.need_jump = NeedJump(0)
-
-        self.search_entry = Gtk.SearchEntry()
-        self.search_entry.connect("search-changed", self.on_search_options_changed, self.need_jump)
-
-        self.search_case_sensitive = Gtk.CheckButton.new_with_label("区分大小写")
-        self.search_case_sensitive.set_active(True)
-        self.search_case_sensitive.connect("toggled", self.on_search_options_changed, self.need_jump)
-
-        self.search_is_word = Gtk.CheckButton.new_with_label("单词")
-        self.search_is_word.set_active(False)
-        self.search_is_word.connect("toggled", self.on_search_options_changed, self.need_jump)
-
-        hbox = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 1)
-        hbox.pack_start(self.search_entry, True, True, 10)
-        hbox.pack_start(self.search_case_sensitive, True, True, 2)
-        hbox.pack_start(self.search_is_word, True, True, 2)
-
-        tool_item = Gtk.ToolItem()
-        tool_item.add(hbox)
-        self.toolbar.insert(tool_item, -1)  # 加在最后
-
         # 添加进度条
         tool_item = Gtk.SeparatorToolItem()
         self.toolbar.insert(tool_item, -1)
@@ -300,56 +262,8 @@ class ViewMenu(FwComponent):
 
         return uimanager
 
-    def _jump_to_search_textbox_and_set_text(self, text):
-        # 跳转到 SearchEntry中。
-        # TODO 算是临时方案，首先设定为“”，然后再设定为需要的检索文字，这样就可以100%引发text_changed事件。
-        if text is not None:
-            self.search_entry.set_text("")
-            self.search_entry.set_text(text)
-
-        self.search_entry.grab_focus()
-
     def on_menuitem_active_send_service(self, widget, service):
         ''' 通用的菜单 Active 函数，发送service'''
         logging.debug("Common process of one menu item and send service.")
         FwManager.instance().request_service(service, None)
 
-    def _set_search_options(self, search_text, case_sensitive, is_word):
-        # 在此设置检索用的项目，想让 编辑器 显示检索项目，但是还不能跳转。下面是解决方法：（不优美）
-        # 解决方法是引发事件的动作，放入一个 Object(不能是普通的数据)，然后在 on_search_options_changed 函数中，
-        # 发送了信息后，再把此标志位改过来。
-
-        self.need_jump.count = 0
-
-        if search_text is None:
-            text = ""
-        else:
-            text = search_text
-
-        if text != self.search_entry.get_text():
-            self.need_jump.count += 1
-        if case_sensitive != self.search_case_sensitive.get_active():
-            self.need_jump.count += 1
-        if is_word != self.search_is_word.get_active():
-            self.need_jump.count += 1
-
-        self.search_entry.set_text(text)
-        self.search_case_sensitive.set_active(case_sensitive)
-        self.search_is_word.set_active(is_word)
-
-    def on_search_options_changed(self, widget, need_jump):
-        search_text = self.search_entry.get_text()
-        need_case_sensitive = self.search_case_sensitive.get_active()
-        need_search_is_word = self.search_is_word.get_active()
-
-        if need_jump.count == 0:
-            jump = True
-            logging.debug("Need Jump.")
-        else:
-            jump = False
-        FwManager.instance().request_service('ctrl.search.find_text',
-                    {'need_jump':jump, 'search_text':search_text, 'need_case_sensitive':need_case_sensitive, 'need_search_is_word':need_search_is_word})
-
-        # TODO 不用need_jump，而是用“之前的检索选项是否相同”
-        if need_jump.count > 0:
-            need_jump.count -= 1
