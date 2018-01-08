@@ -341,6 +341,8 @@ class UtilEditor(object):
 
         # 配置单词自动补齐，使用自定义的CompletionProvider
         editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
+        if editor is None:
+            return
         completion = editor.props.completion
 
         # 清除之前的所有provider
