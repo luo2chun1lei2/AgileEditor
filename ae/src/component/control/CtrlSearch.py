@@ -268,7 +268,7 @@ class CtrlSearch(FwComponent):
         from component.util.UtilDialog import UtilDialog
 
         # 显示一个对话框，输入需要跳转的行。
-        response, text = UtilDialog.show_dialog_one_entry("跳转到行", '行')
+        response, text, result_options = UtilDialog.show_dialog_one_entry("跳转到行", '行')
         if response != Gtk.ResponseType.OK or text is None or text == '':
             return
 
@@ -414,7 +414,7 @@ class CtrlSearch(FwComponent):
             response, pattern, result_options = UtilDialog.show_dialog_one_entry("在文件中检索", '模式', options)
             if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
                 return
-        if result_options is not None:
+
             for opt in result_options:
                 if opt['name'] == 'is_word' and opt['value'] == True:
                     pattern = '\\<%s\\>' % pattern
@@ -459,7 +459,7 @@ class CtrlSearch(FwComponent):
 
     def _find_path_with_dialog(self):
         # 检索需要的文件路径
-        response, pattern = UtilDialog.show_dialog_one_entry("检索文件路径", '模式')
+        response, pattern, result_options = UtilDialog.show_dialog_one_entry("检索文件路径", '模式')
         if response != Gtk.ResponseType.OK or pattern is None or pattern == '':
             return
 
@@ -485,7 +485,7 @@ class CtrlSearch(FwComponent):
 
     def _find_defination_by_dialog(self):
         ''' 查找定义 '''
-        response, tag_name = UtilDialog.show_dialog_one_entry("查找定义", '名字')
+        response, tag_name, result_options = UtilDialog.show_dialog_one_entry("查找定义", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 
@@ -522,7 +522,7 @@ class CtrlSearch(FwComponent):
 
     def _find_reference_by_dialog(self):
         ''' 查找定义 '''
-        response, tag_name = UtilDialog.show_dialog_one_entry("查找引用", '名字')
+        response, tag_name, result_options = UtilDialog.show_dialog_one_entry("查找引用", '名字')
         if response != Gtk.ResponseType.OK or tag_name is None or tag_name == '':
             return
 

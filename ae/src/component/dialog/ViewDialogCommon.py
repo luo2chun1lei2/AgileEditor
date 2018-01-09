@@ -39,11 +39,7 @@ class ViewDialogCommon(FwComponent):
 
         if serviceName == "dialog.common.one_entry":
             window = self._get_window(params)
-            result_options = None
-            if options is None:
-                response, text = ViewDialogCommon.show_one_entry(window, params['title'], params['entry_label'], options)
-            else:
-                response, text, result_options = ViewDialogCommon.show_one_entry(window, params['title'], params['entry_label'], options)
+            response, text, result_options = ViewDialogCommon.show_one_entry(window, params['title'], params['entry_label'], options)
             return (True, {'response': response, 'text':text, 'result_options':result_options})
 
         elif serviceName == "dialog.common.two_entry":
@@ -52,7 +48,7 @@ class ViewDialogCommon(FwComponent):
                                 window, params['title'],
                                 params['entry1_label'], params['text1'],
                                 params['entry2_label'], params['text2'], options)
-            return (True, {'response': response, 'text1':text1, 'text2':text2})
+            return (True, {'response': response, 'text1':text1, 'text2':text2, 'result_options':result_options})
 
         else:
             return (False, None)
@@ -60,7 +56,7 @@ class ViewDialogCommon(FwComponent):
     @staticmethod
     def show_one_entry(widget, dlg_title, entry_label, options=None):
         # 显示一个Entry
-        # return (response:Gtk.ResponseType, text:string)
+        # return (response:Gtk.ResponseType, text:string, options:[{}])
 
         dialog = Gtk.Dialog(title=dlg_title,
                             transient_for=widget,
@@ -112,26 +108,24 @@ class ViewDialogCommon(FwComponent):
                 table.attach_defaults(chk, 1, 2, row_no + 1, row_no + 2)
                 options_chk.append(chk)
                 row_no = row_no + 1
-
         hbox.show_all()
 
+        # 显示对话框
         response = dialog.run()
+
+        # 获取结果
+        result_options = []
         if response == Gtk.ResponseType.OK:
             text = entry1.get_text()
             # 收集options设定结果
-            result_options = []
             for chk in options_chk:
                 result_options.append({'name': getattr(chk, 'option_name'), 'value':chk.get_active()})
         else:
             text = None
-            result_options = None
 
+        # 销毁实例，然后返回结果
         dialog.destroy()
-
-        if options is None:
-            return response, text
-        else:
-            return response, text, result_options
+        return response, text, result_options
 
     @staticmethod
     def show_two_entry(widget, dlg_title, label_title1, text1, label_title2, text2, options=None):
@@ -156,6 +150,11 @@ class ViewDialogCommon(FwComponent):
                           icon_size=Gtk.IconSize.DIALOG)
 
         hbox.pack_start(stock, False, False, 0)
+
+        # 添加选项。
+        options_row = 0
+        if options is not None:
+            options_row = len(options)
 
         table = Gtk.Table(n_rows=2, n_columns=2, homogeneous=False)
         table.set_row_spacings(4)
@@ -182,16 +181,32 @@ class ViewDialogCommon(FwComponent):
         table.attach_defaults(entry2, 1, 2, 1, 2)
         label.set_mnemonic_widget(entry2)
 
+        # 添加选项。
+        options_chk = []
+        if options is not None:
+            row_no = 1
+            for o in options:
+                chk = Gtk.CheckButton.new_with_label(o['label'])
+                setattr(chk, 'option_name', o['name'])
+                table.attach_defaults(chk, 1, 2, row_no + 1, row_no + 2)
+                options_chk.append(chk)
+                row_no = row_no + 1
+
         hbox.show_all()
 
         response = dialog.run()
+
+        result_options = []
         if response == Gtk.ResponseType.OK:
             text1 = entry1.get_text()
             text2 = entry2.get_text()
+            # 收集options设定结果
+            for chk in options_chk:
+                result_options.append({'name': getattr(chk, 'option_name'), 'value':chk.get_active()})
         else:
             text1 = None
             text2 = None
 
         dialog.destroy()
 
-        return response, text1, text2
+        return response, text1, text2, result_options

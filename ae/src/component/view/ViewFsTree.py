@@ -687,7 +687,7 @@ class ViewFsTree(FwComponent):
                 return
 
         # 实现对话框，得到文件名字
-        response, name = UtilDialog.show_dialog_one_entry("新建文件", "文件名字")
+        response, name, result_options = UtilDialog.show_dialog_one_entry("新建文件", "文件名字")
         if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
@@ -721,7 +721,7 @@ class ViewFsTree(FwComponent):
                 return
 
         # 实现对话框，得到文件名字
-        response, name = UtilDialog.show_dialog_one_entry("新建目录", "目录名字")
+        response, name, result_options = UtilDialog.show_dialog_one_entry("新建目录", "目录名字")
         if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
@@ -771,7 +771,7 @@ class ViewFsTree(FwComponent):
         file_path = self._get_abs_file_path_by_iter(itr)
 
         # 实现对话框，得到文件名字
-        response, name = UtilDialog.show_dialog_one_entry("修改文件名字", "新文件名字")
+        response, name, result_options = UtilDialog.show_dialog_one_entry("修改文件名字", "新文件名字")
         if not response == Gtk.ResponseType.OK or is_empty(name):
             return
 
