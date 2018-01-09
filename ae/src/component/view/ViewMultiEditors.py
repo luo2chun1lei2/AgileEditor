@@ -333,6 +333,20 @@ class ViewMultiEditors(FwComponent):
         font_desc = Pango.FontDescription.from_string(str_font_desc)
         widget.modify_font(font_desc)
 
+    def _create_tag_table(self):
+        tag_table = Gtk.TextTagTable.new()
+
+        txt_tag = Gtk.TextTag.new('heading')
+        txt_tag.set_property('weight', Pango.Weight.BOLD)
+        txt_tag.set_property('size', 15 * Pango.SCALE)
+        tag_table.add(txt_tag)
+
+        txt_tag = Gtk.TextTag.new('bookmark')
+        txt_tag.set_property('background', "red")
+        tag_table.add(txt_tag)
+
+        return tag_table
+
     def _create_buffer(self, file_path=None):
 
         # 支持的语言
@@ -345,7 +359,8 @@ class ViewMultiEditors(FwComponent):
 
         manager = GtkSource.LanguageManager()
 
-        src_buffer = GtkSource.Buffer()
+        tag_table = self._create_tag_table()
+        src_buffer = GtkSource.Buffer.new(tag_table)
 
         # TODO:以后如果有算法，需要根据内容来判断文件的类型。
         if file_path is not None:

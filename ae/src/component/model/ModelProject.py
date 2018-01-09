@@ -201,6 +201,9 @@ class ModelProject(object):
         # bookmark:ModelTag:书签
         self.bookmarks.append(bookmark)
 
+    def find_bookmark(self, index):
+        return self.bookmarks[index]
+
     def remove_bookmark(self, no):
         #  删除一个标签
         # no:int:书签的索引（0～）
@@ -233,7 +236,7 @@ class ModelProject(object):
         # 查询某个名字的引用
         # name:string:要查询的名字
         # return:name, [string]:name, tag信息的数组
-        #return name, self.prj_tags.query_reference_tags(name)
+        # return name, self.prj_tags.query_reference_tags(name)
         return name, FwManager.request_one('results', 'model.tags.find_reference', {'text':name})
 
     def get_completion_tags(self, prefix):
@@ -241,13 +244,13 @@ class ModelProject(object):
         # prefix string 前缀，比如“do_w”，查询符合条件[do_w.*]的tag名字。
         # return [IdeOneTag] 包含名字的数组，如果没有符合的，就长度为空。
         return FwManager.request_one('results', 'model.tags.find_symbol_with_prefix_in_project', {'text':prefix})
-    
+
     def query_grep_tags(self, pattern, ignoreCase):
         # 根据pattern查询TAG
         # pattern:string:名字的模式
         # ignoreCase:bool:是否忽略大小写
         # return:[string]:Tag信息的数组
-        return FwManager.request_one('results', 
+        return FwManager.request_one('results',
                 'model.tags.find_symbol_in_project', {'text':pattern, 'ignore_case': ignoreCase})
 
     def query_grep_filepath(self, pattern, ignoreCase=False):
@@ -255,7 +258,7 @@ class ModelProject(object):
         # pattern:string:文件名字的模式
         # ignoreCase:bool:是否忽略大小写
         # return:[string]:Tag信息的数组
-        return FwManager.request_one('results', 
+        return FwManager.request_one('results',
                 'model.tags.find_file', {'text':pattern, 'ignore_case': ignoreCase})
 
     def get_completion_provider(self):

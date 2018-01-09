@@ -5,7 +5,7 @@
 '''
 
 import re, logging
-from gi.repository import Gio, Gtk, Gdk, GtkSource
+from gi.repository import Gio, Gtk, Gdk, GtkSource, Pango
 
 from framework.FwManager import FwManager
 
@@ -163,7 +163,31 @@ class UtilEditor(object):
         line_end.forward_to_line_end()
         content = text_buf.get_text(line_start, line_end, False)
 
+        # 从View上标注此文字
+        UtilEditor.mark_text(text_buf, line_start, line_end)
+
         return ModelTag(name, path, line_no, content)
+
+    @staticmethod
+    def remove_bookmark(bookmark):
+        # 删除一个bookmark的显示
+        # bookmark:ModelTag:书签
+
+        from component.model.ModelTag import ModelTag
+
+        abs_file_path = bookmark.tag_file_path
+        view_editor = FwManager.request_one('editor', 'view.multi_editors.get_editor_by_path', {'abs_file_path': abs_file_path})
+        if view_editor is None:
+            return
+
+        text_buf = view_editor.editor.get_buffer()
+        line_no = bookmark.tag_line_no
+
+        line_start = text_buf.get_iter_at_line(line_no - 1)
+        line_end = line_start.copy()
+        line_end.forward_to_line_end()
+
+        UtilEditor.unmark_text(text_buf, line_start, line_end)
 
     @staticmethod
     def replace_in_file(replace_from, replace_to):
@@ -282,6 +306,14 @@ class UtilEditor(object):
 
         # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
         return False
+
+    @staticmethod
+    def mark_text(text_buf, start, end):
+        text_buf.apply_tag_by_name("bookmark", start, end)
+
+    @staticmethod
+    def unmark_text(text_buf, start, end):
+        text_buf.remove_tag_by_name("bookmark", start, end)  # 删除TAG
 
     @staticmethod
     def jump_to(line_number):

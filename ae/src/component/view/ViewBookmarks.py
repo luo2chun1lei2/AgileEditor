@@ -8,6 +8,7 @@ from gi.repository import Gtk, Gdk, GObject, GLib
 
 from framework.FwComponent import FwComponent
 from framework.FwManager import FwManager
+from component.util.UtilEditor import UtilEditor
 
 class ViewBookmarks(FwComponent):
     ''' 显示一个List，可以加入标签，并且激活标签。
@@ -22,7 +23,7 @@ class ViewBookmarks(FwComponent):
 
     def __init__(self):
         super(ViewBookmarks, self).__init__()
-        
+
         self.cur_prj = None
         self._init_view()
 
@@ -59,7 +60,7 @@ class ViewBookmarks(FwComponent):
     def onRequested(self, manager, serviceName, params):
         if serviceName == 'view.bookmarks.get_view':
             return (True, {'view': self.get_view()})
-        
+
         elif serviceName == "view.bookmarks.add_bookmark":
             # 获取根据当前情况而建立的bookmark。
             isOK, results = manager.request_service("ctrl.search.make_bookmark")
@@ -81,9 +82,12 @@ class ViewBookmarks(FwComponent):
             if self.cur_prj is None:
                 return (False, None)
 
-            self.cur_prj.remove_bookmark(selected_index)
+            # 从图像上删除标记
+            UtilEditor.remove_bookmark(self.cur_prj.find_bookmark(selected_index))
 
+            self.cur_prj.remove_bookmark(selected_index)
             self.set_model(self.cur_prj.bookmarks, self.cur_prj)
+
             return (True, None)
 
         else:
