@@ -17,6 +17,7 @@ import sys, logging
     2，当切换编辑文件时，还需要还原原来检索的情况。
     3，并且对应的检索内容需要修改，必然会发生search_entry的输入事件，如果内容相同，则不会发生事件。】
     【对话框非常的不灵活，层次太多，应该建立更加一般的描述，然后启动对话框，并减少中间的层次。】
+    【检索历史的实现方案还需要再整理，有许多残余的无用服务】
 
     # 辅助用的对话框(OK)。
     dialog.about/dialog.common.one_entry/dialog.common.two_entry/dialog.project.new

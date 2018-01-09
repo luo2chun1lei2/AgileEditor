@@ -23,8 +23,8 @@ class NeedJump:
 
 class CtrlSearch(FwComponent):
 
-    ACT_DEFINITION = 'definition'
-    ACT_REFERENCE = 'reference'
+    ACT_DEFINITION = 'def'
+    ACT_REFERENCE = 'ref'
     ACT_GREP = 'grep'
     ACT_PATH = 'path'
 
