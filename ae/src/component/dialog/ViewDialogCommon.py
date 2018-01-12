@@ -44,7 +44,7 @@ class ViewDialogCommon(FwComponent):
 
         elif serviceName == "dialog.common.two_entry":
             window = self._get_window(params)
-            response, text1, text2 = ViewDialogCommon.show_two_entry(
+            response, text1, text2, result_options = ViewDialogCommon.show_two_entry(
                                 window, params['title'],
                                 params['entry1_label'], params['text1'],
                                 params['entry2_label'], params['text2'], options)
