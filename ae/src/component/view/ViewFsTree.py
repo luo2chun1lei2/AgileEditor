@@ -535,11 +535,12 @@ class ViewFsTree(FwComponent):
 
         self.scrolledwindow = Gtk.ScrolledWindow()
         self.scrolledwindow.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+        self.scrolledwindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
         self.scrolledwindow.add(self.treeview)
 
         # 自定义的。
-        self.scrolledwindow.set_size_request(150, 0)
+        self.scrolledwindow.set_size_request(300, 0)
         self.treeview.set_activate_on_single_click(False)
 
         # 这个时候还没有设定项目的目录，所以没有必要设定list model.

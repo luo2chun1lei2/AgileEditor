@@ -145,9 +145,9 @@ class ViewWindow(Gtk.Window, FwComponent):
 
         panedFsAndEditor = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         view = FwManager.request_one('view', 'view.fstree.get_view')
-        panedFsAndEditor.pack1(view, resize=False, shrink=True)
+        panedFsAndEditor.pack1(view, resize=False, shrink=False)
         panedFsAndEditor.pack2(panedEdtiorAndSearchTag, resize=True, shrink=True)
-        panedFsAndEditor.set_position(200);
+        # panedFsAndEditor.set_position(200);
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.pack_start(self.ide_menu.menubar, False, False, 0)

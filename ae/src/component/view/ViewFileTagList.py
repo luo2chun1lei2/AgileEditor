@@ -59,7 +59,7 @@ class ViewFileTagList (FwComponent):
         vbox.pack_start(sw, True, True, 0)
 
         # 这里请求自己的大小，在放入父容器时，shrink需要等于False，否则此设定将被忽略。
-        vbox.set_size_request(200, 0)
+        vbox.set_size_request(300, 0)
 
         # 设定需要传出的控件。
         self.view = vbox
