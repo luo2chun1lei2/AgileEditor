@@ -56,11 +56,11 @@ f(<x, x, ...> & len>2) = {services = <cmp>}
 【证明正确，必须考察全集】
 
 ## 例子2
-如果有一个组件，有两个操作 reg 和 unreg，
-reg是将cmp注册到services中，如果已经存在，就不再添加。而unreg是在services中找到cmp，然后删除，如果不存在，就不进行任何动作。
-l:无，f:services列表的结果，j:不能有重复的cmp，如果最后reg，services必须有cmp，如果最后unreg，services必须不包含cmp。
-x = cmp.reg，y = cmp.unreg
-<xy> = 由x和y组成的任意顺序和任意长度的序列。
+如果有一个组件，有两个操作 reg 和 unreg，<br>
+reg是将cmp注册到services中，如果已经存在，就不再添加。而unreg是在services中找到cmp，然后删除，如果不存在，就不进行任何动作。<br>
+l:无，f:services列表的结果，j:不能有重复的cmp，如果最后reg，services必须有cmp，如果最后unreg，services必须不包含cmp。<br>
+`x = cmp.reg，y = cmp.unreg`
+<xy> : 由x和y组成的任意顺序和任意长度的序列。
 
 看几种情况：
 ```
@@ -127,3 +127,8 @@ l = cmp1.svc after cmp1.reg，序列中保证 cmp1.reg 后，cmp1.svc才能调�
 虽然看起来好像没有问题，但是这个序列 `<cmp1.reg, cmp1.unreg, cmp1.reg, cmp1.svc>` 明显也是可以的，l 却过不去。
 【这里就可以看到限制之前设定的比较随意，需要有严格的方法来规定怎么设置！】
 【论证一般有两种情况，一种是自己其实已经知道怎么做，需要的是论证成功。另外一种是自己也不知道，需要通过讨论不断的分析得到需要什么样的设定。】
+
+**注意到，如果reg和unreg是随意排列的话，那么序列中必然存在调用svc会出现错误地方。
+所以reg和unreg任意排列，和svc的任意放置，是矛盾的，只能存在一种任意排列，餐能不出现错误。**
+
+目前设定：只要保证 cmp.svc 调用的前一个reg/unreg 是 reg 就可以了，因为最后一个cmp的reg/unreg才会起作用。
