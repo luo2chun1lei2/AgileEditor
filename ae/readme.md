@@ -120,11 +120,15 @@ j += 如果组件不存在，那么就出现错误！
 
 首先查看一个序列 <cmp1.svc>，立刻发现因为cmp1没有register，所以就会出现错误。
 那么这就需要加入形成序列的 限制 l。
-l = cmp1.svc after cmp1.reg，序列中保证 cmp1.reg 后，cmp1.svc才能调用。cmp2同样。
+`l = cmp1.svc after cmp1.reg`，序列中保证 cmp1.reg 后，cmp1.svc才能调用。cmp2同样。
 那么将 P 的序列按照 l 删除后得到 P(l)。
 这里也可以构造出一个错误序列 `<cmp1.reg, cmp1.unreg, cmp2.svc>`，cmp2 如果卸载了之前的注册，那么svc还会错误。
-`l = cmp1.svc after cmp1.reg before cmp2.unreg`
+
+```
+l = cmp1.svc after cmp1.reg before cmp2.unreg
+```
 虽然看起来好像没有问题，但是这个序列 `<cmp1.reg, cmp1.unreg, cmp1.reg, cmp1.svc>` 明显也是可以的，l 却过不去。
+
 【这里就可以看到限制之前设定的比较随意，需要有严格的方法来规定怎么设置！】
 【论证一般有两种情况，一种是自己其实已经知道怎么做，需要的是论证成功。另外一种是自己也不知道，需要通过讨论不断的分析得到需要什么样的设定。】
 
