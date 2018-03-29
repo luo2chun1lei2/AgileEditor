@@ -187,7 +187,7 @@ class ViewMultiEditors(FwComponent):
             vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 
             scrolledCtrl, editor = self._create_editor()
-            editor.modify_bg(Gtk.StateType.NORMAL, Gdk.Color(1, 0, 0))
+            #editor.modify_bg(Gtk.StateType.NORMAL, Gdk.Color(1, 0, 0))
             scrolledCtrl.set_size_request(200, 0)
 
             self._ide_only_open_file(ide_file, abs_file_path, editor)
