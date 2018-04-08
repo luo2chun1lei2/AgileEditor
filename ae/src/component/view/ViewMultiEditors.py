@@ -317,6 +317,9 @@ class ViewMultiEditors(FwComponent):
         src_buffer = self._create_buffer(None)
         editor.set_buffer(src_buffer)
 
+        # 当在editor中按下mouse时，做一些处理。
+        editor.connect('button-press-event', self.mouse_button_press_event_on_editor)
+
         scrolledCtrl = Gtk.ScrolledWindow()
         scrolledCtrl.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         scrolledCtrl.set_hexpand(True)
@@ -461,3 +464,12 @@ class ViewMultiEditors(FwComponent):
             self._ide_set_font(viewEditor.editor, fontName)
 
         return True
+
+    def mouse_button_press_event_on_editor(self, widget, event):
+        logging.info("press event %d" % event.button)
+        if event.button == 8:
+            # mouse's back, 9 is prev.
+            FwManager.instance().request_service('ctrl.search.go_back_tag')
+            return True
+
+        return False
