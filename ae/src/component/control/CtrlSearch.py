@@ -52,6 +52,7 @@ class CtrlSearch(FwComponent):
                 {'name':'ctrl.search.find_reference', 'help':'find the reference of symbol.'},
                 {'name':'ctrl.search.find_reference_need_input', 'help':'show dialog to get the symbol, and then find the reference.'},
                 {'name':'ctrl.search.go_back_tag', 'help':'go back to the previous tag.'},
+                {'name':'ctrl.search.go_forward_tag', 'help':'go forward to the next tag if exists.'},
                 {'name':'ctrl.search.update_tags', 'help':'update the tags by newest project status.'},
                 {'name':'ctrl.search.show_bookmark', 'help':'show a bookmark.'},
                 {'name':'ctrl.search.make_bookmark', 'help': 'make one bookmark by current position, and return bookmarks list'},
@@ -108,6 +109,9 @@ class CtrlSearch(FwComponent):
             return (True, None)
         elif serviceName == 'ctrl.search.go_back_tag':
             self._go_back_tag()
+            return (True, None)
+        elif serviceName == 'ctrl.search.go_forward_tag':
+            self._go_forward_tag()
             return (True, None)
         elif serviceName == 'ctrl.search.update_tags':
             self._update_tags_of_project()
@@ -445,8 +449,8 @@ class CtrlSearch(FwComponent):
     def _goto_file_line(self, file_path, line_number, record=True):
 
         # 记录的当前的位置
-        if record:
-            UtilEditor.push_jumps()
+        #if record:
+        #    UtilEditor.push_jumps()
 
         ''' 跳转到指定文件的行。 '''
         # 先找到对应的文件，然后再滚动到指定的位置
@@ -455,7 +459,7 @@ class CtrlSearch(FwComponent):
         if isOK and results['result'] == ViewWindow.RLT_OK:  # TODO 这里需要知道ViewWindow的常亮
             # 注意：这里采用延迟调用的方法，来调用goto_line方法，可能是buffer被设定后，
             # 还有其他的控件会通过事件来调用滚动，所以才造成马上调用滚动不成功。
-            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number)
+            Gdk.threads_add_idle(GLib.PRIORITY_DEFAULT_IDLE, UtilEditor.goto_line, line_number, record)
 
     def _find_path_with_dialog(self):
         # 检索需要的文件路径
@@ -558,8 +562,14 @@ class CtrlSearch(FwComponent):
 
     def _go_back_tag(self):
         # 回退到上一个位置。
-        # 恢复到原来的位置
-        isOK, results = FwManager.instance().request_service('model.jump_history.pop')
+        isOK, results = FwManager.instance().request_service('model.jump_history.prev')
+        if results is None:
+            return
+        self._goto_file_line(results['file_path'], results['line_no'], record=False)
+
+    def _go_forward_tag(self):
+        # 前进到下一个位置。
+        isOK, results = FwManager.instance().request_service('model.jump_history.next')
         if results is None:
             return
         self._goto_file_line(results['file_path'], results['line_no'], record=False)

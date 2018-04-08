@@ -186,5 +186,8 @@ class ViewWindow(Gtk.Window, FwComponent):
             # mouse's back, 9 is prev.
             FwManager.instance().request_service('ctrl.search.go_back_tag')
             return True
+        elif event.button == 9:
+            FwManager.instance().request_service('ctrl.search.go_forward_tag')
+            return True
 
         return False

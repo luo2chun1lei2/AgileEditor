@@ -283,7 +283,7 @@ class UtilEditor(object):
             src_buffer.undo()
 
     @staticmethod
-    def goto_line(line_number):
+    def goto_line(line_number, record=True):
         # 跳转到当前文件的行。
         # line_number:int:行号（从1开始）
         # return:Bool:False，以后不再调用，True，以后还会调用。
@@ -304,6 +304,10 @@ class UtilEditor(object):
         editor = FwManager.request_one('editor', "view.multi_editors.get_current_editor")
         editor.scroll_to_iter(it, 0.25, False, 0.0, 0.5)
 
+        # 记录当前的位置
+        if record:
+            UtilEditor.push_jumps()
+
         # TODO:这里不是错误，而是给threads_add_idle返回不再继续调用的设定。
         return False
 
@@ -318,10 +322,10 @@ class UtilEditor(object):
     @staticmethod
     def jump_to(line_number):
 
-        # 记录当前的位置
-        UtilEditor.push_jumps()
-
         UtilEditor.goto_line(line_number)
+
+        # 记录当前的位置
+        #UtilEditor.push_jumps()
 
     @staticmethod
     def push_jumps():
