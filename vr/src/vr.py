@@ -2,40 +2,56 @@
 #-*- coding:utf-8 -*-
 
 import os, sys, logging, getopt
+from subject_observer import *
 
-class VSubject(object):
-    def __init__(self):
-        super(VSubject, self).__init__()
-        self.observers = []
-        
-    def attach_observer(self, observer):
-        if observer not in self.observers:
-            self.observers.append(observer)
-    
-    def detach_observer(self, observer):
-        if observer in self.observers:
-            self.observers.remove(observer)
-            
-    def notify_observer(self):
-        for observer in self.observers:
-            observer._on_subject_update(self)
-            
-class VObserver(object):
-    def __init__(self):
-        super(VObserver, self).__init__()
-        
-    def _on_subject_update(self, subject):
-        pass
+def util_print_frame():
+    ''' 打印出现错误的位置的上一个调用点，用于调试。
+    '''
+    import inspect
+
+    stack = inspect.stack()
+    frame = stack[2][0]
+    if "self" in frame.f_locals:
+        the_class = str(frame.f_locals["self"].__module__)
+    else:
+        the_class = "Unknown"
+    the_line = frame.f_lineno
+    the_method = frame.f_code.co_name
+    print "=-> %s:%d/%s" % (the_class, the_line, the_method)
+
 
 class VObject(VSubject, VObserver):
     def __init__(self):
         super(VObject, self).__init__()
+
+class VValue(VObject):
+    
+    def __init__(self, v):
+        super(VValue, self).__init__()
+        self.value = v
+        
+    def __str__(self, *args, **kwargs):
+        return str(self.value)
+    
+    def set_value(self, v):
+        if self.value == v:
+            # 这里制止修改事件“回荡”。
+            return
+        
+        self.value = v
+        self.notify_observers()
+            
+    def get_value(self):
+        return self.value
     
 class VRelation(VObject):
+    # TODO Can method "constrain" be placed here ?
     def __init__(self):
         super(VRelation, self).__init__()
-
+        
 class REqualValue(VRelation):
+    # value1 is equal with value2.
+    # bidirectional
     
     def __init__(self):
         super(REqualValue, self).__init__()
@@ -44,7 +60,7 @@ class REqualValue(VRelation):
         
     def constrain(self, obj1, obj2):
         if not isinstance(obj1, VValue) or not isinstance(obj2, VValue):
-            logging.error("obj1 or obj1 is not VValue")
+            logging.error("obj1 or obj2 is not VValue")
         self.obj1 = obj1
         self.obj2 = obj2
         
@@ -64,23 +80,42 @@ class REqualValue(VRelation):
         if not ok:
             logging.error("subject is NOT obj1 or obj2.")
         
-class VValue(VObject):
-    def __init__(self, v):
-        super(VValue, self).__init__()
-        self.value = v
-        
-    def __str__(self, *args, **kwargs):
-        return str(self.value)
+class VSum(VValue):
+    # This is a combined object.
+    # value = value1 + value2, 
+    # when one of value is changed, then notify observer.
     
-    def set_value(self, v):
-        if self.value != v:
-            self.value = v
-            self.notify_observer()
-            
-    def get_value(self):
-        return self.value
+    def __init__(self):
+        super(VSum, self).__init__(None)    # TODO VValue's init function should be reviewed.
+        self.objects = []
         
-def test():
+    def constrain(self, *args):
+        
+        for arg in args:
+            if not isinstance(arg, VValue):
+                logging.error("args[%d] is not VValue" % args.index(arg) )
+                break
+            
+            self.objects.append(arg)
+            arg.attach_observer(self)
+        
+    def _on_subject_update(self, subject):
+        self.notify_observers()
+        
+    def set_value(self, value):
+        # cannot set value, this is unidirectional.
+        # 这里不能设定值，是否应该作为一个属性设置到object中？
+        # 这里不实现，不就不会“回荡”了吗？
+        #logging.error("This is unidirectional, so cannot set value.")
+        pass
+        
+    def get_value(self):
+        sum = 0
+        for obj in self.objects:
+            sum += obj.get_value()
+        return sum
+        
+def test1():
     obj = VObject()
     rel = VRelation()
     val1 = VValue(100)
@@ -93,6 +128,23 @@ def test():
     
     val2.set_value(0)
     print val1, val2
+    
+def test2():
+    # v3 = v1 + v2
+    v1 = VValue(10)
+    v2 = VValue(20)
+    v3 = VValue(100)
+    
+    sum = VSum()
+    sum.constrain(v1, v2)
+    
+    equal = REqualValue()
+    equal.constrain(v3, sum)
+      
+    print v1, v2, v3
+      
+    v2.set_value(10)
+    print v1, v2, v3
 
 #######################################
 ## Entry of program.
@@ -121,7 +173,8 @@ def main(argv):
             usage()
             sys.exit(2)
     
-    test()
+    test1()
+    test2()
     
     sys.exit(0)
 
