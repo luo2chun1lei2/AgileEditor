@@ -7,13 +7,15 @@
 
 import os, sys, gtk, getopt, keybinder, subprocess
 
+
 def usage():
     print '''vs建立全系统的快捷键，F12 启动编辑器，<ctrl>F12 关闭编辑器，
 参数:
   -h, --help: 显示帮助信息。'''
 
-def start_vx():
-    command = "vx"
+
+def start_executor():
+    command = "ae_executor"
     work_dir = os.path.expanduser("~/")
     p = subprocess.Popen(command, shell=True, executable="/bin/bash",
                          cwd=work_dir,
@@ -23,13 +25,16 @@ def start_vx():
     p.communicate()
     # print "end of process."
 
+
 def on_start_pressed():
     # 启动命令。
-    start_vx()
+    start_executor()
+
 
 def on_stop_pressed():
     # 关闭自己。
     gtk.main_quit()
+
 
 def find_same_process(name):
     # return true:found, false:NOT found
@@ -41,6 +46,7 @@ def find_same_process(name):
     count = len(r.readlines())
     # print "count %d" % (count)
     return count > 1
+
 
 def main(argv):
 
@@ -62,16 +68,25 @@ def main(argv):
             usage()
             sys.exit(2)
 
-    # 如果发现已经存在这个vs，就不再启动
-    if find_same_process("vs.py"):
-        print "The vs.py was executing."
+    # 如果发现已经存在这个程序，就不再启动
+    if find_same_process("ae_starter.py"):
+        print "The ae_starter.py is executing."
         return
 
     # 连接快捷键
     keybinder1 = keybinder.bind("F12", on_start_pressed)
+    if keybinder1 == False:
+        sys.exit(1)
     keybinder2 = keybinder.bind("<control>F12", on_stop_pressed)
+    if keybinder2 is False:
+        keybinder.unbind("F12")
+        sys.exit(1)
 
     gtk.main()
+    
+    keybinder.unbind("F12")
+    keybinder.unbind("<control>F12")
+
 
 if __name__ == '__main__':
     #  主入口

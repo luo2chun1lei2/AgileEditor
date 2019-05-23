@@ -32,7 +32,7 @@ class VxMain():
         win.connect("delete-event", self.quit)
 
         base_path = os.path.dirname((os.path.abspath(sys.argv[0])))
-        win.set_icon_from_file(os.path.join(base_path, "vx.png"))
+        win.set_icon_from_file(os.path.join(base_path, "main.png"))
         win.show_all()
 
         Gtk.main()
