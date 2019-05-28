@@ -4,9 +4,10 @@
 ''' 矢量图形模块。
 '''
 
-import os, sys, getopt
+import os, sys, getopt, gi
+gi.require_version('Gtk', '3.0')
 
-from VgMain import * 
+from VgMain import *
 
 #######################################
 ## 窗口和主函数
@@ -20,7 +21,7 @@ def main(argv):
     
     # 分析参数。
     try:
-        opts, args = getopt.getopt(argv[1:], 'h', [''])
+        opts, args = getopt.getopt(argv[1:], 'h', ['help'])
     except getopt.GetoptError, err:
         print str(err)
         help()
