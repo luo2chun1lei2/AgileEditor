@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-''' 和零游戏。
+''' 矢量图形模块。
 '''
 
 import os, sys, getopt
@@ -12,7 +12,7 @@ from VgMain import *
 ## 窗口和主函数
 
 def help():
-    print 'vg 使用:'
+    print 'ae_diagram 使用:'
     print '-h, --help: 显示帮助信息。'
 
 def main(argv):
@@ -28,7 +28,7 @@ def main(argv):
         
     for opt, a in opts:
         if opt in ('-h', '--help'):
-            '显示帮助信息'
+            #显示帮助信息
             help()
             sys.exit(0)
         else:

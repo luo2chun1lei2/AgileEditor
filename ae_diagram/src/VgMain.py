@@ -10,11 +10,11 @@ from ViewWindow import *
 
 class VgMain():
     '''
-    vg 主入口程序。
+    main 主入口程序。
     '''
     
     # 配置文件所在的地方
-    DEFAULT_VC_CONFIG_PATH = '~/.vg'
+    DEFAULT_VC_CONFIG_PATH = '~/.main'
     
     vg_main_instance = None
     
