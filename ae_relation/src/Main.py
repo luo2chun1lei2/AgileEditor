@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import os, sys, logging, getopt
+import os, sys, logging, getopt, tempfile, shutil
 from Element import *
+from PlantUML import *
 
 def util_print_frame():
     ''' 打印出现错误的位置的上一个调用点，用于调试。
@@ -19,7 +20,14 @@ def util_print_frame():
     the_method = frame.f_code.co_name
     print "=-> %s:%d/%s" % (the_class, the_line, the_method)
 
+def create_tmpfile(suffix):
+    # 生成临时文件。
+    fd, path = tempfile.mkstemp(suffix=(".%s" % suffix))
+    return fd, path
         
+def create_tmpdir():
+    return tempfile.mkdtemp()
+
 def test():
     e1 = AElementFactory.create_element('luocl')
     e2 = AElementFactory.create_relation('luocl')
@@ -29,6 +37,19 @@ def test():
     e2.list_elements()
     e2.detach_element(e1)
     e2.list_elements()
+    
+    #planuml
+    uml = PlantUML("../plantuml/plantuml.jar")
+    data_fd, data_path = create_tmpfile("txt")
+    os.write(data_fd, "@startuml\nAlice -> Bob: test\n@enduml")
+    os.close(data_fd)
+    
+    out_dir = create_tmpdir()
+    
+    uml.create_diagram(data_path, out_dir)
+    
+    os.remove(data_path)
+    shutil.rmtree(out_dir)
     
 
 #######################################
