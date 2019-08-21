@@ -23,6 +23,12 @@ class PlantUML(object):
         # @param out_dir_path:string: output directory, not file
         # @return True: ok, False: failed.
         
+        print "=== %s ===" % data_path
+        f = open(data_path)
+        for l in f:
+            print l
+        f.close()
+        
         command = "java -jar %s %s -o %s -t png" % (self.jar_path, data_path, out_dir_path)
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE) 
         out, err = p.communicate()

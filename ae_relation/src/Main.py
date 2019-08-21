@@ -1,56 +1,124 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import os, sys, logging, getopt, tempfile, shutil
+import os, sys, logging, getopt, shutil
 from Element import *
 from PlantUML import *
-
-def util_print_frame():
-    ''' 打印出现错误的位置的上一个调用点，用于调试。
-    '''
-    import inspect
-
-    stack = inspect.stack()
-    frame = stack[2][0]
-    if "self" in frame.f_locals:
-        the_class = str(frame.f_locals["self"].__module__)
-    else:
-        the_class = "Unknown"
-    the_line = frame.f_lineno
-    the_method = frame.f_code.co_name
-    print "=-> %s:%d/%s" % (the_class, the_line, the_method)
-
-def create_tmpfile(suffix):
-    # 生成临时文件。
-    fd, path = tempfile.mkstemp(suffix=(".%s" % suffix))
-    return fd, path
+from Utils import *
+    
+class UMLClass(AElement):
+    # UML's class
+    def __init__(self, name):
+        super(UMLClass, self).__init__(name)
+        self.fields = []
         
-def create_tmpdir():
-    return tempfile.mkdtemp()
+    @staticmethod
+    def a_create(name):
+        rlt = AGlobalName.register(name)
+        if not rlt:
+            print "Cannot create the class with name=\"%s\"." % name
+            return None
+        return UMLClass(name)
+    
+    def add_field(self, field_name, field_type):
+        self.fields.append((field_name, field_type))
+            
+class UMLClassRelation(ARelation):
+    # 类和类之间的关系
+    def __init__(self, name):
+        super(UMLClassRelation, self).__init__(name)
+        
+    @staticmethod
+    def a_create(name):
+        rlt = AGlobalName.register(name)
+        if not rlt:
+            print "Cannot create the class relation with name=\"%s\"." % name
+            return None
+        return UMLClassRelation(name)
+        
+    def set_relation(self, relation_type, from_element, to_element):    # TODO 此处参数是否应该不定个数?
+        # @param from_element:AElement:
+        # @param to_element:AElement:
+        # @param relation_type:string: Extension/Composition/Aggregation
+        self.from_element = from_element
+        self.to_element = to_element
+        self.relation_type = relation_type
+    
+    def get_relation(self):
+        return self.relation_type, self.from_element, self.to_element 
+        
+class TravelElements(object):
+    # Travel Elements to create some thing
+    # use planuml to create diagram
+    
+    def __init__(self):
+        self.uml = PlantUML("../plantuml/plantuml.jar")
+        self.data_fd, self.data_path = Utils.create_tmpfile("txt")
+        
+        self._write("@startuml")
+    
+    def _write(self, str):
+        # 会在字符串后面加入空格。
+        os.write(self.data_fd, "%s\n" % str)
+    
+    def travel(self, elements):
+        # @param elements: AElement[]: set of all needed elements.
+        # @return bool: True is ok, False is failed.
+        
+        for e in elements:
+            if isinstance(e, UMLClassRelation):
+                type, from_element, to_element = e.get_relation()
+                if type is 'Extension': # TODO: 继承不需要额外的名字。
+                    self._write("%s --|> %s : %s" % (from_element.name, to_element.name, e.name))
+                elif type is 'Composition':
+                    self._write("%s *-- %s : %s" % (from_element.name, to_element.name, e.name))
+                elif type is 'Aggregation':
+                    self._write("%s o-- %s : %s" % (from_element.name, to_element.name, e.name))
+                else:
+                    print "Don't recognize this type\"\" of class relation" % type
+                    sys.exit(1)
+            elif isinstance(e, UMLClass):
+                self._write("class %s {" % e.name)
+                for field_name, field_type in e.fields:
+                    self._write("%s : %s" % (field_name, field_type))
+                self._write("}")
+                
+        return True
+    
+    def finish(self):
+        # finish travel
+        self._write("@enduml")
+        
+        os.close(self.data_fd)
+        out_dir = Utils.create_tmpdir()
+    
+        self.uml.create_diagram(self.data_path, out_dir)
+    
+        # - remove all temporary files and directories.
+        os.remove(self.data_path)
+        shutil.rmtree(out_dir)
 
 def test():
-    e1 = AElementFactory.create_element('luocl')
-    e2 = AElementFactory.create_relation('luocl')
-    if e2 is None:
-        e2 = AElementFactory.create_relation('luocl1')
-    e2.attach_element(e1)
-    e2.list_elements()
-    e2.detach_element(e1)
-    e2.list_elements()
+    # set elements.
+    e1 = UMLClass.a_create('ServiceProviderBridge')
+    e1.add_field("backing_dir", "zx:channel")
+    e1.add_field("backend", "ServiceProviderPtr")
+    e2 = UMLClass.a_create('ServiceProvider')
+    e3 = UMLClass.a_create('zx::channel')
+    e4 = UMLClass.a_create('ServiceProviderPtr')
     
-    #planuml
-    uml = PlantUML("../plantuml/plantuml.jar")
-    data_fd, data_path = create_tmpfile("txt")
-    os.write(data_fd, "@startuml\nAlice -> Bob: test\n@enduml")
-    os.close(data_fd)
+    r1 = UMLClassRelation.a_create('backing_dir')
+    r1.set_relation('Composition', e1, e3)
+    r2 = UMLClassRelation.a_create('backend')
+    r2.set_relation('Composition', e1, e4)
+    r3 = UMLClassRelation.a_create('None')
+    r3.set_relation('Extension', e1, e2)
     
-    out_dir = create_tmpdir()
+    elements = [e1, e2, e3, e4, r1, r2, r3]
     
-    uml.create_diagram(data_path, out_dir)
-    
-    os.remove(data_path)
-    shutil.rmtree(out_dir)
-    
+    travel = TravelElements()
+    travel.travel(elements)
+    travel.finish()
 
 #######################################
 ## Entry of program.
