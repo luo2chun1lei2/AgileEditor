@@ -5,6 +5,7 @@ import os, sys, logging, getopt, shutil
 from Element import *
 from PlantUML import *
 from Utils import *
+from Storage import *
     
 class UMLClass(AElement):
     # UML's class
@@ -99,6 +100,9 @@ class TravelElements(object):
         shutil.rmtree(out_dir)
 
 def test():
+    test_db
+    
+def test2():
     # set elements.
     e1 = UMLClass.a_create('ServiceProviderBridge')
     e1.add_field("backing_dir", "zx:channel")
