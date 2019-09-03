@@ -100,7 +100,7 @@ class TravelElements(object):
         shutil.rmtree(out_dir)
 
 def test():
-    test_db
+    test_db()
     
 def test2():
     # set elements.
