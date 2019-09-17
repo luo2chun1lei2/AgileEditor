@@ -85,7 +85,7 @@ class TravelElements(object):
 
 def test():
     test_db()
-    
+
 def test2():
     try:
         # set elements.
@@ -95,7 +95,6 @@ def test2():
         e2 = UMLClass('ServiceProvider')
         e3 = UMLClass('zx::channel')
         e4 = UMLClass('ServiceProviderPtr')
-        e5 = UMLClass('ServiceProviderPtr')
         
         r1 = UMLClassRelation('backing_dir')
         r1.set_relation('Composition', e1, e3)

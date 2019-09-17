@@ -12,12 +12,13 @@ import os, sys, logging, getopt
 class AGlobalName(object):
     
     # 管理所有元素的名字，不能有重复！
+    # 是单例模式。
     names = []
     
     def __init__(self):
         super(AGlobalName, self).__init__()
     
-    @staticmethod    
+    @staticmethod
     def check_name(name):
         # @param name : string : 需要注册的名字
         # @return False:有重复的名字，True:注册成功。
@@ -26,7 +27,7 @@ class AGlobalName(object):
         
         return True
     
-    @staticmethod    
+    @staticmethod
     def register(name):
         # @param name : string : 需要注册的名字
         # @return False:有重复的名字，True:注册成功。
@@ -66,10 +67,23 @@ class AElement(EnableGlobalName):
     # 因为Python中有Object类了，避免重名，所以这里名字是Element。
     def __init__(self, name):
         super(AElement, self).__init__(name)
-        self.name = name
+        self.relations = []
         
+    # TODO: Element关于Relation的操作不对公开 ?
+    def attach_relation(self, relation):
+        if relation not in self.relations:
+            self.relations.append(relation)
+            
+    def detach_relation(self, relation):
+        if relation in self.relations:
+            self.relations.remove(relation)
+            
+    def list_relations(self):
+        for r in self.relations:
+            print r.name
+    
 
-class ARelation(AElement, EnableGlobalName):
+class ARelation(AElement):
     
     def __init__(self, name):
         super(ARelation, self).__init__(name)
@@ -78,10 +92,12 @@ class ARelation(AElement, EnableGlobalName):
     def attach_element(self, element):
         if element not in self.elements:
             self.elements.append(element)
+            element.attach_relation(self)
             
     def detach_element(self, element):
         if element in self.elements:
             self.elements.remove(element)
+            element.detach_relation(self)
             
     def list_elements(self):
         for e in self.elements:
