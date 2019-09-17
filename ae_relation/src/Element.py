@@ -2,6 +2,9 @@
 
 u'''
     Element and Relation
+类的开头：
+    A: 普通的类
+    Enable: 能力
 '''
 
 import os, sys, logging, getopt
@@ -41,17 +44,32 @@ class AGlobalName(object):
         if name in AGlobalName.names:
             AGlobalName.names.remove(name)
     
-class AElement(object):
-    # 基本的元素，代表了此程序中所有的基本对象。
-    # 因为Python中有Object类了，避免重名，所以这里是Element。
+class EnableGlobalName(object):
+    # 继承了这个类的类，就将要求注册全局的名字。
+    
     def __init__(self, name):
-        super(AElement, self).__init__()
-        self.name = name
+        super(EnableGlobalName, self).__init__()
         
+        rlt = AGlobalName.register(name)
+        if not rlt:
+            print "Cannot create the element with name=\"%s\"." % name
+            raise ValueError("Name(%s) is duplicated." % name)
+    
+        self.name = name
+    
     def __del__(self):
         AGlobalName.unregister(self.name)
         
-class ARelation(AElement):
+
+class AElement(EnableGlobalName):
+    # 基本的元素，代表了此程序中所有的基本对象。
+    # 因为Python中有Object类了，避免重名，所以这里名字是Element。
+    def __init__(self, name):
+        super(AElement, self).__init__(name)
+        self.name = name
+        
+
+class ARelation(AElement, EnableGlobalName):
     
     def __init__(self, name):
         super(ARelation, self).__init__(name)
@@ -68,24 +86,3 @@ class ARelation(AElement):
     def list_elements(self):
         for e in self.elements:
             print e.name
-
-class AElementFactory(object):
-    # Element的工厂类
-    def __init__(self):
-        super(AElementFactory, self).__init__()
-        
-    @staticmethod
-    def create_element(name):
-        rlt = AGlobalName.register(name)
-        if not rlt:
-            print "Cannot create the element with name=\"%s\"." % name
-            return None
-        return AElement(name)
-    
-    @staticmethod
-    def create_relation(name):
-        rlt = AGlobalName.register(name)
-        if not rlt:
-            print "Cannot create the relation with name=\"%s\"." % name
-            return None
-        return ARelation(name)

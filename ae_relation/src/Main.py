@@ -12,31 +12,15 @@ class UMLClass(AElement):
     def __init__(self, name):
         super(UMLClass, self).__init__(name)
         self.fields = []
-        
-    @staticmethod
-    def a_create(name):
-        rlt = AGlobalName.register(name)
-        if not rlt:
-            print "Cannot create the class with name=\"%s\"." % name
-            return None
-        return UMLClass(name)
-    
+
     def add_field(self, field_name, field_type):
         self.fields.append((field_name, field_type))
-            
+
 class UMLClassRelation(ARelation):
     # 类和类之间的关系
     def __init__(self, name):
         super(UMLClassRelation, self).__init__(name)
-        
-    @staticmethod
-    def a_create(name):
-        rlt = AGlobalName.register(name)
-        if not rlt:
-            print "Cannot create the class relation with name=\"%s\"." % name
-            return None
-        return UMLClassRelation(name)
-        
+
     def set_relation(self, relation_type, from_element, to_element):    # TODO 此处参数是否应该不定个数?
         # @param from_element:AElement:
         # @param to_element:AElement:
@@ -103,26 +87,31 @@ def test():
     test_db()
     
 def test2():
-    # set elements.
-    e1 = UMLClass.a_create('ServiceProviderBridge')
-    e1.add_field("backing_dir", "zx:channel")
-    e1.add_field("backend", "ServiceProviderPtr")
-    e2 = UMLClass.a_create('ServiceProvider')
-    e3 = UMLClass.a_create('zx::channel')
-    e4 = UMLClass.a_create('ServiceProviderPtr')
+    try:
+        # set elements.
+        e1 = UMLClass('ServiceProviderBridge')
+        e1.add_field("backing_dir", "zx:channel")
+        e1.add_field("backend", "ServiceProviderPtr")
+        e2 = UMLClass('ServiceProvider')
+        e3 = UMLClass('zx::channel')
+        e4 = UMLClass('ServiceProviderPtr')
+        e5 = UMLClass('ServiceProviderPtr')
+        
+        r1 = UMLClassRelation('backing_dir')
+        r1.set_relation('Composition', e1, e3)
+        r2 = UMLClassRelation('backend')
+        r2.set_relation('Composition', e1, e4)
+        r3 = UMLClassRelation('None')
+        r3.set_relation('Extension', e1, e2)
+        
+        elements = [e1, e2, e3, e4, r1, r2, r3]
+        
+        travel = TravelElements()
+        travel.travel(elements)
+        travel.finish()
+    except Exception, ex:
+        print ex.message
     
-    r1 = UMLClassRelation.a_create('backing_dir')
-    r1.set_relation('Composition', e1, e3)
-    r2 = UMLClassRelation.a_create('backend')
-    r2.set_relation('Composition', e1, e4)
-    r3 = UMLClassRelation.a_create('None')
-    r3.set_relation('Extension', e1, e2)
-    
-    elements = [e1, e2, e3, e4, r1, r2, r3]
-    
-    travel = TravelElements()
-    travel.travel(elements)
-    travel.finish()
 
 #######################################
 ## Entry of program.
@@ -151,7 +140,7 @@ def main(argv):
             usage()
             sys.exit(2)
     
-    test()
+    test2()
     
     sys.exit(0)
 
