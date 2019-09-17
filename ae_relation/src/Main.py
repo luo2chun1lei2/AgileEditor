@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import os, sys, logging, getopt, shutil
+import os, sys, logging, getopt, shutil, traceback
 from Element import *
 from PlantUML import *
 from Utils import *
@@ -10,7 +10,7 @@ from Storage import *
 class UMLClass(AElement):
     # UML's class
     def __init__(self, name):
-        super(UMLClass, self).__init__(name)
+        super(UMLClass, self).__init__("Class", name)
         self.fields = []
 
     def add_field(self, field_name, field_type):
@@ -19,7 +19,7 @@ class UMLClass(AElement):
 class UMLClassRelation(ARelation):
     # 类和类之间的关系
     def __init__(self, name):
-        super(UMLClassRelation, self).__init__(name)
+        super(UMLClassRelation, self).__init__("ClassRelation", name)
 
     def set_relation(self, relation_type, from_element, to_element):    # TODO 此处参数是否应该不定个数?
         # @param from_element:AElement:
@@ -95,7 +95,7 @@ def test2():
         e2 = UMLClass('ServiceProvider')
         e3 = UMLClass('zx::channel')
         e4 = UMLClass('ServiceProviderPtr')
-        
+
         r1 = UMLClassRelation('backing_dir')
         r1.set_relation('Composition', e1, e3)
         r2 = UMLClassRelation('backend')
@@ -109,7 +109,9 @@ def test2():
         travel.travel(elements)
         travel.finish()
     except Exception, ex:
+        
         print ex.message
+        traceback.print_exc()
     
 
 #######################################
