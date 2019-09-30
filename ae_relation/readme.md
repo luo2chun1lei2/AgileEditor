@@ -1,4 +1,7 @@
-Agile Relation Editor 
+Agile Relation Editor
+
+安装：
+pip install prompt_toolkit
 
 目标：
   用特定的语法描述元素和它们之间的关系，然后可以显示和编辑。

@@ -4,8 +4,15 @@
 # 1. 控制所有的模块，以及各个子模块。
 # 1. Control不需要知道每个模块的具体含义。
 
+from __future__ import unicode_literals
+
 import os, sys, logging, getopt, shutil, traceback
 from Model import *
+
+from prompt_toolkit import prompt
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.contrib.completers import WordCompleter
 
 def main_usage():
     print 'program usage:'
@@ -37,18 +44,30 @@ class Control(object):
     def loop(self):
         # 进入Loop循环
         
+        model = Model()
+        
+        SQLCompleter = WordCompleter(['select', 'from', 'insert', 'update', 'delete', 'drop'],
+                             ignore_case=True)
+        
         while True:
-            str = raw_input(">")
+            str = prompt('>',
+                         history=FileHistory('history.txt'),
+                         auto_suggest=AutoSuggestFromHistory(),
+                         completer=SQLCompleter,
+                       )
             
             # TODO 目前还用不到。
             #command = self.parse_command(str)
-                        
+            
             if str == 'quit' or str == 'q':
                 break
-            if str == 'help' or str == 'h':
+            elif str == 'help' or str == 'h':
                 control_usage()
             elif str == 'test':
-                test2()
+                model.test2()
+            elif str == 'create_class':
+                # 想创建一个uml class
+                model.create_class('')
             else:
                 print "unknown:%s" % str
     
