@@ -15,10 +15,23 @@ def control_usage():
     print 'control usage:'
     print 'h/help: show help information.'
     print 'q/quit: quit from control.'
+    
+
+# TODO 目前还用不到。
+class SystemCommand(object):
+    # 系统级别的命令。
+    # 命令是解析好的“描述如何执行的数据”，和普通的命令相比，不适用于人类阅读的，而是用于方便执行的。
+    def __self__(self):
+        super(SystemCommand, self).__init__()
 
 class Control(object):
     def __init__(self):
         super(Control, self).__init__()
+        
+    # TODO 目前还用不到。
+    def parse_command(self, str_cmd):
+        # str_cmd: String: command as string format
+        return SystemCommand()
         
 
     def loop(self):
@@ -27,6 +40,9 @@ class Control(object):
         while True:
             str = raw_input(">")
             
+            # TODO 目前还用不到。
+            #command = self.parse_command(str)
+                        
             if str == 'quit' or str == 'q':
                 break
             if str == 'help' or str == 'h':
@@ -47,7 +63,7 @@ class Control(object):
             opts, args = getopt.getopt(argv[1:], 'h', ['help'])
         except getopt.GetoptError, err:
             print str(err)
-            usage()
+            main_usage()
             sys.exit(1)
             
         for o, a in opts:
