@@ -8,7 +8,8 @@ from Control import *
 ## Entry of program.
 
 def main(argv):
-    Control.main(argv)
+    control = Control()
+    control.main(argv)
 
 if __name__ == '__main__':    
     main(sys.argv)

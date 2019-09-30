@@ -7,17 +7,36 @@
 import os, sys, logging, getopt, shutil, traceback
 from Model import *
 
-def usage():
+def main_usage():
     print 'program usage:'
     print '-h, --help: show help information.'
+    
+def control_usage():
+    print 'control usage:'
+    print 'h/help: show help information.'
+    print 'q/quit: quit from control.'
 
-class Control:
+class Control(object):
     def __init__(self):
         super(Control, self).__init__()
         
+
+    def loop(self):
+        # 进入Loop循环
+        
+        while True:
+            str = raw_input(">")
+            
+            if str == 'quit' or str == 'q':
+                break
+            if str == 'help' or str == 'h':
+                control_usage()
+            elif str == 'test':
+                test2()
+            else:
+                print "unknown:%s" % str
     
-    @staticmethod    
-    def main(argv):
+    def main(self, argv):
         logging.basicConfig(level=logging.INFO,
                         format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
         
@@ -33,13 +52,13 @@ class Control:
             
         for o, a in opts:
             if o in ('-h', '--help'):
-                usage()
+                main_usage()
                 sys.exit(0)
             else:
                 print 'unknown arguments.'
-                usage()
+                main_usage()
                 sys.exit(2)
         
-        test2()
+        self.loop()
         
         sys.exit(0)
