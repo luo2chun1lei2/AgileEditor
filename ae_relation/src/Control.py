@@ -9,16 +9,21 @@ from __future__ import unicode_literals
 import os, sys, logging, getopt, shutil, traceback
 from Model import *
 
-from prompt_toolkit import prompt
-from prompt_toolkit.history import FileHistory
+# 用于命令提示
+from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.contrib.completers import WordCompleter
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 
 def main_usage():
     print 'program usage:'
-    print '-h, --help: show help information.'
+    print 'help: show help information.'
+    # TODO:
+    print '...'
     
 def control_usage():
+    # TODO: 需要和关键字匹配
     print 'control usage:'
     print 'h/help: show help information.'
     print 'q/quit: quit from control.'
@@ -32,6 +37,10 @@ class SystemCommand(object):
         super(SystemCommand, self).__init__()
 
 class Control(object):
+    
+    CMDLINE_CMD = ['help', 'quit', 'test',
+                    'select', 'from', 'insert', 'update', 'delete', 'drop']
+    
     def __init__(self):
         super(Control, self).__init__()
         
@@ -39,61 +48,80 @@ class Control(object):
     def parse_command(self, str_cmd):
         # str_cmd: String: command as string format
         return SystemCommand()
-        
+    
+    def execute_command(self, model, str_cmd):
+        # return: bool: if true, continue, false, break loop.
+        if str_cmd == 'quit' or str_cmd == 'q':
+            return False
+        elif str_cmd == 'help' or str_cmd == 'h':
+            control_usage()
+        elif str_cmd == 'test':
+            model.test2()
+        elif str_cmd == 'create_class':
+            # 想创建一个uml class
+            model.create_class('')
+        else:
+            print "unknown:%s" % str_cmd
+            
+        return True
 
-    def loop(self):
+    def loop(self, model):
         # 进入Loop循环
         
-        model = Model()
         
-        SQLCompleter = WordCompleter(['select', 'from', 'insert', 'update', 'delete', 'drop'],
-                             ignore_case=True)
+        
+        # 设定命令的提示符号。
+        # TODO 提示的关键字，需要和下面的命令解析配套。
+        word_completer = WordCompleter(Control.CMDLINE_CMD,
+                                       ignore_case=True)
         
         while True:
-            str = prompt('>',
-                         history=FileHistory('history.txt'),
-                         auto_suggest=AutoSuggestFromHistory(),
-                         completer=SQLCompleter,
-                       )
             
+            input_str = prompt('>', completer=word_completer,
+                  complete_while_typing=False)
+
             # TODO 目前还用不到。
-            #command = self.parse_command(str)
+            #command = self.parse_command(input_str)
             
-            if str == 'quit' or str == 'q':
+            rlt = self.execute_command(model, input_str)
+            if not rlt:
                 break
-            elif str == 'help' or str == 'h':
-                control_usage()
-            elif str == 'test':
-                model.test2()
-            elif str == 'create_class':
-                # 想创建一个uml class
-                model.create_class('')
-            else:
-                print "unknown:%s" % str
+            
     
-    def main(self, argv):
+    def main(self, argv, model):
+        # set log and level.
         logging.basicConfig(level=logging.INFO,
                         format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
         
         u''' Analysis command's arguments '''
     
-        # analysis code.
-        try:
-            opts, args = getopt.getopt(argv[1:], 'h', ['help'])
-        except getopt.GetoptError, err:
-            print str(err)
-            main_usage()
-            sys.exit(1)
-            
-        for o, a in opts:
-            if o in ('-h', '--help'):
-                main_usage()
-                sys.exit(0)
-            else:
-                print 'unknown arguments.'
+        # analysis command arguments.
+        # 命令分成：program command options.
+        if len(argv) == 1:
+            # Only this program name, goto loop.
+            self.loop(model)
+
+        elif len(argv) > 1:
+            # check command is ok.
+            if argv[1] not in Control.CMDLINE_CMD:
+                print 'unknown command(%s).' % argv[1]
                 main_usage()
                 sys.exit(2)
-        
-        self.loop()
-        
-        sys.exit(0)
+            else:
+                self.execute_command(model, " ".join(argv[1:]))
+
+# TODO:应该是每个command，一个参数分析。
+#             try:
+#                 opts, args = getopt.getopt(argv[2:], 'h', ['help'])
+#             except getopt.GetoptError, err:
+#                 print str(err)
+#                 main_usage()
+#                 sys.exit(1)
+#                 
+#             for o, a in opts:
+#                 if o in ('-h', '--help'):
+#                     main_usage()
+#                     sys.exit(0)
+#                 else:
+#                     pass
+
