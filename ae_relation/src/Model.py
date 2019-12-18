@@ -37,7 +37,7 @@ class TravelElements(object):
     # use planuml to create diagram
     
     def __init__(self):
-        self.uml = PlantUML("../plantuml/plantuml.jar")
+        self.uml = PlantUML("plantuml/plantuml.jar")
         self.data_fd, self.data_path = Utils.create_tmpfile("txt")
         
         self._write("@startuml")

@@ -7,6 +7,9 @@
 from __future__ import unicode_literals
 
 import os, sys, logging, getopt, shutil, traceback
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 from Model import *
 
 # 用于命令提示
@@ -16,17 +19,23 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-def main_usage():
+def program_usage():
+    # 和 PROGRAM_CMD 一致
     print 'program usage:'
     print 'help: show help information.'
-    # TODO:
-    print '...'
-    
+    print 'script <script file path>: run input script'
+
 def control_usage():
-    # TODO: 需要和关键字匹配
+    # 和 CMDLINE_CMD 一致。
     print 'control usage:'
-    print 'h/help: show help information.'
-    print 'q/quit: quit from control.'
+    print 'help: show help information.'
+    print 'quit: quit from control.'
+    print 'test: test this program.'
+    print 'select: select on element and do something to it.'
+    print 'insert: insert element.'
+    print 'update: update properties of element.'
+    print 'delete: delete element or relation.'
+    print 'drop: drop all data.'
     
 
 # TODO 目前还用不到。
@@ -38,6 +47,11 @@ class SystemCommand(object):
 
 class Control(object):
     
+    # 命令的参数
+    PROGRAM_CMD = ['help', 'test', 'script']
+    
+    # 在内部控制或者脚本可以执行的命令。
+    # TODO : from ?
     CMDLINE_CMD = ['help', 'quit', 'test',
                     'select', 'from', 'insert', 'update', 'delete', 'drop']
     
@@ -51,13 +65,18 @@ class Control(object):
     
     def execute_command(self, model, str_cmd):
         # return: bool: if true, continue, false, break loop.
-        if str_cmd == 'quit' or str_cmd == 'q':
+        
+        if len(str_cmd) == 0:
+            pass
+        elif str_cmd.startswith("#"):
+            pass
+        elif str_cmd == 'quit':
             return False
-        elif str_cmd == 'help' or str_cmd == 'h':
+        elif str_cmd == 'help':
             control_usage()
         elif str_cmd == 'test':
             model.test2()
-        elif str_cmd == 'create_class':
+        elif str_cmd == 'create class':
             # 想创建一个uml class
             model.create_class('')
         else:
@@ -65,10 +84,21 @@ class Control(object):
             
         return True
 
+    def run_script_file(self, model, script_file):
+        # model : Model: 在此模型中执行脚本
+        # script_file : string: path of script file
+        try:
+            f = open(script_file)
+            
+            for l in f:
+                self.execute_command(model, l.strip())
+        except Exception, ex:
+            print ex
+            return False
+        return True
+
     def loop(self, model):
         # 进入Loop循环
-        
-        
         
         # 设定命令的提示符号。
         # TODO 提示的关键字，需要和下面的命令解析配套。
@@ -103,12 +133,22 @@ class Control(object):
 
         elif len(argv) > 1:
             # check command is ok.
-            if argv[1] not in Control.CMDLINE_CMD:
-                print 'unknown command(%s).' % argv[1]
-                main_usage()
+            if argv[1] not in Control.PROGRAM_CMD:
+                print 'unknown program argument (%s).' % argv[1]
+                program_usage()
                 sys.exit(2)
             else:
-                self.execute_command(model, " ".join(argv[1:]))
+                if argv[1] == "help":
+                    program_usage()
+                    sys.exit(0)
+                elif argv[1] == "test":
+                    pass
+                elif argv[1] == "script":
+                    if len(argv) != 3:
+                        program_usage()
+                        sys.exit(2)
+                    self.run_script_file(model, argv[2])
+                
 
 # TODO:应该是每个command，一个参数分析。
 #             try:

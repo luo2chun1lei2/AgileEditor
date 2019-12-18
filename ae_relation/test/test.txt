@@ -1,0 +1,6 @@
+# 测试的脚本文件。
+
+#create UMLClass("abc")
+#create UMLClass('123')
+
+test
