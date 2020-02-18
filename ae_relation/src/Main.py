@@ -3,7 +3,7 @@
 
 import os, sys, logging, getopt, shutil, traceback
 from Control import *
-from model.TestModel1 import *
+from mvc.model.TestModel1 import *
 
 #######################################
 ## 程序的主要入口。

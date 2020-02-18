@@ -45,16 +45,16 @@ pip install CodernityDB
 这个是 Python 语言开发的，嵌入到程序中的NoSQL DB，是 key-value 类型。
    
 具体的实现：
-1. 是App模块，主要是
+1. App层，有App，功能主要是
     【这样设计的方案是，主要是建立命令执行和交互执行两种模式Mode】
     1. 解释命令行，然后创建 Parser + Container 模型，将参数传递给这两个。
     2. 解释命令，将“交互界面”的命令行传入到 Parser 中。
-2. Parser + Container。
+2. container层，有Parser + Container，功能主要是
     1. Parser：是控制整个程序的，包括Container。
         负责分析传入的命令，变成命令包(command package)，自己执行，或者发送给更下层的Control。
-    1. Container:整个模型，包含若干的模型。
+    1. Container:整个模型，包含若干的MVC。
         允许替换容器内的Model，以及当前的Model。
-3. Control + Model + View 
+3. mvc层，包含Control + Model + View，功能主要是： 
 3.1 Model：
     1. Element是基本的数据结构，包含特殊的Relation，它可以联系两个Element。
 3.2 Control，是对MV的控制，但是只能控制配对Model内部。

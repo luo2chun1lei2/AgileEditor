@@ -4,7 +4,7 @@
 import os, sys, logging, getopt, shutil, traceback
 from Element import *
 from PlantUML import *
-from Utils import *
+from misc.Utils import *
 from Storage import *
 
 class UMLClass(AElement):
