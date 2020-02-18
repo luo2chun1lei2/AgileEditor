@@ -3,15 +3,15 @@
 
 import os, sys, logging, getopt, shutil, traceback
 from Control import *
-from Model import *
+from model.TestModel1 import *
 
 #######################################
-## Main Entry of program.
+## 程序的主要入口。
 
 def main(argv):
     control = Control()
-    model = Model()
+    model = TestModel1()
     control.main(argv, model)
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     main(sys.argv)

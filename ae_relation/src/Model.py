@@ -6,7 +6,7 @@ from Element import *
 from PlantUML import *
 from Utils import *
 from Storage import *
-    
+
 class UMLClass(AElement):
     # UML's class
     def __init__(self, name):

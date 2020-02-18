@@ -1,4 +1,11 @@
-# 测试的脚本文件。
+# 测试的脚本文件，用于外置的脚本。
+# 只能执行内部的命令。
+# 命令说明：
+# 总体格式是下面，方便用 getopt 来实现。
+# 动作 参数
+#   参数可以是 --xxx[=???] -x[=?]
+# load Model(name="xxx")
+# create
 
 #create UMLClass("abc")
 #create UMLClass('123')

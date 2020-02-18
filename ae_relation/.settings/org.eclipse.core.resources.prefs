@@ -6,3 +6,7 @@ encoding//src/Model.py=utf-8
 encoding//src/PlantUML.py=utf-8
 encoding//src/Storage.py=utf-8
 encoding//src/Utils.py=utf-8
+encoding//src/element/Module.py=utf-8
+encoding//src/element/__init__.py=utf-8
+encoding//src/model/TestModel1.py=utf-8
+encoding//src/model/__init__.py=utf-8
