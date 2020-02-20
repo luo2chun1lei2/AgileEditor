@@ -14,7 +14,7 @@ class Parser():
     
     def do(self, str_action):
         # 分析和执行action.
-        # return: bool: True, continue, False, quit.
+        # return: Return: 
         
         if str_action.startswith('!'):
             return self._do_inner(str_action[1:])
@@ -33,7 +33,7 @@ class Parser():
     def _do_inner(self, str_action):
         # str_action: String: 命令以字符串的方式传入
         # 执行Parser内部的命令。
-        logging.debug(str_action)
+        logging.debug("Execute inner command:%s" % str_action)
         
         
         # TODO 命令解析用 getopt。

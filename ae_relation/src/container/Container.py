@@ -13,12 +13,12 @@ class Container():
         
         # TODO: 这里需要建立全局的mvc的名字注册机制，然后才能用名字实现model的创建。
         # TODO: control and model 应该组装在一起。
-        self.control = Control()
-        self.model = TestModel1()
-        
+        model = TestModel1()
+        self.control = Control(model)
     
     def get_current_control(self):
         return self.control
     
     def do_action_by_current_control(self, str_action):
-        return self.control.do(self.model, str_action)
+        #return: Return:
+        return self.control.do(str_action.strip())

@@ -30,6 +30,9 @@ class UMLClassRelation(ARelation):
         self.relation_type = relation_type
     
     def get_relation(self):
+        # relation_type: string
+        # from_element: AElement
+        # to_element: AElement
         return self.relation_type, self.from_element, self.to_element 
         
 class TravelElements(object):
@@ -39,6 +42,7 @@ class TravelElements(object):
     def __init__(self):
         self.uml = PlantUML("plantuml/plantuml.jar")
         self.data_fd, self.data_path = Utils.create_tmpfile("txt")
+        logging.debug("Create tmp file:%s" % self.data_path)
         
         self._write("@startuml")
     
@@ -52,15 +56,15 @@ class TravelElements(object):
         
         for e in elements:
             if isinstance(e, UMLClassRelation):
-                type, from_element, to_element = e.get_relation()
-                if type is 'Extension': # TODO: 继承不需要额外的名字。
+                type_element, from_element, to_element = e.get_relation()
+                if type_element == 'Extension': # TODO: 继承不需要额外的名字。
                     self._write("%s --|> %s : %s" % (from_element.name, to_element.name, e.name))
-                elif type is 'Composition':
+                elif type_element == 'Composition':
                     self._write("%s *-- %s : %s" % (from_element.name, to_element.name, e.name))
-                elif type is 'Aggregation':
+                elif type_element == 'Aggregation':
                     self._write("%s o-- %s : %s" % (from_element.name, to_element.name, e.name))
                 else:
-                    print "Don't recognize this type\"\" of class relation" % type
+                    print "Don't recognize this type_element \"%s\" of class relation" % type_element
                     sys.exit(1)
             elif isinstance(e, UMLClass):
                 self._write("class %s {" % e.name)
@@ -86,10 +90,22 @@ class TravelElements(object):
 class Model(object):
     def __init__(self):
         super(Model, self).__init__()
-
+        self.elements = {}
+        
+    def add_element(self, e_id, e):
+        # e_id: string: element's id
+        # e: object: element
+        self.elements[e_id] = e
+        
+    def find_element(self, e_id):
+        # e_id: string: element's id
+        return self.elements[e_id]
+    
+    # TODO: 此方法作废，之后删除
     def test(self):
         test_db()
     
+    # TODO: 此方法作废，之后删除。
     def test2(self):
         try:
             # set elements.
@@ -116,3 +132,5 @@ class Model(object):
             
             print ex.message
             traceback.print_exc()
+            
+            

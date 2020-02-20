@@ -108,14 +108,18 @@ class App():
         # script_path : string: path of script file
         # return : bool: True, OK, False, failed.
         try:
+            logging.debug('Open script %s, and execute it.' % script_path)
             f = open(script_path)
             
             for l in f:
-                # self.execute_command(model, l.strip())
-                if not self.parser.do(l):
+                logging.debug('Execute a line: %s.' % l)
+                rtn = self.parser.do(l.strip())
+                if rtn != Return.OK:
                     break
+                    
         except Exception, ex:
-            print ex
+            print ex.message
+            traceback.print_exc()
             return False
         return True
 
@@ -134,7 +138,8 @@ class App():
             input_str = prompt('>', completer=word_completer,
                   complete_while_typing=False)
 
-            if not self.parser.do(input_str):
+            rtn = self.parser.do(input_str)
+            if rtn == Return.QUIT:
                 break
             
             

@@ -5,7 +5,7 @@ from Model import *
 
 class TestModel1(Model):
     def __init__(self):
-        super(Model, self).__init__()
+        super(TestModel1, self).__init__()
 
     def test_db(self):
         test_db()
