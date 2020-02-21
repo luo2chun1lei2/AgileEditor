@@ -65,7 +65,7 @@ class TravelElements(object):
                     self._write("%s o-- %s : %s" % (from_element.name, to_element.name, e.name))
                 else:
                     print "Don't recognize this type_element \"%s\" of class relation" % type_element
-                    sys.exit(1)
+                    return False
             elif isinstance(e, UMLClass):
                 self._write("class %s {" % e.name)
                 for field_name, field_type in e.fields:
@@ -97,6 +97,7 @@ class Model(object):
         # e: object: element
         # return: bool: True, OK, False, failed.
         if e_id in self.elements:
+            print "Add duplicated name \"%s\" in element." % e_id
             return False
         self.elements[e_id] = e
         

@@ -65,7 +65,7 @@ class EnableGlobalName(object):
         
         rlt = AGlobalName.register(category, name)
         if not rlt:
-            print "Cannot create the element with category=%d, name=\"%s\"." % (category, name)
+            print "Cannot create the element with category=\"%s\", name=\"%s\"." % (category, name)
             raise ValueError("Category(%s) and Name(%s) is duplicated." % (category, name))
     
         self.category = category

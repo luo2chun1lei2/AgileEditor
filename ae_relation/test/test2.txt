@@ -1,4 +1,7 @@
 #此脚本主要是针对模块，生成对应的模块图。
 #
 
-UMLPackage --id="Android Proxy" --name="Android Proxy"
+UMLClass --name="Android Proxy"
+add_field --target="Android Proxy" --name="a b c" --type="zx:channel"
+
+show

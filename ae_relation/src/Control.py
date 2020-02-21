@@ -6,6 +6,7 @@
 
 from Model import *
 from Return import *
+from misc.Utils import *
 
 def program_usage():
     # 和 PROGRAM_CMD 一致
@@ -49,7 +50,8 @@ class Control(object):
             logging.debug('One comment: %s.' % str_action)
             return Return.OK
 
-        argv = str_action.split()
+        # TODO 不能用这个函数，因为会将“xxx xxx”的字符串也分割。
+        argv = util_split_command_args(str_action)
         if len(argv) == 0:
             logging.debug('One empty line: %s.' % str_action)
             return Return.OK
@@ -126,8 +128,10 @@ class Control(object):
                 return Return.ERROR
     
         e = UMLClass(opt_name)
-        self.model.add_element(opt_name, e)
-        return Return.OK
+        if self.model.add_element(opt_name, e):
+            return Return.ERROR
+        else:
+            return Return.OK
     
     def _create_uml_class_relation(self, opts, args):
         opt_name = None
@@ -139,8 +143,10 @@ class Control(object):
                 return Return.ERROR
     
         e = UMLClassRelation(opt_name)
-        self.model.add_element(opt_name, e)
-        return Return.OK
+        if self.model.add_element(opt_name, e):
+            return Return.OK
+        else:
+            return Return.ERROR
     
     def _uml_class_add_field(self, opts, args):
         opt_name = None
