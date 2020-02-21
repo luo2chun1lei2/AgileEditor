@@ -60,28 +60,28 @@ class Control(object):
             self._show()
             
         elif argv[0] == "UMLClass":
-            # ex: UMLClass --id=e1 --name="ServiceProviderBridge"
-            opts, args = self._parse_one_action(argv[1:], "", ["id=", "name="])
+            # ex: UMLClass --name=ServiceProviderBridge
+            opts, args = self._parse_one_action(argv[1:], "", ["name="])
             if not opts is None:
                 self._create_uml_class(opts, args)
                 
         elif argv[0] == "UMLClassRelation":
-            # ex: UMLClassRelation --id=r1 --name='backing_dir'
-            opts, args = self._parse_one_action(argv[1:], "", ["id=", "name="])
+            # ex: UMLClassRelation --name=backing_dir
+            opts, args = self._parse_one_action(argv[1:], "", ["name="])
             if not opts is None:
                 self._create_uml_class_relation(opts, args)
             
         elif argv[0] == "add_field":
-            # ex: add_field --target_id=e1 --name="backing_dir" --type="zx:channel"
+            # ex: add_field --target=abc --name=backing_dir --type=zx:channel
             opts, args = self._parse_one_action(argv[1:], "",
-                            ["target_id=", "name=", "type="])
+                            ["target=", "name=", "type="])
             if not opts is None:
                 self._uml_class_add_field(opts, args)
             
         elif argv[0] == "set_relation":
-            # ex: set_relation --target_id=r1 --name='Composition' --from=e1 --to=e3
+            # ex: set_relation --target=abc --name=Composition --from=e1 --to=e3
             opts, args = self._parse_one_action(argv[1:], "",
-                            ["target_id=", "name=", "from=", "to="])
+                            ["target=", "name=", "from=", "to="])
             if not opts is None:
                 self._uml_class_relation_set_relation(opts, args)
                 
@@ -117,35 +117,29 @@ class Control(object):
         travel.finish()
     
     def _create_uml_class(self, opts, args):
-        opt_id = None
         opt_name = None
         for o, a in opts:
-            if o in ('--id'):
-                opt_id = a
-            elif o in ('--name'):
+            if o in ('--name'):
                 opt_name = a
             else:
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
         e = UMLClass(opt_name)
-        self.model.add_element(opt_id, e)
+        self.model.add_element(opt_name, e)
         return Return.OK
     
     def _create_uml_class_relation(self, opts, args):
-        opt_id = None
         opt_name = None
         for o, a in opts:
-            if o in ('--id'):
-                opt_id = a
-            elif o in ('--name'):
+            if o in ('--name'):
                 opt_name = a
             else:
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
         e = UMLClassRelation(opt_name)
-        self.model.add_element(opt_id, e)
+        self.model.add_element(opt_name, e)
         return Return.OK
     
     def _uml_class_add_field(self, opts, args):
@@ -155,7 +149,7 @@ class Control(object):
         for o, a in opts:
             if o in ('--name'):
                 opt_name = a
-            elif o in ('--target_id'):
+            elif o in ('--target'):
                 opt_target = a
             elif o in ('--type'):
                 opt_type = a
@@ -176,7 +170,7 @@ class Control(object):
         for o, a in opts:
             if o in ('--name'):
                 opt_name = a
-            elif o in ('--target_id'):
+            elif o in ('--target'):
                 opt_target = a
             elif o in ('--from'):
                 opt_from = a

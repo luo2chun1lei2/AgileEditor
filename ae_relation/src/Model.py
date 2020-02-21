@@ -95,6 +95,9 @@ class Model(object):
     def add_element(self, e_id, e):
         # e_id: string: element's id
         # e: object: element
+        # return: bool: True, OK, False, failed.
+        if e_id in self.elements:
+            return False
         self.elements[e_id] = e
         
     def find_element(self, e_id):

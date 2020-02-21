@@ -1,0 +1,25 @@
+# 测试的脚本文件，用于外置的脚本。
+# 只能执行内部的命令。
+# 命令说明：
+# 总体格式是下面，方便用 getopt 来实现。
+# 动作 参数
+#   参数可以是 --xxx[=???] -x[=?]
+
+UMLClass --name=ServiceProviderBridge
+add_field --target=ServiceProviderBridge --name=backing_dir --type=zx:channel
+add_field --target=ServiceProviderBridge --name=backend --type=ServiceProviderPtr
+            
+UMLClass --name=ServiceProvider
+UMLClass --name=zx::channel
+UMLClass --name=ServiceProviderPtr
+    
+UMLClassRelation --name=backing_dir
+set_relation --target=backing_dir --name=Composition --from=ServiceProviderBridge --to=zx::channel
+
+UMLClassRelation --name=backend
+set_relation --target=backend --name=Composition --from=ServiceProviderBridge --to=ServiceProviderPtr
+
+UMLClassRelation --name=None
+set_relation --target=None --name=Extension --from=ServiceProviderBridge --to=ServiceProvider
+
+show
