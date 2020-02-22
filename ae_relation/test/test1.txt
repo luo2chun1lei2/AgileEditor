@@ -14,7 +14,7 @@
 # title: 显示的信息，可以重复。如果没有设置，就不显示。
 # target/from/to 都是引用 name 的标志。
 
-UMLClass --name=ServiceProviderBridge
+UMLClass --name=ServiceProviderBridge  --color=Yellow
 add_field --target=ServiceProviderBridge --name=backing_dir --type=zx:channel
 add_field --target=ServiceProviderBridge --name=backend --type=ServiceProviderPtr
             

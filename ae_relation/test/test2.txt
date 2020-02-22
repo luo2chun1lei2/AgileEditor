@@ -1,11 +1,13 @@
-#此脚本主要是针对模块，生成对应的模块图。
+# 此脚本主要是针对模块，生成对应的模块图。
 # 语句最后可以加入“\”来让多行表示一行的内容。
 
-UMLComponent --name="Android Proxy"
-UMLComponent --name="Android ipc"
-UMLComponent --name="Android storage"
-UMLComponent --name="Android rpmb"
-UMLComponent --name="REE storage API"
+# Android部分的模块图
+
+UMLComponent --name="Android Proxy"  --color=Yellow
+UMLComponent --name="Android ipc" --color=Yellow
+UMLComponent --name="Android storage" --color=Yellow
+UMLComponent --name="Android rpmb" --color=Yellow
+UMLComponent --name="REE storage API" --color=Yellow
 
 UMLComponent --name="proxy"
 UMLComponent --name="tipc_ns"

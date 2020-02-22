@@ -1,0 +1,72 @@
+# 此脚本主要是针对模块，生成对应的模块图。
+# 语句最后可以加入“\”来让多行表示一行的内容。
+
+# TEE的security-storage的component diagram
+
+# main component
+UMLComponent --name="main" --color=Red
+UMLComponent --name="proxy" --color=Red
+UMLComponent --name="block_device_tipc" --color=Red
+UMLComponent --name="client_tipc" --color=Red
+UMLComponent --name="file" --color=Red
+UMLComponent --name="block_cache" --color=Red
+
+UMLComponent --name="tipc_ns"
+UMLComponent --name="rpmb"
+UMLComponent --name="transaction"
+UMLComponent --name="block_allocator"
+UMLComponent --name="block_map"
+
+# tools
+UMLComponent --name="ipc"
+UMLComponent --name="block_mac"
+UMLComponent --name="crypt"
+
+# file system
+UMLComponent --name="super"
+UMLComponent --name="block_tree"
+UMLComponent --name="block_set"
+
+# REE
+UMLComponent --name="Android proxy" --color=Yellow
+UMLComponent --name="REE storage API" --color=Yellow
+
+#######################################
+# relation : main
+add_relation --type=Use --from="main" --to="proxy"
+add_relation --type=Use --from="proxy" --to="block_device_tipc"
+add_relation --type=Use --from="block_device_tipc" --to="client_tipc"
+add_relation --type=Use --from="client_tipc" --to="file"
+add_relation --type=Use --from="file" --to="block_cache"
+
+add_relation --type=Use --from="block_device_tipc" --to="tipc_ns"
+add_relation --type=Use --from="block_device_tipc" --to="rpmb"
+add_relation --type=Use --from="client_tipc" --to="transaction"
+add_relation --type=Use --from="file" --to="transaction"
+add_relation --type=Use --from="file" --to="block_allocator"
+add_relation --type=Use --from="file" --to="block_map"
+add_relation --type=Use --from="block_cache" --to="block_device_tipc"
+
+# relation -> tools
+add_relation --type=Use --from="main" --to="ipc"
+add_relation --type=Use --from="proxy" --to="ipc"
+add_relation --type=Use --from="tipc_ns" --to="ipc"
+
+add_relation --type=Use --from="file" --to="block_mac"
+add_relation --type=Use --from="block_mac" --to="crypt"
+add_relation --type=Use --from="block_cache" --to="crypt"
+
+# relation -> file_system
+add_relation --type=Use --from="super" --to="block_tree"
+add_relation --type=Use --from="super" --to="block_set"
+add_relation --type=Use --from="block_set" --to="block_tree"
+add_relation --type=Use --from="block_device_tipc" --to="super"
+add_relation --type=Use --from="block_allocator" --to="super"
+#add_relation --type=Use --from="block_map" --to="file_system"
+
+# relation: REE
+add_relation --title="send msg" --type=Use --from="REE storage API" --to="client_tipc"
+add_relation --type=Use --from="proxy" --to="Android proxy"
+add_relation --type=Use --from="tipc_ns" --to="Android proxy"
+
+show

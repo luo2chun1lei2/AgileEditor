@@ -33,6 +33,7 @@ class Utils(object):
         return tempfile.mkdtemp()
     
 def util_trip_quoted_name(str_name):
+    #删除一个字符串前后的双引号。
     start = 0
     end = len(str_name)+1
     

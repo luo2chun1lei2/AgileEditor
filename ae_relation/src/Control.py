@@ -63,21 +63,15 @@ class Control(object):
             self._show()
 
         elif argv[0] == "UMLClass":
-            # ex: UMLClass --name=ServiceProviderBridge --title=ServiceProviderBridge
+            # ex: UMLClass --name=ServiceProviderBridge --title=ServiceProviderBridge --color=Yellow
             # 如果title是空的，那么title就是name。
-            opts, args = self._parse_one_action(argv[1:], "", ["name=", "title="])
+            opts, args = self._parse_one_action(argv[1:], "", ["name=", "title=", "color="])
             if not opts is None:
                 self._create_uml_class(opts, args)
-                
-#         elif argv[0] == "UMLClassRelation":
-#             # ex: UMLClassRelation --name=backing_dir
-#             opts, args = self._parse_one_action(argv[1:], "", ["name="])
-#             if not opts is None:
-#                 self._create_uml_class_relation(opts, args)
             
         elif argv[0] == "UMLComponent":
-            # ex: UMLComponent --name="Android Proxy"
-            opts, args = self._parse_one_action(argv[1:], "", ["name="])
+            # ex: UMLComponent --name="Android Proxy" --color=Yellow
+            opts, args = self._parse_one_action(argv[1:], "", ["name=", "title=", "color="])
             if not opts is None:
                 self._create_uml_component(opts, args)
                 
@@ -87,13 +81,6 @@ class Control(object):
                             ["target=", "name=", "type="])
             if not opts is None:
                 self._uml_class_add_field(opts, args)
-            
-#         elif argv[0] == "set_relation":
-#             # ex: set_relation --target=abc --name=Composition --from=e1 --to=e3
-#             opts, args = self._parse_one_action(argv[1:], "",
-#                             ["target=", "name=", "from=", "to="])
-#             if not opts is None:
-#                 self._uml_class_relation_set_relation(opts, args)
                 
         elif argv[0] == "add_relation":
             # ex: add_relation --title="get/send msg" --type=Composition \
@@ -137,21 +124,46 @@ class Control(object):
     def _create_uml_class(self, opts, args):
         opt_name = None
         opt_title = None
+        opt_color = None
         for o, a in opts:
             if o in ('--name'):
                 opt_name = a
             elif o in ('--title'):
                 opt_title = a
+            elif o in ('--color'):
+                opt_color = a
             else:
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
-        e = UMLClass(opt_name, opt_title)
+        e = UMLClass(opt_name, opt_title, opt_color)
         if self.model.add_element(opt_name, e):
             return Return.ERROR
         else:
             return Return.OK
     
+    def _create_uml_component(self, opts, args):
+        opt_name = None
+        opt_title = None
+        opt_color = None
+        for o, a in opts:
+            if o in ('--name'):
+                opt_name = a
+            elif o in ('--title'):
+                opt_title = a
+            elif o in ('--color'):
+                opt_color = a
+            else:
+                print 'Find unknown option:%s' % (o)
+                return Return.ERROR
+    
+        e = UMLComponent(opt_name, opt_title, opt_color)
+        if self.model.add_element(opt_name, e):
+            return Return.ERROR
+        else:
+            return Return.OK
+    
+    # TODO: useless, can remove
     def _create_uml_class_relation(self, opts, args):
         opt_name = None
         for o, a in opts:
@@ -166,21 +178,6 @@ class Control(object):
             return Return.OK
         else:
             return Return.ERROR
-    
-    def _create_uml_component(self, opts, args):
-        opt_name = None
-        for o, a in opts:
-            if o in ('--name'):
-                opt_name = a
-            else:
-                print 'Find unknown option:%s' % (o)
-                return Return.ERROR
-    
-        e = UMLComponent(opt_name)
-        if self.model.add_element(opt_name, e):
-            return Return.ERROR
-        else:
-            return Return.OK
     
     def _uml_class_add_field(self, opts, args):
         opt_name = None
