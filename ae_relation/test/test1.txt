@@ -22,13 +22,10 @@ UMLClass --name=ServiceProvider
 UMLClass --name=zx::channel
 UMLClass --name=ServiceProviderPtr
     
-UMLClassRelation --name=backing_dir
-set_relation --target=backing_dir --name=Composition --from=ServiceProviderBridge --to=zx::channel
+add_relation --title=backing_dir --type=Composition --from=ServiceProviderBridge --to=zx::channel
 
-UMLClassRelation --name=backend
-set_relation --target=backend --name=Composition --from=ServiceProviderBridge --to=ServiceProviderPtr
+add_relation --title=backend --type=Composition --from=ServiceProviderBridge --to=ServiceProviderPtr
 
-UMLClassRelation --name=None
-set_relation --target=None --name=Extension --from=ServiceProviderBridge --to=ServiceProvider
+add_relation --type=Extension --from=ServiceProviderBridge --to=ServiceProvider
 
 show

@@ -18,9 +18,13 @@ class UMLComponent(AElement):
 
 class UMLClass(AElement):
     # UML's class
-    def __init__(self, name):
+    def __init__(self, name, title):
         super(UMLClass, self).__init__("Class", name)
         self.fields = []
+        if title:
+            self.title = title
+        else:
+            self.title = name
 
     def add_field(self, field_name, field_type):
         self.fields.append((field_name, field_type))
@@ -32,19 +36,21 @@ class UMLClassRelation(ARelation):
     def __init__(self, name):
         super(UMLClassRelation, self).__init__("ClassRelation", name)
 
-    def set_relation(self, relation_type, from_element, to_element):    # TODO 此处参数是否应该不定个数?
+    def set_relation(self, relation_type, title, from_element, to_element):    # TODO 此处参数是否应该不定个数?
         # @param from_element:AElement:
+        # @param title: string:
         # @param to_element:AElement:
         # @param relation_type:string: Extension/Composition/Aggregation
         self.from_element = from_element
         self.to_element = to_element
         self.relation_type = relation_type
+        self.title = title
     
     def get_relation(self):
         # relation_type: string
         # from_element: AElement
         # to_element: AElement
-        return self.relation_type, self.from_element, self.to_element 
+        return self.relation_type, self.title, self.from_element, self.to_element 
         
 class UMLComponentRelation(ARelation):
     # 组件之间的关系
@@ -53,6 +59,7 @@ class UMLComponentRelation(ARelation):
 
     def set_relation(self, relation_type, title, from_element, to_element):
         # @param from_element:AElement:
+        # @param title: string
         # @param to_element:AElement:
         # @param relation_type:string: Use
         self.from_element = from_element
@@ -89,16 +96,21 @@ class TravelElements(object):
         # TODO: 下面的方法是否应该挪入到各个 element 中实现？但是这个和具体的view相关。
         for e in elements:
             if isinstance(e, UMLClassRelation):
-                type_element, from_element, to_element = e.get_relation()
+                type_element, title, from_element, to_element = e.get_relation()
                 if type_element == 'Extension': # TODO: 继承不需要额外的名字。
-                    self._write("%s --|> %s : %s" % (from_element.name, to_element.name, e.name))
+                    text = "%s --|> %s" % (from_element.name, to_element.name)
                 elif type_element == 'Composition':
-                    self._write("%s *-- %s : %s" % (from_element.name, to_element.name, e.name))
+                    text = "%s *-- %s" % (from_element.name, to_element.name)
                 elif type_element == 'Aggregation':
-                    self._write("%s o-- %s : %s" % (from_element.name, to_element.name, e.name))
+                    text = "%s o-- %s" % (from_element.name, to_element.name)
                 else:
                     print "Don't recognize this type_element \"%s\" of class relation" % type_element
                     return False
+                
+                if e.title:
+                    text += ": %s" % (e.title)
+                
+                self._write(text)
             
             if isinstance(e, UMLComponentRelation):
                 type_element, title, from_element, to_element = e.get_relation()
@@ -114,7 +126,7 @@ class TravelElements(object):
                 self._write(text)
             
             elif isinstance(e, UMLClass):
-                self._write("class %s {" % e.name)
+                self._write("class %s {" % e.title)
                 for field_name, field_type in e.fields:
                     self._write("%s : %s" % (field_name, field_type))
                 self._write("}")

@@ -7,6 +7,7 @@
 from Model import *
 from Return import *
 from misc.Utils import *
+from asn1crypto.core import InstanceOf
 
 def program_usage():
     # 和 PROGRAM_CMD 一致
@@ -62,16 +63,17 @@ class Control(object):
             self._show()
 
         elif argv[0] == "UMLClass":
-            # ex: UMLClass --name=ServiceProviderBridge
-            opts, args = self._parse_one_action(argv[1:], "", ["name="])
+            # ex: UMLClass --name=ServiceProviderBridge --title=ServiceProviderBridge
+            # 如果title是空的，那么title就是name。
+            opts, args = self._parse_one_action(argv[1:], "", ["name=", "title="])
             if not opts is None:
                 self._create_uml_class(opts, args)
                 
-        elif argv[0] == "UMLClassRelation":
-            # ex: UMLClassRelation --name=backing_dir
-            opts, args = self._parse_one_action(argv[1:], "", ["name="])
-            if not opts is None:
-                self._create_uml_class_relation(opts, args)
+#         elif argv[0] == "UMLClassRelation":
+#             # ex: UMLClassRelation --name=backing_dir
+#             opts, args = self._parse_one_action(argv[1:], "", ["name="])
+#             if not opts is None:
+#                 self._create_uml_class_relation(opts, args)
             
         elif argv[0] == "UMLComponent":
             # ex: UMLComponent --name="Android Proxy"
@@ -86,12 +88,12 @@ class Control(object):
             if not opts is None:
                 self._uml_class_add_field(opts, args)
             
-        elif argv[0] == "set_relation":
-            # ex: set_relation --target=abc --name=Composition --from=e1 --to=e3
-            opts, args = self._parse_one_action(argv[1:], "",
-                            ["target=", "name=", "from=", "to="])
-            if not opts is None:
-                self._uml_class_relation_set_relation(opts, args)
+#         elif argv[0] == "set_relation":
+#             # ex: set_relation --target=abc --name=Composition --from=e1 --to=e3
+#             opts, args = self._parse_one_action(argv[1:], "",
+#                             ["target=", "name=", "from=", "to="])
+#             if not opts is None:
+#                 self._uml_class_relation_set_relation(opts, args)
                 
         elif argv[0] == "add_relation":
             # ex: add_relation --title="get/send msg" --type=Composition \
@@ -134,14 +136,17 @@ class Control(object):
     
     def _create_uml_class(self, opts, args):
         opt_name = None
+        opt_title = None
         for o, a in opts:
             if o in ('--name'):
                 opt_name = a
+            elif o in ('--title'):
+                opt_title = a
             else:
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
-        e = UMLClass(opt_name)
+        e = UMLClass(opt_name, opt_title)
         if self.model.add_element(opt_name, e):
             return Return.ERROR
         else:
@@ -239,15 +244,23 @@ class Control(object):
             else:
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
-    
-        name = AGlobalName.get_unique_name("ComponentRelation")
+            
+        from_e = self.model.find_element(opt_from)
+        to_e = self.model.find_element(opt_to)
         
-        r = UMLComponentRelation(name)
+        if from_e is None or to_e is None:
+            return False
+    
+        if isinstance(from_e, UMLClass):
+            name = AGlobalName.get_unique_name("ClassRelation")
+            r = UMLClassRelation(name)
+        elif isinstance(from_e, UMLComponent):
+            name = AGlobalName.get_unique_name("ComponentRelation")
+            r = UMLComponentRelation(name)
+        
         if self.model.add_element(name, r):
             return Return.ERROR
         
-        from_e = self.model.find_element(opt_from)
-        to_e = self.model.find_element(opt_to)
         r.set_relation(opt_type, opt_title, from_e, to_e)
 
         return Return.OK
