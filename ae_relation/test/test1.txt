@@ -4,6 +4,15 @@
 # 总体格式是下面，方便用 getopt 来实现。
 # 动作 参数
 #   参数可以是 --xxx[=???] -x[=?]
+# 
+# name : 是唯一的标志符号，不能有重复。
+#        如果用引号，那么文字中可以添加空格，但是名字也包括了双引号。
+#        如果没有设置，就生成随机的名字，但是必须是唯一的。
+#        其他命令可以用 name 来确定这个对象，如果没有设置，则无法引用。
+# [注意]class或者package，名字是不能重复的，包括标题，但是对于relation来说，在两个对象不同的情况下，
+#      标题是可以相同的。这就是两个之间的区别。
+# title: 显示的信息，可以重复。如果没有设置，就不显示。
+# target/from/to 都是引用 name 的标志。
 
 UMLClass --name=ServiceProviderBridge
 add_field --target=ServiceProviderBridge --name=backing_dir --type=zx:channel

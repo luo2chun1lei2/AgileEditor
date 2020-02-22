@@ -60,7 +60,7 @@ class Control(object):
             self._help()
         elif argv[0] == "show":
             self._show()
-            
+
         elif argv[0] == "UMLClass":
             # ex: UMLClass --name=ServiceProviderBridge
             opts, args = self._parse_one_action(argv[1:], "", ["name="])
@@ -73,6 +73,12 @@ class Control(object):
             if not opts is None:
                 self._create_uml_class_relation(opts, args)
             
+        elif argv[0] == "UMLComponent":
+            # ex: UMLComponent --name="Android Proxy"
+            opts, args = self._parse_one_action(argv[1:], "", ["name="])
+            if not opts is None:
+                self._create_uml_component(opts, args)
+                
         elif argv[0] == "add_field":
             # ex: add_field --target=abc --name=backing_dir --type=zx:channel
             opts, args = self._parse_one_action(argv[1:], "",
@@ -86,6 +92,14 @@ class Control(object):
                             ["target=", "name=", "from=", "to="])
             if not opts is None:
                 self._uml_class_relation_set_relation(opts, args)
+                
+        elif argv[0] == "add_relation":
+            # ex: add_relation --title="get/send msg" --type=Composition \
+            #        --from="Android Proxy" --to="Android ipc"
+            opts, args = self._parse_one_action(argv[1:], "",
+                            ["title=", "type=", "from=", "to="])
+            if not opts is None:
+                self._uml_add_relation(opts, args)
                 
         
         else: 
@@ -148,6 +162,21 @@ class Control(object):
         else:
             return Return.ERROR
     
+    def _create_uml_component(self, opts, args):
+        opt_name = None
+        for o, a in opts:
+            if o in ('--name'):
+                opt_name = a
+            else:
+                print 'Find unknown option:%s' % (o)
+                return Return.ERROR
+    
+        e = UMLComponent(opt_name)
+        if self.model.add_element(opt_name, e):
+            return Return.ERROR
+        else:
+            return Return.OK
+    
     def _uml_class_add_field(self, opts, args):
         opt_name = None
         opt_target = None
@@ -190,6 +219,36 @@ class Control(object):
         from_e = self.model.find_element(opt_from)
         to_e = self.model.find_element(opt_to)
         e = e.set_relation(opt_name, from_e, to_e)
+
+        return Return.OK
+    
+    def _uml_add_relation(self, opts, args):
+        opt_title = None
+        opt_type = None
+        opt_from = None
+        opt_to = None
+        for o, a in opts:
+            if o in ('--title'):
+                opt_title = a
+            elif o in ('--type'):
+                opt_type = a
+            elif o in ('--from'):
+                opt_from = a
+            elif o in ('--to'):
+                opt_to = a
+            else:
+                print 'Find unknown option:%s' % (o)
+                return Return.ERROR
+    
+        name = AGlobalName.get_unique_name("ComponentRelation")
+        
+        r = UMLComponentRelation(name)
+        if self.model.add_element(name, r):
+            return Return.ERROR
+        
+        from_e = self.model.find_element(opt_from)
+        to_e = self.model.find_element(opt_to)
+        r.set_relation(opt_type, opt_title, from_e, to_e)
 
         return Return.OK
     

@@ -1,7 +1,42 @@
 #此脚本主要是针对模块，生成对应的模块图。
-#
+# 语句最后可以加入“\”来让多行表示一行的内容。
 
-UMLClass --name="Android Proxy"
-add_field --target="Android Proxy" --name="a b c" --type="zx:channel"
+UMLComponent --name="Android Proxy"
+UMLComponent --name="Android ipc"
+UMLComponent --name="Android storage"
+UMLComponent --name="Android rpmb"
+UMLComponent --name="REE storage API"
+
+UMLComponent --name="proxy"
+UMLComponent --name="tipc_ns"
+UMLComponent --name="client_tipc"
+
+add_relation --title="get/send msg" \
+    --type=Use \
+    --from="Android Proxy" --to="Android ipc"
+
+add_relation  \
+    --type=Use \
+    --from="Android Proxy" --to="Android storage"
+
+add_relation \
+    --type=Use \
+    --from="Android Proxy" --to="Android rpmb"
+
+add_relation --title="connect" \
+    --type=Use \
+    --from="Android ipc" --to="proxy"
+    
+add_relation --title="send event" \
+    --type=Use \
+    --from="tipc_ns" --to="Android ipc"
+
+add_relation --title="After process, request it to send msg." \
+    --type=Use \
+    --from="client_tipc" --to="tipc_ns"
+
+add_relation --title="send msg." \
+    --type=Use \
+    --from="REE storage API" --to="client_tipc"
 
 show

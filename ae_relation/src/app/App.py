@@ -111,11 +111,24 @@ class App():
             logging.debug('Open script %s, and execute it.' % script_path)
             f = open(script_path)
             
+            # 读取文件中的每一行处理，如果行末有“\"，那么就将此行之下合并为此行。
+            cmd = ""
+            line_no = 0
             for l in f:
-                logging.debug('Execute a line: %s.' % l)
-                rtn = self.parser.do(l.strip())
+                line_no += 1
+                ll = l.replace('\n', '').strip()
+                if len(ll) > 0 and ll[-1] == '\\':
+                    cmd += ll[:-1]
+                    continue
+                else:
+                    cmd += ll
+                    
+                logging.debug('Execute line[%d]: %s' % (line_no, cmd))
+                rtn = self.parser.do(cmd)
                 if rtn != Return.OK:
                     break
+                
+                cmd = ""
                     
         except Exception, ex:
             print ex.message

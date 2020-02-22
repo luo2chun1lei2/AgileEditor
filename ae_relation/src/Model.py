@@ -7,6 +7,15 @@ from PlantUML import *
 from misc.Utils import *
 from Storage import *
 
+class UMLComponent(AElement):
+    # UML's component
+    def __init__(self, name):
+        super(UMLComponent, self).__init__("Component", name)
+        self.fields = []
+
+    #def add_field(self, field_name, field_type):
+    #    self.fields.append((field_name, field_type))
+
 class UMLClass(AElement):
     # UML's class
     def __init__(self, name):
@@ -16,6 +25,8 @@ class UMLClass(AElement):
     def add_field(self, field_name, field_type):
         self.fields.append((field_name, field_type))
 
+# TODO: relation 是否应该区分 class 还是 component，虽然有不同的type，但是实现方面是没有什么区别的
+# 是有不同的。
 class UMLClassRelation(ARelation):
     # 类和类之间的关系
     def __init__(self, name):
@@ -34,6 +45,27 @@ class UMLClassRelation(ARelation):
         # from_element: AElement
         # to_element: AElement
         return self.relation_type, self.from_element, self.to_element 
+        
+class UMLComponentRelation(ARelation):
+    # 组件之间的关系
+    def __init__(self, name):
+        super(UMLComponentRelation, self).__init__("ComponentRelation", name)
+
+    def set_relation(self, relation_type, title, from_element, to_element):
+        # @param from_element:AElement:
+        # @param to_element:AElement:
+        # @param relation_type:string: Use
+        self.from_element = from_element
+        self.to_element = to_element
+        self.relation_type = relation_type
+        self.title = title
+    
+    def get_relation(self):
+        # relation_type: string
+        # title: string
+        # from_element: AElement
+        # to_element: AElement
+        return self.relation_type, self.title, self.from_element, self.to_element 
         
 class TravelElements(object):
     # Travel Elements to create some thing
@@ -54,6 +86,7 @@ class TravelElements(object):
         # @param elements: AElement[]: set of all needed elements.
         # @return bool: True is ok, False is failed.
         
+        # TODO: 下面的方法是否应该挪入到各个 element 中实现？但是这个和具体的view相关。
         for e in elements:
             if isinstance(e, UMLClassRelation):
                 type_element, from_element, to_element = e.get_relation()
@@ -66,8 +99,28 @@ class TravelElements(object):
                 else:
                     print "Don't recognize this type_element \"%s\" of class relation" % type_element
                     return False
+            
+            if isinstance(e, UMLComponentRelation):
+                type_element, title, from_element, to_element = e.get_relation()
+                text = ""
+                if type_element == 'Use':
+                    text = "%s --> %s" % (from_element.name, to_element.name)
+                else:
+                    print "Don't recognize this type_element \"%s\" of class relation" % type_element
+                    return False
+                
+                if title:
+                    text += " : %s" % (title)
+                self._write(text)
+            
             elif isinstance(e, UMLClass):
                 self._write("class %s {" % e.name)
+                for field_name, field_type in e.fields:
+                    self._write("%s : %s" % (field_name, field_type))
+                self._write("}")
+                
+            elif isinstance(e, UMLComponent):
+                self._write("component %s {" % e.name)
                 for field_name, field_type in e.fields:
                     self._write("%s : %s" % (field_name, field_type))
                 self._write("}")
@@ -103,6 +156,9 @@ class Model(object):
         
     def find_element(self, e_id):
         # e_id: string: element's id
+        if not e_id in self.elements:
+            print "Cannot find \"%s\"" % e_id
+            return None
         return self.elements[e_id]
     
     # TODO: 此方法作废，之后删除

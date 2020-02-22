@@ -32,6 +32,14 @@ class AGlobalName(object):
         return True
     
     @staticmethod
+    def get_unique_name(category):
+        # 得到一个category的随机名字。
+        while True:
+            name = os.tmpnam()
+            if AGlobalName.check_name(category, name):
+                return name
+    
+    @staticmethod
     def register(category, name):
         # @param name : string : 需要注册的名字
         # @return False:有重复的名字，True:注册成功。
