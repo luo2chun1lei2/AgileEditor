@@ -183,7 +183,7 @@ class ShowSequence(TravelElements):
         # @param elements: AElement[]: set of all needed elements.
         # @return bool: True is ok, False is failed.
         
-        pre_texts = []
+        pre_texts = {}
         post_texts = {}
         
         for e in elements:
@@ -194,7 +194,7 @@ class ShowSequence(TravelElements):
                 if e.color:
                     text += " #%s" % e.color
 
-                pre_texts.append(text)
+                pre_texts[e.no] = text
                 
             elif isinstance(e, UMLClassRelation) or isinstance(e, UMLComponentRelation):
                 # ex: Alice->Bob: Authentication Request
@@ -209,8 +209,8 @@ class ShowSequence(TravelElements):
                     text += ": %s" % (e.title)
                 post_texts[e.no] = text
                 
-        for l in pre_texts:
-            self._write(l)
+        for l in sorted(pre_texts):
+            self._write(pre_texts[l])
         
         for l in sorted(post_texts):
             self._write(post_texts[l])

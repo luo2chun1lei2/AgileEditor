@@ -12,12 +12,25 @@
 # block_cache_queue_read(这里计算了entry涉及的mac值) &entry->mac和mac校验 & block_cache_entry_decrypt (重点) ：
 
 UMLComponent --name=client_tipc
-
 UMLComponent --name=file
+UMLComponent --name=block_cache
 
 #需要有先后顺序的。
+# TODO: 实际上应该描述的是 函数与函数 之间的关系，而不是 模块和模块之间的关系。
+
+add_relation --title=client_handle_msg --type=Use --from=client_tipc --to=client_tipc
+# client_handle_msg 里面调用 storage_file_read
 add_relation --title=storage_file_read --type=Use --from=client_tipc --to=client_tipc
 add_relation --title=file_get_block --type=Use --from=client_tipc --to=file
 add_relation --title=file_get_block_etc --type=Use --from=file --to=file
+
+add_relation --title=block_get --type=Use --from=file --to=block_cache
+add_relation --title=block_get_no_tr_fail --type=Use --from=block_cache --to=block_cache
+add_relation --title=block_cache_get_data --type=Use --from=block_cache --to=block_cache
+add_relation --title=block_cache_get --type=Use --from=block_cache --to=block_cache
+add_relation --title=block_cache_load_entry --type=Use --from=block_cache --to=block_cache
+# block_cache_load_entry 调用了下面两个函数
+add_relation --title=block_cache_queue_read --type=Use --from=block_cache --to=block_cache
+add_relation --title=block_cache_entry_decrypt --type=Use --from=block_cache --to=block_cache
 
 show seq
