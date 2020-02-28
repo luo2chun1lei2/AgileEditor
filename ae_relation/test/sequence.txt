@@ -1,0 +1,23 @@
+# 本脚本主要描述运行关系：活动图。
+# 1. 活动图不是函数调动关系，而是处理的步骤。函数调用是一个有向网络。
+# 2. 但是可以用“泳道”(swimlane)来区分调用的模块。
+# 3. 用“时序图”可以显示出复杂的函数调用，不过需要加入模块。
+
+# storage_file_read 计算块号和位置后-》
+# file_get_block -> 
+# file_get_block_etc (读写一体的函数，计算了block_map) -> 
+# block_get -> block_get_no_tr_fail -> 
+# block_cache_get_data -> block_cache_get -> 
+# block_cache_load_entry -> 
+# block_cache_queue_read(这里计算了entry涉及的mac值) &entry->mac和mac校验 & block_cache_entry_decrypt (重点) ：
+
+UMLComponent --name=client_tipc
+
+UMLComponent --name=file
+
+#需要有先后顺序的。
+add_relation --title=storage_file_read --type=Use --from=client_tipc --to=client_tipc
+add_relation --title=file_get_block --type=Use --from=client_tipc --to=file
+add_relation --title=file_get_block_etc --type=Use --from=file --to=file
+
+show seq

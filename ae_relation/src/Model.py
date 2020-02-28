@@ -9,8 +9,8 @@ from Storage import *
 
 class UMLComponent(AElement):
     # UML's component
-    def __init__(self, name, title, color=None):
-        super(UMLComponent, self).__init__("Component", name)
+    def __init__(self, name, no, title, color=None):
+        super(UMLComponent, self).__init__("Component", name, no)
         self.fields = []
         self.color = color
         if title:
@@ -18,13 +18,13 @@ class UMLComponent(AElement):
         else:
             self.title = name
 
-    #def add_field(self, field_name, field_type):
-    #    self.fields.append((field_name, field_type))
+    def add_field(self, field_name, field_type):
+        self.fields.append((field_name, field_type))
 
 class UMLClass(AElement):
     # UML's class
-    def __init__(self, name, title, color=None):
-        super(UMLClass, self).__init__("Class", name)
+    def __init__(self, name, no, title, color=None):
+        super(UMLClass, self).__init__("Class", name, no)
         self.fields = []
         self.color = color
         if title:
@@ -39,8 +39,8 @@ class UMLClass(AElement):
 # 是有不同的。
 class UMLClassRelation(ARelation):
     # 类和类之间的关系
-    def __init__(self, name):
-        super(UMLClassRelation, self).__init__("ClassRelation", name)
+    def __init__(self, name, no):
+        super(UMLClassRelation, self).__init__("ClassRelation", name, no)
 
     def set_relation(self, relation_type, title, from_element, to_element):    # TODO 此处参数是否应该不定个数?
         # @param from_element:AElement:
@@ -60,8 +60,8 @@ class UMLClassRelation(ARelation):
         
 class UMLComponentRelation(ARelation):
     # 组件之间的关系
-    def __init__(self, name):
-        super(UMLComponentRelation, self).__init__("ComponentRelation", name)
+    def __init__(self, name, no):
+        super(UMLComponentRelation, self).__init__("ComponentRelation", name, no)
 
     def set_relation(self, relation_type, title, from_element, to_element):
         # @param from_element:AElement:
@@ -82,9 +82,11 @@ class UMLComponentRelation(ARelation):
         
 class TravelElements(object):
     # Travel Elements to create some thing
-    # use planuml to create diagram
+    # use PlantUML to create class and component diagram
     
     def __init__(self):
+        super(TravelElements, self).__init__()
+        
         self.uml = PlantUML("plantuml/plantuml.jar")
         self.data_fd, self.data_path = Utils.create_tmpfile("txt")
         logging.debug("Create tmp file:%s" % self.data_path)
@@ -169,6 +171,53 @@ class TravelElements(object):
         # - remove all temporary files and directories.
         os.remove(self.data_path)
         shutil.rmtree(out_dir)
+
+class ShowSequence(TravelElements):
+    # Travel Elements to create SEQUENCE diagram.
+    # use PlantUML. 需要顺序。
+    
+    def __init__(self):
+        super(ShowSequence, self).__init__()
+    
+    def travel(self, elements):
+        # @param elements: AElement[]: set of all needed elements.
+        # @return bool: True is ok, False is failed.
+        
+        pre_texts = []
+        post_texts = {}
+        
+        for e in elements:
+            if isinstance(e, UMLClass) or isinstance(e, UMLComponent):
+                # ex: participant "I have a really\nlong name" as L #99FF99
+                text = "participant \"%s\" " % e.title
+                text += " as %s" % e.name
+                if e.color:
+                    text += " #%s" % e.color
+
+                pre_texts.append(text)
+                
+            elif isinstance(e, UMLClassRelation) or isinstance(e, UMLComponentRelation):
+                # ex: Alice->Bob: Authentication Request
+                type_element, title, from_element, to_element = e.get_relation()
+                if type_element == 'Use': # TODO: 继承不需要额外的名字。
+                    text = "%s -> %s : %s" % (from_element.name, to_element.name, title)
+                else:
+                    print "Don't recognize this type_element \"%s\" of relation." % type_element
+                    return False
+                
+                if e.title:
+                    text += ": %s" % (e.title)
+                post_texts[e.no] = text
+                
+        for l in pre_texts:
+            self._write(l)
+        
+        for l in sorted(post_texts):
+            self._write(post_texts[l])
+
+        self._write("hide footbox")
+        return True
+    
 
 class Model(object):
     def __init__(self):

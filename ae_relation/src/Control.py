@@ -41,11 +41,14 @@ class Control(object):
         # model: Model: control对应的模型
         super(Control, self).__init__()
         self.model = model
+        self.no = 0
     
     def do(self, str_action):
         # 执行action
         # str_action: Action: 做的动作，以字符串格式
         # return：bool：无法处理这个命令。
+        
+        self.no = self.no + 1
         
         if str_action.startswith("#"):
             logging.debug('One comment: %s.' % str_action)
@@ -60,27 +63,36 @@ class Control(object):
         if argv[0] == "help":
             self._help()
         elif argv[0] == "show":
-            self._show()
+            # ex: show sequence/class/component
+            # Default is class. class = component. only one.
+            
+            opts, args = self._parse_one_action(argv[1:], "", [""])
+            if args is None or len(args) == 0:
+                diagram = "class"
+            else:
+                diagram = args[len(args) - 1]
+                
+            self._show(diagram)
 
         elif argv[0] == "UMLClass":
             # ex: UMLClass --name=ServiceProviderBridge --title=ServiceProviderBridge --color=Yellow
             # 如果title是空的，那么title就是name。
             opts, args = self._parse_one_action(argv[1:], "", ["name=", "title=", "color="])
             if not opts is None:
-                self._create_uml_class(opts, args)
+                self._create_uml_class(self.no, opts, args)
             
         elif argv[0] == "UMLComponent":
             # ex: UMLComponent --name="Android Proxy" --color=Yellow
             opts, args = self._parse_one_action(argv[1:], "", ["name=", "title=", "color="])
             if not opts is None:
-                self._create_uml_component(opts, args)
+                self._create_uml_component(self.no, opts, args)
                 
         elif argv[0] == "add_field":
             # ex: add_field --target=abc --name=backing_dir --type=zx:channel
             opts, args = self._parse_one_action(argv[1:], "",
                             ["target=", "name=", "type="])
             if not opts is None:
-                self._uml_class_add_field(opts, args)
+                self._uml_class_add_field(self.no, opts, args)
                 
         elif argv[0] == "add_relation":
             # ex: add_relation --title="get/send msg" --type=Composition \
@@ -88,7 +100,7 @@ class Control(object):
             opts, args = self._parse_one_action(argv[1:], "",
                             ["title=", "type=", "from=", "to="])
             if not opts is None:
-                self._uml_add_relation(opts, args)
+                self._uml_add_relation(self.no, opts, args)
                 
         
         else: 
@@ -114,14 +126,20 @@ class Control(object):
         
         return (opts, args)
     
-    def _show(self):
+    def _show(self, diagram_type=None):
         logging.debug("show diagram of model.")
         
-        travel = TravelElements()
+        if diagram_type in ( "class", "component"): 
+            travel = TravelElements()
+        elif diagram_type in ("sequence", "seq"):
+            travel = ShowSequence()
+        else:
+            travel = TravelElements()
+
         travel.travel(self.model.elements.values())
         travel.finish()
     
-    def _create_uml_class(self, opts, args):
+    def _create_uml_class(self, no, opts, args):
         opt_name = None
         opt_title = None
         opt_color = None
@@ -136,13 +154,13 @@ class Control(object):
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
-        e = UMLClass(opt_name, opt_title, opt_color)
+        e = UMLClass(opt_name, no, opt_title, opt_color)
         if self.model.add_element(opt_name, e):
             return Return.ERROR
         else:
             return Return.OK
     
-    def _create_uml_component(self, opts, args):
+    def _create_uml_component(self, no, opts, args):
         opt_name = None
         opt_title = None
         opt_color = None
@@ -157,14 +175,14 @@ class Control(object):
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
-        e = UMLComponent(opt_name, opt_title, opt_color)
+        e = UMLComponent(opt_name, no, opt_title, opt_color)
         if self.model.add_element(opt_name, e):
             return Return.ERROR
         else:
             return Return.OK
     
     # TODO: useless, can remove
-    def _create_uml_class_relation(self, opts, args):
+    def _create_uml_class_relation(self, no, opts, args):
         opt_name = None
         for o, a in opts:
             if o in ('--name'):
@@ -173,13 +191,13 @@ class Control(object):
                 print 'Find unknown option:%s' % (o)
                 return Return.ERROR
     
-        e = UMLClassRelation(opt_name)
+        e = UMLClassRelation(opt_name, no)
         if self.model.add_element(opt_name, e):
             return Return.OK
         else:
             return Return.ERROR
     
-    def _uml_class_add_field(self, opts, args):
+    def _uml_class_add_field(self, no, opts, args):
         opt_name = None
         opt_target = None
         opt_type = None
@@ -199,7 +217,7 @@ class Control(object):
 
         return Return.OK
     
-    def _uml_class_relation_set_relation(self, opts, args):
+    def _uml_class_relation_set_relation(self, no, opts, args):
         opt_name = None
         opt_target = None
         opt_from = None
@@ -224,7 +242,7 @@ class Control(object):
 
         return Return.OK
     
-    def _uml_add_relation(self, opts, args):
+    def _uml_add_relation(self, no, opts, args):
         opt_title = None
         opt_type = None
         opt_from = None
@@ -250,10 +268,10 @@ class Control(object):
     
         if isinstance(from_e, UMLClass):
             name = AGlobalName.get_unique_name("ClassRelation")
-            r = UMLClassRelation(name)
+            r = UMLClassRelation(name, no)
         elif isinstance(from_e, UMLComponent):
             name = AGlobalName.get_unique_name("ComponentRelation")
-            r = UMLComponentRelation(name)
+            r = UMLComponentRelation(name, no)
         
         if self.model.add_element(name, r):
             return Return.ERROR

@@ -86,8 +86,9 @@ class EnableGlobalName(object):
 class AElement(EnableGlobalName):
     # 基本的元素，代表了此程序中所有的基本对象。
     # 因为Python中有Object类了，避免重名，所以这里名字是Element。
-    def __init__(self, category, name):
+    def __init__(self, category, name, no):
         super(AElement, self).__init__(category, name)
+        self.no = no
         self.relations = []
 
     # TODO: Element关于Relation的操作不对公开 ?
@@ -106,8 +107,8 @@ class AElement(EnableGlobalName):
 
 class ARelation(AElement):
     
-    def __init__(self, category, name):
-        super(ARelation, self).__init__(category, name)
+    def __init__(self, category, name, no):
+        super(ARelation, self).__init__(category, name, no)
         self.elements = []
         
     def attach_element(self, element):
