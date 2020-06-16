@@ -12,6 +12,7 @@ class UMLComponent(AElement):
     def __init__(self, name, no, title, color=None):
         super(UMLComponent, self).__init__("Component", name, no)
         self.fields = []
+        self.methods = []
         self.color = color
         if title:
             self.title = title
@@ -20,12 +21,22 @@ class UMLComponent(AElement):
 
     def add_field(self, field_name, field_type):
         self.fields.append((field_name, field_type))
+    
+    # TODO: should change to relation.
+    def add_method(self, method):
+        # method: UMLMethod
+        self.methods.append(method)
+        
+#     def get_method(self, method_name):
+#         if method_name in self.methods:
+#             return self.methods[method_name]
 
 class UMLClass(AElement):
     # UML's class
     def __init__(self, name, no, title, color=None):
         super(UMLClass, self).__init__("Class", name, no)
         self.fields = []
+        self.methods = {}
         self.color = color
         if title:
             self.title = title
@@ -34,6 +45,38 @@ class UMLClass(AElement):
 
     def add_field(self, field_name, field_type):
         self.fields.append((field_name, field_type))
+    
+    def add_method(self, method):
+        # method: UMLMethod
+        self.methods.append(method)
+    
+#     def get_method(self, method_name):
+#         if method_name in self.methods:
+#             return self.methods[method_name]
+
+class UMLMethod(AElement):
+    # UML's method
+    def __init__(self, name, no, title, parent, color=None):
+        # TODO:这里category，有可能重复，因为函数有可能在不同的类或者component中重名。
+        # parent: AELement: 是此方法所在的模块，如果是None，那么将是全局空间的。
+        super(UMLMethod, self).__init__(parent.name, name, no)
+        self.fields = []
+        self.returns = []
+        self.color = color
+        if title:
+            self.title = title
+        else:
+            self.title = name
+        
+        self.parent = parent
+
+    def add_argument(self, aug_name, arg_type):
+        # 添加参数。
+        self.fields.append((aug_name, arg_type))
+        
+    def add_return(self, arg_name, arg_type):
+        # 添加返回值，比如python，允许返回多个值
+        self.returns.append((arg_name, arg_type))
 
 # TODO: relation 是否应该区分 class 还是 component，虽然有不同的type，但是实现方面是没有什么区别的
 # 是有不同的。
@@ -78,7 +121,54 @@ class UMLComponentRelation(ARelation):
         # title: string
         # from_element: AElement
         # to_element: AElement
-        return self.relation_type, self.title, self.from_element, self.to_element 
+        return self.relation_type, self.title, self.from_element, self.to_element
+    
+class UMLElement2MethodRelation(ARelation):
+    # 其他元素和函数之间的关系。单向关系。
+    def __init__(self, name, no):
+        super(UMLElement2MethodRelation, self).__init__("Element2MethodRelation", name, no)
+
+    def set_relation(self, relation_type, title, from_element, to_element):
+        # @param relation_type: string: Have/  [一般函数和静态函数关系]
+        # @param title: string
+        # @param from_element:AElement:
+        # @param to_element:UMLMethod:
+        self.from_element = from_element
+        self.to_element = to_element
+        self.relation_type = relation_type
+        self.title = title
+    
+    def get_relation(self):
+        # relation_type: string
+        # title: string
+        # from_element: AElement
+        # to_element: AElement
+        return self.relation_type, self.title, self.from_element, self.to_element
+    
+class UMLMethodRelation(ARelation):
+    # 函数之间的关系，基本上就是调用。
+    def __init__(self, name, no):
+        super(UMLMethodRelation, self).__init__("MethodRelation", name, no)
+
+    def set_relation(self, relation_type, from_parent, from_element, to_parent, to_element):
+        # @param from_parent:AElement:
+        # @param from_method:AElement:
+        # @param to_parent:AElement:
+        # @param to_element:AElement:
+        # @param to_method:string: Invoke
+        
+        self.relation_type = relation_type
+        self.from_parent = from_parent
+        self.from_element = from_element
+        self.to_parent = to_parent
+        self.to_element = to_element
+    
+    def get_relation(self):
+        # relation_type: string
+        # from_element: AElement
+        # to_element: AElement
+        return self.relation_type, self.from_parent, self.from_element, \
+            self.to_parent, self.to_element 
         
 class TravelElements(object):
     # Travel Elements to create some thing
@@ -178,8 +268,65 @@ class ShowSequence(TravelElements):
     
     def __init__(self):
         super(ShowSequence, self).__init__()
+        
+    def travel_component(self, elements):
+        # participants: []: 所有的参与者
+        participants = []
+        seq = {}
+        for e in elements:
+            if isinstance(e, UMLClass) or isinstance(e, UMLComponent):
+                participants.append(e)
+                
+                text = "participant \"%s\" " % e.title
+                text += " as %s" % e.name
+                if e.color:
+                    text += " #%s" % e.color
+                
+                seq[e.no] = text
+        
+        for l in sorted(seq):
+            self._write(seq[l])
+        
+        return True
     
+    def travel_invoke(self, elements):
+        # invokes: []: 所有的调动关系
+        invokes = []
+        seq_info = {}
+        for e in elements:
+            if isinstance(e, UMLMethodRelation):
+                invokes.append(e)
+                
+                type_element, from_parent, from_element, to_parent, to_element = e.get_relation()
+                text = "%s -> %s : %s" % (from_parent.name, to_parent.name, to_element.name)
+                seq_info[e.no] = (to_parent, text)
+
+        
+        last_to = None
+        for l in sorted(seq_info):
+            to_parent, text = seq_info[l]
+            
+            if last_to is not to_parent:
+                if last_to is not None:
+                    self._write("deactivate %s" % last_to.name)
+                self._write("activate %s" % to_parent.name)
+                last_to = to_parent
+            
+            self._write(text)
+            
+        return True
+        
     def travel(self, elements):
+        # 先找到所有的invoke关系，然后按照顺序再找到相关的组件。
+        
+        self.travel_component(elements)
+        self.travel_invoke(elements)
+        
+        self._write("hide footbox")
+        return True
+        
+    # TODO :  不用了。
+    def travel1(self, elements):
         # @param elements: AElement[]: set of all needed elements.
         # @return bool: True is ok, False is failed.
         
@@ -204,6 +351,20 @@ class ShowSequence(TravelElements):
                 else:
                     print "Don't recognize this type_element \"%s\" of relation." % type_element
                     return False
+                 
+                if e.title:
+                    text += ": %s" % (e.title)
+                post_texts[e.no] = text
+                
+            elif isinstance(e, UMLElement2MethodRelation):
+                # 找到函数
+                # ex: Alice->Bob: Authentication Request
+                type_element, title, from_element, to_element = e.get_relation()
+                if type_element == 'Use': # TODO: 继承不需要额外的名字。
+                    text = "%s -> %s : %s" % (from_element.name, to_element.name, title)
+                else:
+                    print "Don't recognize this type_element \"%s\" of relation." % type_element
+                    return False
                 
                 if e.title:
                     text += ": %s" % (e.title)
@@ -220,6 +381,7 @@ class ShowSequence(TravelElements):
     
 
 class Model(object):
+    # TODO: id 是否都改成name？
     def __init__(self):
         super(Model, self).__init__()
         self.elements = {}
@@ -243,33 +405,5 @@ class Model(object):
     # TODO: 此方法作废，之后删除
     def test(self):
         test_db()
-    
-    # TODO: 此方法作废，之后删除。
-    def test2(self):
-        try:
-            # set elements.
-            e1 = UMLClass('ServiceProviderBridge')
-            e1.add_field("backing_dir", "zx:channel")
-            e1.add_field("backend", "ServiceProviderPtr")
-            e2 = UMLClass('ServiceProvider')
-            e3 = UMLClass('zx::channel')
-            e4 = UMLClass('ServiceProviderPtr')
-    
-            r1 = UMLClassRelation('backing_dir')
-            r1.set_relation('Composition', e1, e3)
-            r2 = UMLClassRelation('backend')
-            r2.set_relation('Composition', e1, e4)
-            r3 = UMLClassRelation('None')
-            r3.set_relation('Extension', e1, e2)
-            
-            elements = [e1, e2, e3, e4, r1, r2, r3]
-            
-            travel = TravelElements()
-            travel.travel(elements)
-            travel.finish()
-        except Exception, ex:
-            
-            print ex.message
-            traceback.print_exc()
-            
+
             

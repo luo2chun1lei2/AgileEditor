@@ -2,6 +2,7 @@
 # 1. 活动图不是函数调动关系，而是处理的步骤。函数调用是一个有向网络。
 # 2. 但是可以用“泳道”(swimlane)来区分调用的模块。
 # 3. 用“时序图”可以显示出复杂的函数调用，不过需要加入模块。
+# 4. TODO: 缺少函数是什么时候返回的，也就是调用是有“作用范围”的。
 
 # storage_file_read 计算块号和位置后-》
 # file_get_block -> 
@@ -12,25 +13,31 @@
 # block_cache_queue_read(这里计算了entry涉及的mac值) &entry->mac和mac校验 & block_cache_entry_decrypt (重点) ：
 
 UMLComponent --name=client_tipc
+add_method --target=client_tipc --name=client_handle_msg
+add_method --target=client_tipc --name=storage_file_read
+
 UMLComponent --name=file
+add_method --target=file --name=file_get_block
+add_method --target=file --name=file_get_block_etc
+
 UMLComponent --name=block_cache
+add_method --name=block_get --target=file
+add_method --name=block_get_no_tr_fail --target=block_cache
+add_method --name=block_cache_get_data --target=block_cache
+add_method --name=block_cache_get --target=block_cache
+add_method --name=block_cache_load_entry --target=block_cache
+add_method --name=block_cache_queue_read --target=block_cache
+add_method --name=block_cache_entry_decrypt --target=block_cache
 
-#需要有先后顺序的。
-# TODO: 实际上应该描述的是 函数与函数 之间的关系，而不是 模块和模块之间的关系。
-
-add_relation --title=client_handle_msg --type=Use --from=client_tipc --to=client_tipc
-# client_handle_msg 里面调用 storage_file_read
-add_relation --title=storage_file_read --type=Use --from=client_tipc --to=client_tipc
-add_relation --title=file_get_block --type=Use --from=client_tipc --to=file
-add_relation --title=file_get_block_etc --type=Use --from=file --to=file
-
-add_relation --title=block_get --type=Use --from=file --to=block_cache
-add_relation --title=block_get_no_tr_fail --type=Use --from=block_cache --to=block_cache
-add_relation --title=block_cache_get_data --type=Use --from=block_cache --to=block_cache
-add_relation --title=block_cache_get --type=Use --from=block_cache --to=block_cache
-add_relation --title=block_cache_load_entry --type=Use --from=block_cache --to=block_cache
-# block_cache_load_entry 调用了下面两个函数
-add_relation --title=block_cache_queue_read --type=Use --from=block_cache --to=block_cache
-add_relation --title=block_cache_entry_decrypt --type=Use --from=block_cache --to=block_cache
+add_invoke --from_parent=client_tipc --from=client_handle_msg --to_parent=client_tipc --to=storage_file_read
+add_invoke --from_parent=client_tipc --from=storage_file_read --to_parent=file --to=file_get_block
+add_invoke --from_parent=file --from=file_get_block --to_parent=file --to=file_get_block_etc
+add_invoke --from_parent=file --from=file_get_block_etc --to_parent=block_cache --to=block_get
+add_invoke --from_parent=block_cache --from=block_get --to_parent=block_cache --to=block_get_no_tr_fail
+add_invoke --from_parent=block_cache --from=block_get_no_tr_fail --to_parent=block_cache --to=block_cache_get_data
+add_invoke --from_parent=block_cache --from=block_cache_get_data --to_parent=block_cache --to=block_cache_get
+add_invoke --from_parent=block_cache --from=block_cache_get --to_parent=block_cache --to=block_cache_load_entry
+add_invoke --from_parent=block_cache --from=block_cache_load_entry --to_parent=block_cache --to=block_cache_queue_read
+add_invoke --from_parent=block_cache --from=block_cache_load_entry --to_parent=block_cache --to=block_cache_entry_decrypt
 
 show seq

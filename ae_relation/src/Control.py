@@ -8,24 +8,26 @@ from Model import *
 from Return import *
 from misc.Utils import *
 from asn1crypto.core import InstanceOf
+import logging
+import getopt
 
 def program_usage():
     # 和 PROGRAM_CMD 一致
-    print 'program usage:'
-    print 'help: show help information.'
-    print 'script <script file path>: run input script'
+    print ('program usage:')
+    print ('help: show help information.')
+    print ('script <script file path>: run input script')
 
 def control_usage():
     # 和 CMDLINE_CMD 一致。
-    print 'control usage:'
-    print 'help: show help information.'
-    print 'quit: quit from control.'
-    print 'test: test this program.'
-    print 'select: select on element and do something to it.'
-    print 'insert: insert element.'
-    print 'update: update properties of element.'
-    print 'delete: delete element or relation.'
-    print 'drop: drop all data.'
+    print ('control usage:')
+    print ('help: show help information.')
+    print ('quit: quit from control.')
+    print ('test: test this program.')
+    print ('select: select on element and do something to it.')
+    print ('insert: insert element.')
+    print ('update: update properties of element.')
+    print ('delete: delete element or relation.')
+    print ('drop: drop all data.')
     
 
 # TODO 目前还用不到。
@@ -75,6 +77,7 @@ class Control(object):
             self._show(diagram)
 
         elif argv[0] == "UMLClass":
+            # 类型。
             # ex: UMLClass --name=ServiceProviderBridge --title=ServiceProviderBridge --color=Yellow
             # 如果title是空的，那么title就是name。
             opts, args = self._parse_one_action(argv[1:], "", ["name=", "title=", "color="])
@@ -82,19 +85,31 @@ class Control(object):
                 self._create_uml_class(self.no, opts, args)
             
         elif argv[0] == "UMLComponent":
+            # 组件。
             # ex: UMLComponent --name="Android Proxy" --color=Yellow
             opts, args = self._parse_one_action(argv[1:], "", ["name=", "title=", "color="])
             if not opts is None:
                 self._create_uml_component(self.no, opts, args)
                 
         elif argv[0] == "add_field":
+            # 类对象中，添加一个“字段”。
             # ex: add_field --target=abc --name=backing_dir --type=zx:channel
             opts, args = self._parse_one_action(argv[1:], "",
                             ["target=", "name=", "type="])
             if not opts is None:
                 self._uml_class_add_field(self.no, opts, args)
+
+        elif argv[0] == "add_method":
+            # 类对象中添加一个函数。
+            # ex: add_method --name=foo --targe=file
+            # 在target的模块中，添加一个方法，名字是 name。
+            opts, args = self._parse_one_action(argv[1:], "",
+                            ["name=", "target="])
+            if not opts is None:
+                self._uml_class_add_method(self.no, opts, args)
                 
         elif argv[0] == "add_relation":
+            # 两个对象之间的关系。
             # ex: add_relation --title="get/send msg" --type=Composition \
             #        --from="Android Proxy" --to="Android ipc"
             opts, args = self._parse_one_action(argv[1:], "",
@@ -102,9 +117,18 @@ class Control(object):
             if not opts is None:
                 self._uml_add_relation(self.no, opts, args)
                 
+        elif argv[0] == "add_invoke":
+            # 函数之间的调用关系。
+            # ex: add_invoke --from_parent=client_tipc --from=xxx --to_parent=file --to=file_get_block
+            # 允许 from 可以为空。parent代表method所在的模块，因为method允许在一定范围内可见和隐藏，就存在重名问题。
+            opts, args = self._parse_one_action(argv[1:], "",
+                            ["from_parent=", "from=", "to_parent=", "to="])
+            
+            if not opts is None:
+                self._uml_add_invoke(self.no, opts, args)
         
         else: 
-            print "Unknown MVC command:%s" % argv[0]
+            print ("Unknown MVC command:%s" % argv[0])
             self._help()
             return Return.ERROR
         
@@ -217,6 +241,32 @@ class Control(object):
 
         return Return.OK
     
+    def _uml_class_add_method(self, no, opts, args):
+        opt_name = None
+        opt_target = None
+        for o, a in opts:
+            if o in ('--name'):
+                opt_name = a
+            elif o in ('--target'):
+                opt_target = a
+            else:
+                print ('Find unknown option:%s' % (o))
+                return Return.ERROR
+    
+        # find class or component
+        e = self.model.find_element(opt_target)
+        
+        # create a new Method element.
+        m = UMLMethod(opt_name, no, opt_name, e)
+        if self.model.add_element(opt_name, m):
+            return Return.OK
+        else:
+            return Return.ERROR
+        
+        e = e.add_method(m)
+
+        return Return.OK
+
     def _uml_class_relation_set_relation(self, no, opts, args):
         opt_name = None
         opt_target = None
@@ -272,11 +322,77 @@ class Control(object):
         elif isinstance(from_e, UMLComponent):
             name = AGlobalName.get_unique_name("ComponentRelation")
             r = UMLComponentRelation(name, no)
-        
+
         if self.model.add_element(name, r):
             return Return.ERROR
         
         r.set_relation(opt_type, opt_title, from_e, to_e)
+
+        return Return.OK
+    
+    def _uml_add_invoke(self, no, opts, args):
+        # 只添加 to 到 to_parent 中，from应该已经存在。
+        opt_from_parent = None
+        opt_from = None
+        opt_to_parent = None
+        opt_to = None
+        # 注意下面的顺序，字符少的在上面，字符多且包括上面字符的，在下面。
+        for o, a in opts:
+            if o in ('--from'):
+                opt_from = a
+            elif o in ('--from_parent'):
+                opt_from_parent = a
+            elif o in ('--to'):
+                opt_to = a
+            elif o in ('--to_parent'):
+                opt_to_parent = a
+            else:
+                print 'Find unknown option:%s' % (o)
+                return Return.ERROR
+        
+        # 找到必须有的选项，和对应的对象。
+        from_parent_e = None
+        if opt_from_parent != None:
+            from_parent_e = self.model.find_element(opt_from_parent)
+        
+        if from_parent_e is None:
+            return False
+        
+        from_e = None
+        if opt_from is not None:
+            from_e = self.model.find_element(opt_from)
+        
+        if from_e is None:
+            return False
+        
+        to_parent_e = None
+        if opt_to_parent != None:
+            to_parent_e = self.model.find_element(opt_to_parent)
+        
+        if to_parent_e is None:
+            return False
+        
+        to_e = None
+        if opt_to is not None:
+            to_e = self.model.find_element(opt_to)
+            
+        if to_e is None:
+            return False
+        
+        # 将方法和类、组件联系在一起。
+        #rm = UMLElement2MethodRelation("Have", "have", _e, m)
+        #if self.model.add_element(m.name, rm):
+        #    return Return.ERROR
+    
+        # 添加 两个方法之间的关系。
+        #name = AGlobalName.get_unique_name(to_parent_e)
+        # TODO 名字不好起，在代码中是一个函数调用另外一个函数。
+        name = "%s->%s" % (opt_from, opt_to)
+        r = UMLMethodRelation(name, no)
+        r.set_relation("Use", from_parent_e, from_e, to_parent_e, to_e)
+        
+        if not self.model.add_element(r.name, r):
+            return Return.ERROR
 
         return Return.OK
     
