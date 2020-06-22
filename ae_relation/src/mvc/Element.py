@@ -3,8 +3,8 @@
 u'''
     Element and Relation
 类的开头：
-    A: 普通的类
-    Enable: 能力
+    A: 普通的类(Agile的缩写)
+    Enable: 能力，相当于接口。
 '''
 
 import os, sys, logging, getopt

@@ -1,0 +1,20 @@
+# 基本的模型。
+# 意思是说：Mike有一辆自行车
+
+element --name=all
+element --name=people
+element --name=Mike
+element --name=bike
+element --name=a123
+
+relation --from=all --to=people --type=contain
+relation --from=all --to=Mike --type=contain
+relation --from=all --to=bike --type=contain
+relation --from=all --to=a123 --type=contain
+
+relation --from=people --to=Mike --type=type
+relation --from=bike --to=a123 --type=type
+
+relation --from=abc --to=123 --type=own
+
+show basic

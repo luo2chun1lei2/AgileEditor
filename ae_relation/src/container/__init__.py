@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
 '''
-Parser层
+Container
+一个容器，一套独立的模型。
 '''

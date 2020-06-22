@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 # 作为测试程序的一个Model，从Model继承下来。
-from Model import *
+# 内部有固定代码实现的测试模型。
+from mvc.Model import *
 
 class TestModel1(Model):
     def __init__(self):
@@ -11,6 +12,7 @@ class TestModel1(Model):
         test_db()
     
     def test1(self):
+        # TODO: 应该删除！
         try:
             # set elements.
             e1 = UMLClass('ServiceProviderBridge')

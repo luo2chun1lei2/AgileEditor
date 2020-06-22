@@ -2,10 +2,10 @@
 
 # Parser模块：
 # 1. 解析传入的命令，不关心命令来自于GUI/CUI/File什么，
-# 如果开头是！，那么就是针对parser的，
-# 其他，则以字符串的方式传入到 MVC:Controller中去执行。
+# 2. 如果开头是"!"，那么就是针对parser的，
+# 3. 其他，则以字符串的方式传入到 MVC:Controller中去执行。
 
-from Control import *
+from mvc.Control import *
 from container.Container import *
 
 class Parser():
@@ -16,27 +16,30 @@ class Parser():
         # 分析和执行action.
         # return: Return: 
         
+        # "!" 开头的是针对此层的操作，比如对 Container 的。
         if str_action.startswith('!'):
-            return self._do_inner(str_action[1:])
+            return self._inner_do(str_action[1:])
         else:
-            return self.container.do_action_by_current_control(str_action)
+            self.container.do_action_by_current_control(str_action)
+            return Return.OK
 
     def _help(self):
+        # 显示帮助信息。
         print 'parser usage:'
         print 'help: show help information.'
         print 'quit: quit from parser.'
         print 'test: test parser.'
         
     def _test_self(self):
-        print "test this parser, is OK."
+        # TODO: 这里需要吗？
+        print "NOT IMPLEMENT."
 
-    def _do_inner(self, str_action):
+    def _inner_do(self, str_action):
         # str_action: String: 命令以字符串的方式传入
-        # 执行Parser内部的命令。
+        # 执行Parser内部的命令，这些命令主要是针对Container。
         logging.debug("Execute inner command:%s" % str_action)
-        
-        
-        # TODO 命令解析用 getopt。
+
+        # TODO 命令解析用 getopt，这样就允许用参数了。
         if len(str_action) == 0:
             pass
         elif str_action.startswith("#"):
@@ -47,10 +50,7 @@ class Parser():
             self._help()
         elif str_action == 'test':
             self._test_self()
-        #elif str_action == 'create class':
-            # TODO: 想创建一个uml class
-            #model.create_class('')
         else:
             print "Unknown parser command:%s" % str_action
             
-        return True
+        return Return.OK

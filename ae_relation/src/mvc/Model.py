@@ -1,11 +1,14 @@
 # -*- coding:utf-8 -*-
-# 包含被Control下的所有模型
+
+# 模型的根类。
 
 import os, sys, logging, getopt, shutil, traceback
-from Element import *
-from PlantUML import *
+
+from misc.PlantUML import *
+from misc.Storage import *
 from misc.Utils import *
-from Storage import *
+from mvc.Element import *
+
 
 class UMLComponent(AElement):
     # UML's component

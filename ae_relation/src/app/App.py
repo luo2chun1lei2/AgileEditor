@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 建立基本的界面，无论是 console、GUI 还是什么。
 # 负责建构Parser和Container。
 # 无论从 console、GUI、file还是哪里获取的执行命令（字符串），传递给Parser去执行。
 # options
@@ -12,11 +11,11 @@
 from __future__ import unicode_literals
 
 import os, sys, logging, getopt, shutil, traceback
-from Control import *
+from mvc.Control import *
 from mvc.model.TestModel1 import *
 
 from container.Container import *
-from container.Parser import *
+from parser.Parser import *
 
 # 用于命令提示
 
@@ -36,7 +35,7 @@ class App():
         self.parser = None
     
     def do(self, argv):
-        self._parse_options(argv)
+        self._parse_options_and_do(argv)
         
     def _show_help(self):
         # 和 PROGRAM_CMD 一致
@@ -47,9 +46,8 @@ class App():
         print '-i/--interview start interview mode, if not, quit if run script.'
         print '--debug show log with debug level. If not, show information level.'
 
-    def _parse_options(self, argv):
-        
-        u''' 解析命令行的设置 '''
+    def _parse_options_and_do(self, argv):
+        u''' 解析命令行的设置，并执行'''
     
         try:
             opts, args = getopt.getopt(argv[1:],
@@ -98,7 +96,7 @@ class App():
         if opt_script_path:
             self._execute_script(opt_script_path)
         
-        # if is interview mode, run for a loop until return quit.
+        # if it's interview mode, run for a loop until return quit.
         if opt_interview_mode:
             self._enter_interview()
             #is_continue = self.parser.do()
@@ -108,7 +106,7 @@ class App():
         # script_path : string: path of script file
         # return : bool: True, OK, False, failed.
         try:
-            logging.debug('Open script %s, and execute it.' % script_path)
+            logging.debug('Open script "%s", and execute it.' % script_path)
             f = open(script_path)
             
             # 读取文件中的每一行处理，如果行末有“\"，那么就将此行之下合并为此行。

@@ -4,8 +4,8 @@
 # 2. 控制所有的模块，以及各个子模块。
 # 3. Control不需要知道每个模块的具体含义。
 
-from Model import *
-from Return import *
+from mvc.Model import *
+from misc.Return import *
 from misc.Utils import *
 from asn1crypto.core import InstanceOf
 import logging

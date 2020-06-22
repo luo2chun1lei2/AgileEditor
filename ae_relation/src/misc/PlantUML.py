@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 '''
-控制PlantUML工具的
+控制PlantUML工具。
+本地必须有 plantuml.jar
 '''
 
 import os, sys, subprocess
@@ -17,7 +18,7 @@ class PlantUML(object):
         if not os.path.isfile(jar_path):
             print "Cannot find PlantUML jar of \"%s\" in %s." % (jar_path, os.getcwd())
             sys.exit(1)
-            
+
     def create_diagram(self, data_path, out_dir_path):
         # @param data_path:string: data file path
         # @param out_dir_path:string: output directory, not file
