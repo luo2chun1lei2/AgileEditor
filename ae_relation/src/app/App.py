@@ -89,7 +89,8 @@ class App():
             format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
         # create parser and container
-        container = Container(opt_model_name)
+        # TODO: Container是哪里来的？
+        container = TestContainer(opt_model_name)
         self.parser = Parser(container)
         
         # if set script file, execute it.

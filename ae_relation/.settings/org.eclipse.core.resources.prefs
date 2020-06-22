@@ -4,6 +4,7 @@ encoding//src/app/App.py=utf-8
 encoding//src/app/__init__.py=utf-8
 encoding//src/container/Container.py=utf-8
 encoding//src/container/__init__.py=utf-8
+encoding//src/misc/GlobalName.py=utf-8
 encoding//src/misc/PlantUML.py=utf-8
 encoding//src/misc/Return.py=utf-8
 encoding//src/misc/Storage.py=utf-8
