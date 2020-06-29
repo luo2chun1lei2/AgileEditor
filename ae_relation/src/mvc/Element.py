@@ -10,7 +10,7 @@ u'''
 
 import os, sys, logging, getopt
 
-from  misc.GlobalName import * 
+from  misc.GlobalName import *
    
 class AElement(EnableGlobalName):
     # 基本的元素，代表了此程序中所有的基本对象。

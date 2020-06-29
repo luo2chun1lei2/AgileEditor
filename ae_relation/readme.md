@@ -34,6 +34,23 @@ Agile Relation Editor
     可以通过描述要什么，而由程序自己选择算法来实现。
         比如我想去A，那么到A的途径就由程序来设计。这个不是安排好的算法，而是用AI进行启发的解决。
 3. 可以将某个数据“依附”到其他的数据上，通过依附建立数据之间的关系。
+4. 用户建立了基本的模型(model)后，可以针对模型进行各种分析和处理。
+    1. 最简单的分析就是检索模型中的某些类型的数据或者特定的元素。
+        然后再根据检索的结果，显示某个方面，比如显示为关系图，或者类图等等。
+    2. 处理就复杂多了，可以添加更加复杂的数据，也可以减少和修改。
+5. 数据可以有不同的来源，可以是
+    1. 特定的python脚本文件，直接调用内部的model、control的接口。
+    2. 是内部的script脚本，通过parse、control解析后，调用model的函数。
+    3. 可以是数据文件，被反序列化后，直接形成model数据。
+    4. 来自命令行的要求，这里允许简单的数据输入，然后就可以形成简单的模型，方便马上验证想法和测试。
+    总结一下来源： command line, inner script(各种), serialized data, invoke inner API.
+    所以就要求，程序允许接受各种输入，这个不是故意复杂化，而是因为测试和实际开发的需要。
+    另外，这里说的是数据的来源，并不包括所有的外部输入，比如操控多个模型的命令。
+6. 对于程序的控制：
+    0. 模型的数据最好是模型自己控制输入，而不再需要其他模块负责，因为数据本身已经很复杂了，再复制接口是没有必要必要的。 
+    1. 对于模型的各种遍历和无改处理。
+    2. 对于多个模型的处理，比如合并、转化等。
+    3. 对于程序的处理，必须启动、关闭、交互等。
 
 目前想用到的应用场景是：数据分析（彩票分析）、程序关系（调用关系、静态关系等）、逻辑分析关系等。
   
@@ -53,26 +70,36 @@ Agile Relation Editor
         1. 为了方便使用。针对添加类型，元素可以按照类型衍生出来。
             类型和元素之间的关系是“衍生”，正向和反向的称呼不同。
             类到元素是衍生，元素到类是继承。
-   
+
 具体的实现：
 --------
-1. App层，有App，功能主要是
+1. Model：
+    1. 包含一个完整的元素和关系，提供 register event/callback method 接口，
+        以及遍历和分析接口。 
+    2. Element是基本的数据结构，包含Relation。
+    3. Element和Relation的设计和实现
+        Relation和Element之间功能的切分一定要清晰，因为目前没有多少实现的经验，所以还不知道怎么设计。
+    4. Model需要提供给外部一直的接口，【这里有疑问，如果model数据的输入格式和来源不同，那么Model怎么处理？】
+2. mvc层，包含Control + Model + View，功能主要是： 
+    1. Control，是对MV的控制，但是只能控制配对Model。
+        可以接受外部的命令包，然后针对MVC层进行处理，不负责具体的Model的处理，
+        可以将外部的数据处理传入到Model来处理。
+    2. View 是模型数据的表现，可以是显示的界面，日志输出，或者是文件。
+        View可以是多个，这个都由Control来决定。
+3. container层，有 Parser + Container，功能主要是
+    1. Parser：负责将传入的输入导入到
+        负责分析传入的命令，变成命令包(command package)，自己执行，或者发送给更下层的Control。
+    1. Container:容纳多个MVC实例，这样就允许不同的 Model 可以交互。
+4. App层，有App，功能主要是
     【这样设计的方案是，主要是建立命令执行和交互执行两种模式Mode】
     1. 解释命令行，然后创建 Parser + Container 模型，将参数传递给这两个。
     2. 解释命令，将“交互界面”的命令行传入到 Parser 中。
-2. container层，有Parser + Container，功能主要是
-    1. Parser：是控制整个程序的，包括Container。
-        负责分析传入的命令，变成命令包(command package)，自己执行，或者发送给更下层的Control。
-    1. Container:整个模型，包含若干的MVC。
-        允许替换容器内的Model，以及当前的Model。
-3. mvc层，包含Control + Model + View，功能主要是： 
-3.1 Model：
-    1. Element是基本的数据结构，包含Relation。
-3.2 Control，是对MV的控制，但是只能控制配对Model内部。
-    可以接受外部的命令包，然后根据Model的实际情况执行，推动View的更新。
-3.3 View 是模型数据的体现，可以是显示的界面，日志输出，或者是文件输出。
-4. Element和Relation的设计和实现
-    Relation和Element之间功能的切分一定要清晰，因为目前没有多少实现的经验，所以还不知道怎么设计。
+
+所有数据转化流程：
+                                        [script Parser]
+cmd line/interview cmd  ----> model script ----> model method ----> model <----> serialized data
+                         \--> control app/mvc
+                        [Parser]       
 
 要点：
 ----
