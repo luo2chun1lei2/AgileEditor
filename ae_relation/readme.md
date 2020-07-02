@@ -7,10 +7,21 @@ Agile Relation Editor
 1. pip install CodernityDB
     这个是 Python 语言开发的，嵌入到程序中的NoSQL DB，是 key-value 类型。
 
+有三个阶段：
+---------
+1. 元素关系描述数据关系，可以对这个数据关系进行管理(insert/delete/change/select)。
+2. 元素关系是蓝图（blueprint），相当于结构描述，程序根据蓝图可以组成应用。
+    组装后的程序自行运行，运行的内部调用还是Python之间的调用。
+    当改变蓝图，就同时改变应用的结构。
+3. 元素关系就是一切，每个特殊的元素都是特定的模块，关系来设定这些模块的组成方式和通信方法。
+    模块之间的通信都通过关系来传递（就像fidl）。这样元素关系就是应用，应用就是元素关系。
+下面开始第一阶段的设计和实现。
+
 目标：
 ----
-  用特定的语法描述元素和它们之间的关系，然后可以显示、查询和编辑。
-  需要符合我个人对于这个世界的各种理解方法：
+
+用特定的语法描述元素和它们之间的关系，然后可以显示、查询和编辑。
+需要符合我个人对于这个世界的各种理解方法：
   1. 所有的事务都称为对象。
     对象具有类别（类别也是对象），同样类别的对象具有同样的行为逻辑和特征值，当然具体对象具有具体的特征值。
     此软件可以根据类别建立具体对象，并且如规定的一样具有同样的行为逻辑和基本的特征值。
@@ -95,11 +106,25 @@ Agile Relation Editor
     1. 解释命令行，然后创建 Parser + Container 模型，将参数传递给这两个。
     2. 解释命令，将“交互界面”的命令行传入到 Parser 中。
 
+基本的输入、分析、控制模型: IPPM
+input --> parser --------> Process ---> Model
+各种输入   分析输入得到命令     处理命令       改变模型
+
+基本的 MVC：
+Control ---> Model --> View
+
+这里需要Control能够将 Parser 和 Model 连接起来：
+Parser --> Model
+
+基本的程序结构
+        App/Container --> MVC ----------> Parser/Model
+input >>----程序相关--------控制Model----------模型相关 
+
 所有数据转化流程：
                                         [script Parser]
 cmd line/interview cmd  ----> model script ----> model method ----> model <----> serialized data
                          \--> control app/mvc
-                        [Parser]       
+                        [Command Parser]
 
 要点：
 ----
@@ -108,6 +133,20 @@ cmd line/interview cmd  ----> model script ----> model method ----> model <---->
 1. 起点高一些吧，建立“领域语言”，并且可以进行编程。
    领域语言不一定是独立的解释、编译语言，可以是建立在某种特殊方法（比如早期建立在C的宏基础上的objective-c语言），
    或者就是一个复杂的类库，这样就不需要建立额外的语法了。
+   
+对外接口：
+-------
+描述命令接口
+rlt --execute <script file>
+rlt --interview
+
+进入交互模式后，可以执行命令
+命令可以是下面几类：
+0. execute <script file>，脚本文件中可以包含下面所有的种类。
+1. app 管理应用程序 （$xxx）
+2. control 管理内部的MVC (!xxx)
+3. model 针对MVC中的M，当然需要通过parser解析  (xxx)
+
 
 进度(要尽快！！！不要磨蹭，抓住空闲时间！)：
 --------------------------------
