@@ -1,7 +1,7 @@
 # 基本的模型。
 # 意思是说：Mike有一辆自行车
 
-$create mvc --name "test1"
+create mvc --name "test1"
 
 element --name=all
 element --name=people

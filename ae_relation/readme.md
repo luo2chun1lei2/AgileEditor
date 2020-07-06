@@ -1,6 +1,8 @@
 Agile Relation Editor
 ====================
 
+不要人为复杂化！
+
 安装：
 ----
 1. pip install prompt_toolkit
@@ -106,25 +108,34 @@ Agile Relation Editor
     1. 解释命令行，然后创建 Parser + Container 模型，将参数传递给这两个。
     2. 解释命令，将“交互界面”的命令行传入到 Parser 中。
 
-基本的输入、分析、控制模型: IPPM
-input --> parser --------> Process ---> Model
+为了让命令更加有通用性：
+command text --------> command package ----------------> model
+              parser                      executor
+
+所以需要“输入、分析、执行模型”（IPE）
+input --> parser --------> Executor ---> Model
 各种输入   分析输入得到命令     处理命令       改变模型
 
 基本的 MVC：
 Control ---> Model --> View
 
-这里需要Control能够将 Parser 和 Model 连接起来：
-Parser --> Model
+那么需要 Subject-Observer模式，建立Model和View之间的关系。
+
+这里需要Control能够将 Parser/Executor 和 Model 连接起来：
+Parser --> Executor --> Model
 
 基本的程序结构
-        App/Container --> MVC ----------> Parser/Model
+        App/Container --> MVC ----------> Parser/Executor/Model
 input >>----程序相关--------控制Model----------模型相关 
+[这样在Executor处，就可以建立command history，这样可以回滚、重播和找错]
 
 所有数据转化流程：
-                                        [script Parser]
-cmd line/interview cmd  ----> model script ----> model method ----> model <----> serialized data
+                                        [parser]       [executor]
+cmd line/interview cmd  ----> model script --> command package --> model method ----> model <----> serialized data
                          \--> control app/mvc
-                        [Command Parser]
+                           [parser]
+
+
 
 要点：
 ----
