@@ -1,20 +1,15 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 负责建构Parser和Container。
-# 无论从 console、GUI、file还是哪里获取的执行命令（字符串），传递给Parser去执行。
-# options
-# -m/--model <name> 加载哪个model，缺省加载对应的control
-# -s/--script <path> 加载model后，是否启动对应的
-# -i/--interview 是否启动交互模式，如果没有启动交互模式，那么执行了脚本后就退出。
-# --debug 显示DEBUG等级的日志
+# 建立基本的 “parser、executor、model” pipe。
+
 from __future__ import unicode_literals
 
 import os, sys, logging, getopt, shutil, traceback
-from mvc.Control import *
+from parser.Control import *
 from mvc.model.TestModel1 import *
 
-from container.Container import *
+from pipe.Pipe import *
 from parser.Parser import *
 
 # 用于命令提示
@@ -88,7 +83,7 @@ class App():
         logging.basicConfig(level=level,
             format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
-        # create parser and container
+        # create parser and pipe
         # TODO: Container是哪里来的？
         container = TestContainer(opt_model_name)
         self.parser = Parser(container)

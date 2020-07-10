@@ -16,14 +16,8 @@ SCRIPT_HOME=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 AE_RELATION_HOME=$(cd "${SCRIPT_HOME}/.." && pwd)
 
 # 建立一个基本的mvc，然后名字是 test，其他都是缺省的
-ae_rlt "test" create mvc
+ae_rlt "test" create
 # 在test中建立基本的数据关系。
-ae_rlt "test" element --name=all
+ae_rlt "test" element --name=123
 # 在 test 中执行脚本，是为了建立基本的数据关系
 ae_rlt "test" execute --script=${SCRIPT_HOME}/basic.txt
-
-
-# 进入到”互动“模式，一下有三种交互模式
-#ae_rlt "test" interview # 然后手动输入命令。
-#ae_rlt "test" interview < ${SCRIPT_HOME}/basic.txt
-#cat ${SCRIPT_HOME}/basic.txt | ae_rlt "test" interview

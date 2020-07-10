@@ -99,25 +99,30 @@ Agile Relation Editor
         可以将外部的数据处理传入到Model来处理。
     2. View 是模型数据的表现，可以是显示的界面，日志输出，或者是文件。
         View可以是多个，这个都由Control来决定。
-3. container层，有 Parser + Container，功能主要是
+3. Executor，负责将标准的model命令，变成对于Model的调用。
+    当Model支持的函数不同时，Executor负责转接。
+    当Model的标准命令的版本不同时，Executor负责转接。
+4. Parser，负责将各种输入，转化为标准的model命令。Parser可以是各种来源（GUI、Console、Script）或者
+    各种命令格式（简单的命令、复杂脚本语言等）。
     1. Parser：负责将传入的输入导入到
         负责分析传入的命令，变成命令包(command package)，自己执行，或者发送给更下层的Control。
-    1. Container:容纳多个MVC实例，这样就允许不同的 Model 可以交互。
-4. App层，有App，功能主要是
+5. Pipe层，功能主要是
+    1. Pipe: 容纳一个MVC实例，这样就允许App同时有不同的 Model。【目前不允许MVC之间交互】
+6. App层，建立基本的程序运行结构，包括建立 input/parser/executor/model/view 模式。
     【这样设计的方案是，主要是建立命令执行和交互执行两种模式Mode】
-    1. 解释命令行，然后创建 Parser + Container 模型，将参数传递给这两个。
-    2. 解释命令，将“交互界面”的命令行传入到 Parser 中。
+    1. 解释命令行，然后创建 Parser + Container 模型，这样就建立基本的运行机制。
+    2. 将“交互界面”的输入和Parser连接在一起。
 
 为了让命令更加有通用性：
-command text --------> command package ----------------> model
-              parser                      executor
+command text --------> command standard package ----------------> model
+              parser                                executor
 
 所以需要“输入、分析、执行模型”（IPE）
-input --> parser --------> Executor ---> Model
-各种输入   分析输入得到命令     处理命令       改变模型
+input --> parser --------> Executor ---> Model ---> output
+各种输入   分析输入得到命令     处理命令       改变模型     输出（view或者序列化）
 
 基本的 MVC：
-Control ---> Model --> View
+Control ---> Model --> Output(View/Storage)
 
 那么需要 Subject-Observer模式，建立Model和View之间的关系。
 
@@ -125,16 +130,19 @@ Control ---> Model --> View
 Parser --> Executor --> Model
 
 基本的程序结构
-        App/Container --> MVC ----------> Parser/Executor/Model
-input >>----程序相关--------控制Model----------模型相关 
+        App/Container --> MVC ----------> Parser/Executor/Model  -----> Output
+input >>----程序相关--------控制Model----------模型相关 -------------------输出相关的
 [这样在Executor处，就可以建立command history，这样可以回滚、重播和找错]
 
 所有数据转化流程：
                                         [parser]       [executor]
-cmd line/interview cmd  ----> model script --> command package --> model method ----> model <----> serialized data
+cmd line/interview cmd  ----> model script --> command package --> model method ----> model <----> serialized data/View
                          \--> control app/mvc
                            [parser]
 
+核心的是两条：
+1. 根据 “输入、分析、执行、模型、输出” 为一条核心执行设计线索。
+2. 根据 ”控制(输入、分析、执行） -> 模型 -> View“ 的模式，是核心的架构。
 
 
 要点：
@@ -155,8 +163,8 @@ rlt --interview
 命令可以是下面几类：
 0. execute <script file>，脚本文件中可以包含下面所有的种类。
 1. app 管理应用程序 （$xxx）
-2. control 管理内部的MVC (!xxx)
-3. model 针对MVC中的M，当然需要通过parser解析  (xxx)
+2. pipe 管理内部的处理管道 (!xxx)
+3. model 针对MVC中的M，当然需要通过parser解析 (xxx)
 
 
 进度(要尽快！！！不要磨蹭，抓住空闲时间！)：

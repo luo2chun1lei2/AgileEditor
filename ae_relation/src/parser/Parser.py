@@ -5,8 +5,8 @@
 # 2. 如果开头是"!"，那么就是针对parser的，
 # 3. 其他，则以字符串的方式传入到 MVC:Controller中去执行。
 
-from mvc.Control import *
-from container.Container import *
+from parser.Control import *
+from pipe.Pipe import *
 
 class Parser():
     def __init__(self, container):
