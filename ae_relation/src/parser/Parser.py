@@ -45,7 +45,7 @@ class Parser():
         elif str_action.startswith("#"):
             pass
         elif str_action == 'quit':
-            return False
+            return Return.QUIT
         elif str_action == 'help':
             self._help()
         elif str_action == 'test':

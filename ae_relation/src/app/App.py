@@ -11,6 +11,8 @@ from mvc.model.TestModel1 import *
 
 from pipe.Pipe import *
 from parser.Parser import *
+from app.ParserCommandArgument import *
+from executor.Executor import *
 
 # 用于命令提示
 
@@ -23,79 +25,52 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
+class AppExecutor(Executor):
+    # 执行
+    
+    def __init__(self, app):
+        super(AppExecutor, self).__init__()
+        self.app = app
+        
+    def execute(self, cmdPkg):
+        # @param cmdPkg CommandPackage，需要执行的命令
+        
+        if cmdPkg.cmdId == CommandId.SET_LOG_LEVEL:
+            # set log and level.
+            logging.basicConfig(level=cmdPkg.level,
+                format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
+        elif cmdPkg.cmdId == CommandId.SHOW_HELP:   #TODO 这里不正确，help和exit在一起。
+            self.app.parserCommandArgument.show_help()
+            if cmdPkg.error:
+                sys.exit(1)
+            else:
+                sys.exit(0)
+
+        elif cmdPkg.cmdId == CommandId.EXECUTE_SCRIPT:
+            # if set script file, execute it.
+            self.app._execute_script(cmdPkg.script_path)
+
+        elif cmdPkg.cmdId == CommandId.ENTER_INTERVIEW: #TODO: 必须放在所有命令的后面，否则退出有问题。
+            # if it's interview mode, run for a loop until return quit.
+            self.app._enter_interview()
+        
+        elif cmdPkg.cmdId == CommandId.MODEL_NAME:  # TODO 有先后顺序，必须在执行脚本前执行。
+            # TODO: Container是哪里来的？
+            container = TestContainer(cmdPkg.model_name)
+            self.app.parser = Parser(container)
+            
 class App():
 
     def __init__(self):
         self.parser = None
+        self.executor = AppExecutor(self)
+        self.parserCommandArgument = ParserCommandArgument()
     
     def do(self, argv):
-        self._parse_options_and_do(argv)
-        
-    def _show_help(self):
-        # 和 PROGRAM_CMD 一致
-        print 'program usage:'
-        print '-h/--help: show help information.'
-        print '-m/--model <name> load the given model.'
-        print '-s/--script <path> run script after having loaded model.'
-        print '-i/--interview start interview mode, if not, quit if run script.'
-        print '--debug show log with debug level. If not, show information level.'
-
-    def _parse_options_and_do(self, argv):
-        u''' 解析命令行的设置，并执行'''
-    
-        try:
-            opts, args = getopt.getopt(argv[1:],
-                                       "hm:s:i",
-                                       ["help", "model=", "script=", "interview", "debug"])
-        except getopt.GetoptError, err:
-            print str(err)
-            self._show_help()
-            sys.exit(1)
-        
-        opt_model_name = None
-        opt_script_path = None
-        opt_interview_mode = False
-        opt_log_debug = False
-        
-        for o, a in opts:
-            if o in ('-h', '--help'):
-                self._show_help()
-                sys.exit(0)
-            elif o in ('-m', '--model'):
-                opt_model_name = a
-            elif o in ('-s', '--script'):
-                opt_script_path = a
-            elif o in ('-i', '--interview'):
-                opt_interview_mode = True
-            elif o in ('--debug'):
-                opt_log_debug = True
-            else:
-                print 'Find unknown option:%s' % (o) 
-                self._show_help()
-                sys.exit(1)
-                
-        # set log and level.
-        if opt_log_debug:
-            level = logging.DEBUG
-        else:
-            level = logging.INFO
-        logging.basicConfig(level=level,
-            format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
-
-        # create parser and pipe
-        # TODO: Container是哪里来的？
-        container = TestContainer(opt_model_name)
-        self.parser = Parser(container)
-        
-        # if set script file, execute it.
-        if opt_script_path:
-            self._execute_script(opt_script_path)
-        
-        # if it's interview mode, run for a loop until return quit.
-        if opt_interview_mode:
-            self._enter_interview()
-            #is_continue = self.parser.do()
+        cmdPkgs = self.parserCommandArgument.parse(argv)
+        for cmdPkg in cmdPkgs:
+            self.executor.execute(cmdPkg)
 
     def _execute_script(self, script_path):
         # 执行一个脚本文件。

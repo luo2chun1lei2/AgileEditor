@@ -7,7 +7,7 @@
 from mvc.Model import *
 from misc.Return import *
 from misc.Utils import *
-from asn1crypto.core import InstanceOf
+
 import logging
 import getopt
 
