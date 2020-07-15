@@ -15,6 +15,7 @@ from parser.ParserInteractiveCommand import *
 from parser.ParserAppOption import *
 from executor.Executor import *
 from executor.ExecutorApp import *
+from executor.ExecutorPipe import *
 from input.Input import *
 from output.Output import *
 
@@ -34,6 +35,7 @@ class App():
     def __init__(self):
         # 为了解析应用程序启动的命令行。
         self.pipeApp = PipeSimple("app", ParserAppOption(), ExecutorApp(self))
+        self.quit = False
     
     def do(self, argv):
         self.pipeApp.do(argv)
@@ -42,12 +44,15 @@ class App():
         output = Output()
         model = TestModel1()
         # TODO：有两层parser！
-        executor = ParserCommandLine(model)
+        executor = ExecutorPipe(self) #ParserCommandLine(model) 
         # 用于分析“交互模式”下的命令输入。
-        self.parserInteractiveCommand = ParserInteractiveCommand()
+        self.parserInteractiveCommand = ParserInteractiveCommand(model)
         input = Input()
         
         self.pipe = PipeBasic(model_name, input, self.parserInteractiveCommand, executor, model, output)
+
+    def quit(self):
+        self.quit = True
 
     def _execute_script(self, script_path):
         # 执行一个脚本文件。
@@ -61,6 +66,7 @@ class App():
             cmd = ""
             line_no = 0
             for l in f:
+                
                 line_no += 1
                 ll = l.replace('\n', '').strip()
                 if len(ll) > 0 and ll[-1] == '\\':
@@ -70,8 +76,11 @@ class App():
                     cmd += ll
                     
                 logging.debug('Execute line[%d]: %s' % (line_no, cmd))
-                rtn = self.parserInteractiveCommand.do(self.pipe.executor, cmd)
-                if rtn != Return.OK:
+                cmdPkgs = self.parserInteractiveCommand.parse(self.pipe.executor, cmd)
+                for pkg in cmdPkgs:
+                    self.pipe.executor.execute(pkg)
+
+                if quit:
                     break
                 
                 cmd = ""
@@ -97,8 +106,13 @@ class App():
             input_str = prompt('>', completer=word_completer,
                   complete_while_typing=False)
 
-            rtn = self.parserInteractiveCommand.do(self.pipe.control, input_str)
-            if rtn == Return.QUIT:
+            cmdPkgs = self.parserInteractiveCommand.parse(input_str)
+            for pkg in cmdPkgs:
+                self.pipe.executor.execute(pkg)
+
+            if quit:
                 break
+                
             
-            
+    def show_inner_command_help(self):
+        self.pipe.parserInteractiveCommand.show_help()

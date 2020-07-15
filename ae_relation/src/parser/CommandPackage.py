@@ -10,6 +10,8 @@ class CommandId():
     EXECUTE_SCRIPT = 3
     ENTER_INTERVIEW = 4
     MODEL_NAME = 5
+    QUIT_PIPE = 6
+    HELP_PIPE = 7
 
 class CommandPackage(object):
     # 只保存标准的数据包，

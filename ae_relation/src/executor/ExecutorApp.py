@@ -27,7 +27,7 @@ class ExecutorApp(Executor):
         elif cmdPkg.cmdId == CommandId.SHOW_HELP:   #TODO 这里不正确，help和exit在一起。
             self.app.parserApp.show_help()
             if cmdPkg.error:
-                sys.exit(1)
+                sys.exit(1)         # TODO: 这里不对，不应该这里用sys.exit退出！
             else:
                 sys.exit(0)
 

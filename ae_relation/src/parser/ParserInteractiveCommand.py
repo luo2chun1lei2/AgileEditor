@@ -1,54 +1,58 @@
 #-*- coding:utf-8 -*-
 
 from parser.ParserCommandLine import *
+from parser.CommandPackage import *
 from pipe.Pipe import *
 
 class ParserInteractiveCommand(object):
     # 1. 如果开头是"!"，解析。
     # 2. 其他，传递到其他的Parser执行！
 
-    def __init__(self):
+    def __init__(self, model):  #TODO: model是临时的。
         super(ParserInteractiveCommand, self).__init__()
+        self.parserCommandLine = ParserCommandLine(model)
     
-    def do(self, executor, str_action):
+    def parse(self, str_action):
         # 分析和执行action.
         # return: Return: 
+
+        cmdPkgs = []
         
         # "!" 开头的是针对此层的操作，比如对 Container 的。
         if str_action.startswith('!'):
-            return self._inner_do(executor, str_action[1:])
+            self._inner_parse(cmdPkgs, str_action[1:])
         else:
-            executor.do(str_action.strip())
-            return Return.OK
+            #executor.do(str_action.strip())
+            pkgs = self.parserCommandLine.parse(str_action.strip())
+            cmdPkgs.append(pkgs)
 
-    def _help(self):
+        return cmdPkgs
+
+    def _help(self):    # TODO: 多个parser时如何显示帮助信息?
         # 显示帮助信息。
         print 'parser usage:'
         print 'help: show help information.'
         print 'quit: quit from parser.'
         print 'test: test parser.'
-        
-    def _test_self(self):
-        # TODO: 这里需要吗？
-        print "NOT IMPLEMENT."
 
-    def _inner_do(self, executor, str_action):
-        # str_action: String: 命令以字符串的方式传入
-        # 执行Parser内部的命令，这些命令主要是针对Container。
-        logging.debug("Execute inner command:%s" % str_action)
-
+    def _inner_parse(self, cmdPkgs, str_action):
+        # 解析命令，变成command package。
         # TODO 命令解析用 getopt，这样就允许用参数了。
+        pkg = None
+
         if len(str_action) == 0:
             pass
         elif str_action.startswith("#"):
             pass
         elif str_action == 'quit':
-            return Return.QUIT
+            #return Return.QUIT
+            pkg = CommandPackage(CommandId.QUIT_PIPE)
         elif str_action == 'help':
-            self._help()
-        elif str_action == 'test':
-            self._test_self()
+            pkg = CommandPackage(CommandId.HELP_PIPE)
         else:
             print "Unknown parser command:%s" % str_action
-            
-        return Return.OK
+        
+        if pkg:
+            cmdPkgs.append(pkg)
+
+        return
