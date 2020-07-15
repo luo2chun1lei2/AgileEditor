@@ -1,16 +1,16 @@
 #-*- coding:utf-8 -*-
 
 # Pipe：
-# input --> parser --> executor --> model --> output
+# input --> parserInteractiveCommand --> executorApp --> model --> output
 
-from parser.Control import *
+from parser.ParserCommandLine import *
 from mvc.model.TestModel1 import *
 
 class Pipe(object):
-    # 建立一个处理队列
+    # 负责最基本的工作和接口，建立一个处理队列
     # 1. 整合 MVC 作为一个整体。
     # 2. TODO 对外提供什么标准操作？
-    def __init__(self, name):
+    def __init__(self, mvc_name):
         # 根据model 的名字，初始化整个container。
         # TODO: 这里需要建立全局的mvc的名字注册机制，然后才能用名字实现model的创建。
         #    这里的mvc_name不是script名字，它应该是缓存的模型数据的名字。
@@ -19,21 +19,40 @@ class Pipe(object):
         
         self.model = None
         self.control = None
+        self.mvc_name = mvc_name
     
-    def get_current_control(self):
-        return self.control
-    
-    def do_action_by_current_control(self, str_action):
-        #return: Return:
-        return self.control.do(str_action.strip())
+    #def do_action_by_current_control(self, str_action):
+    #    #return: Return:
+    #    return self.control.do(str_action.strip())
 
+class PipeSimple(Pipe):
+    # 简单的Pipe，只需要指定Parser和Executor两个。
+    def __init__(self, mvc_name, parser, executor):
+        # @param mvc_name string pipe name
+        super(PipeSimple, self).__init__(mvc_name)
 
-class TestContainer(Pipe):
-    # 测试用的Container
-    def __init__(self, mvc_name):
+        self.parserInteractiveCommand = parser
+        self.executor = executor
+
+    def do(self, input):
+        #@param input Any 只要是parser可以接受的输入就可以。
+        #@return None
+        cmdPkgs = self.parserInteractiveCommand.parse(input)
+        for cmdPkg in cmdPkgs:
+            self.executor.execute(cmdPkg)
+
+class PipeBasic(Pipe):
+    # 可以使用的Pipe，简单的一个pipe，TODO:以后要允许有多个input和output。
+    def __init__(self, mvc_name, input, parser, executor, model, output):
         # mvc_name: string: mvc name
-        super(TestContainer, self).__init__(mvc_name)
+        super(PipeBasic, self).__init__(mvc_name)
 
-        model = TestModel1()
-        self.control = Control(model)
-    
+        self.input = input
+        self.parserInteractiveCommand = parser
+        self.executor = executor
+        self.model = model
+        self.output = output
+
+    # TODO: 以后要删掉！
+    def get_current_control(self):
+        return self.executor

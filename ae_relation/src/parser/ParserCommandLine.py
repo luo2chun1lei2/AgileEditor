@@ -1,8 +1,6 @@
 # -*- coding:utf-8 -*-
-# 控制所有的模块，以及单独的模块。
-# 1. 接受外部的操控，包括命令输入、鼠标输入等。
-# 2. 控制所有的模块，以及各个子模块。
-# 3. Control不需要知道每个模块的具体含义。
+
+# TODO:拆成Parser和Executor两个。
 
 from mvc.Model import *
 from misc.Return import *
@@ -28,20 +26,12 @@ def control_usage():
     print ('update: update properties of element.')
     print ('delete: delete element or relation.')
     print ('drop: drop all data.')
-    
 
-# TODO 目前还用不到。
-class SystemCommand(object):
-    # 系统级别的命令。
-    # 命令是解析好的“描述如何执行的数据”，和普通的命令相比，不适用于人类阅读的，而是用于方便执行的。
-    def __self__(self):
-        super(SystemCommand, self).__init__()
-
-class Control(object):
+class ParserCommandLine(object):
+    # 这个parser能够分析类似命令行的脚本。就是用getopt可以分析的命令行。
     
     def __init__(self, model):
-        # model: Model: control对应的模型
-        super(Control, self).__init__()
+        super(ParserCommandLine, self).__init__()
         self.model = model
         self.no = 0
     

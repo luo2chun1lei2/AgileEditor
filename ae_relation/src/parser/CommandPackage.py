@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 # Parser模块：
-# 1. 标准的命令包
+# 1. 标准的命令包，由Parser产生，然后分发给Executor执行。
 
 class CommandId():
     SET_LOG_LEVEL = 0
@@ -21,7 +21,7 @@ class CommandPackage(object):
         self.cmdId = cmdId
         
 class CommandPackageList(object):
-    # 保存CommandPackage的列表
+    # 保存CommandPackage的列表 TODO:是否有必要？用数组不是就可以了吗？
 
     def __init__(self, cmdPkgs):
         #@param cmdPkgs CommandPackage[]

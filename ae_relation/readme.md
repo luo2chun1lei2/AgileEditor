@@ -86,6 +86,7 @@ Agile Relation Editor
 
 具体的实现：
 --------
+0. input是输入，可以是view、console、Text等。output是输出，可以是view。
 1. Model：
     1. 包含一个完整的元素和关系，提供 register event/callback method 接口，
         以及遍历和分析接口。 
@@ -93,12 +94,14 @@ Agile Relation Editor
     3. Element和Relation的设计和实现
         Relation和Element之间功能的切分一定要清晰，因为目前没有多少实现的经验，所以还不知道怎么设计。
     4. Model需要提供给外部一直的接口，【这里有疑问，如果model数据的输入格式和来源不同，那么Model怎么处理？】
-2. mvc层，包含Control + Model + View，功能主要是： 
+2. mvc层，包含Control + Model + View，功能主要是：
     1. Control，是对MV的控制，但是只能控制配对Model。
         可以接受外部的命令包，然后针对MVC层进行处理，不负责具体的Model的处理，
         可以将外部的数据处理传入到Model来处理。
+        Control 就是 Executor ！
     2. View 是模型数据的表现，可以是显示的界面，日志输出，或者是文件。
-        View可以是多个，这个都由Control来决定。
+        View可以是多个，这个都由Pipe来决定。
+        View将输入的信息也变成标准命令，然后交给Executor来执行。
 3. Executor，负责将标准的model命令，变成对于Model的调用。
     当Model支持的函数不同时，Executor负责转接。
     当Model的标准命令的版本不同时，Executor负责转接。
@@ -117,12 +120,12 @@ Agile Relation Editor
 command text --------> command standard package ----------------> model
               parser                                executor
 
-所以需要“输入、分析、执行模型”（IPE）
+所以需要“输入、分析、执行模型”（IPE）:【只是最基本的处理流程】
 input --> parser --------> Executor ---> Model ---> output
 各种输入   分析输入得到命令     处理命令       改变模型     输出（view或者序列化）
 
-基本的 MVC：
-Control ---> Model --> Output(View/Storage)
+Executor/Model/Output = Control/Model/View：
+Control(=Executor) ---> Model --> Output(View/Storage)
 
 那么需要 Subject-Observer模式，建立Model和View之间的关系。
 
@@ -143,6 +146,7 @@ cmd line/interview cmd  ----> model script --> command package --> model method 
 核心的是两条：
 1. 根据 “输入、分析、执行、模型、输出” 为一条核心执行设计线索。
 2. 根据 ”控制(输入、分析、执行） -> 模型 -> View“ 的模式，是核心的架构。
+    两个设计架构是结合在一起的。 执行就是控制，输出就是View。
 
 
 要点：

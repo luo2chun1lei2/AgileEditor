@@ -1,18 +1,22 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 建立基本的 “parser、executor、model” pipe。
+# 建立基本的 “parserInteractiveCommand、executorApp、model” pipe。
+# App相当于一个Executor/Control。
 
 from __future__ import unicode_literals
 
 import os, sys, logging, getopt, shutil, traceback
-from parser.Control import *
+from parser.ParserCommandLine import *
 from mvc.model.TestModel1 import *
 
 from pipe.Pipe import *
-from parser.Parser import *
-from app.ParserCommandArgument import *
+from parser.ParserInteractiveCommand import *
+from parser.ParserAppOption import *
 from executor.Executor import *
+from executor.ExecutorApp import *
+from input.Input import *
+from output.Output import *
 
 # 用于命令提示
 
@@ -24,53 +28,26 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
-
-class AppExecutor(Executor):
-    # 执行
-    
-    def __init__(self, app):
-        super(AppExecutor, self).__init__()
-        self.app = app
-        
-    def execute(self, cmdPkg):
-        # @param cmdPkg CommandPackage，需要执行的命令
-        
-        if cmdPkg.cmdId == CommandId.SET_LOG_LEVEL:
-            # set log and level.
-            logging.basicConfig(level=cmdPkg.level,
-                format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
-
-        elif cmdPkg.cmdId == CommandId.SHOW_HELP:   #TODO 这里不正确，help和exit在一起。
-            self.app.parserCommandArgument.show_help()
-            if cmdPkg.error:
-                sys.exit(1)
-            else:
-                sys.exit(0)
-
-        elif cmdPkg.cmdId == CommandId.EXECUTE_SCRIPT:
-            # if set script file, execute it.
-            self.app._execute_script(cmdPkg.script_path)
-
-        elif cmdPkg.cmdId == CommandId.ENTER_INTERVIEW: #TODO: 必须放在所有命令的后面，否则退出有问题。
-            # if it's interview mode, run for a loop until return quit.
-            self.app._enter_interview()
-        
-        elif cmdPkg.cmdId == CommandId.MODEL_NAME:  # TODO 有先后顺序，必须在执行脚本前执行。
-            # TODO: Container是哪里来的？
-            container = TestContainer(cmdPkg.model_name)
-            self.app.parser = Parser(container)
             
 class App():
 
     def __init__(self):
-        self.parser = None
-        self.executor = AppExecutor(self)
-        self.parserCommandArgument = ParserCommandArgument()
+        # 为了解析应用程序启动的命令行。
+        self.pipeApp = PipeSimple("app", ParserAppOption(), ExecutorApp(self))
     
     def do(self, argv):
-        cmdPkgs = self.parserCommandArgument.parse(argv)
-        for cmdPkg in cmdPkgs:
-            self.executor.execute(cmdPkg)
+        self.pipeApp.do(argv)
+            
+    def init_parser_container(self, model_name):
+        output = Output()
+        model = TestModel1()
+        # TODO：有两层parser！
+        executor = ParserCommandLine(model)
+        # 用于分析“交互模式”下的命令输入。
+        self.parserInteractiveCommand = ParserInteractiveCommand()
+        input = Input()
+        
+        self.pipe = PipeBasic(model_name, input, self.parserInteractiveCommand, executor, model, output)
 
     def _execute_script(self, script_path):
         # 执行一个脚本文件。
@@ -93,7 +70,7 @@ class App():
                     cmd += ll
                     
                 logging.debug('Execute line[%d]: %s' % (line_no, cmd))
-                rtn = self.parser.do(cmd)
+                rtn = self.parserInteractiveCommand.do(self.pipe.executor, cmd)
                 if rtn != Return.OK:
                     break
                 
@@ -120,7 +97,7 @@ class App():
             input_str = prompt('>', completer=word_completer,
                   complete_while_typing=False)
 
-            rtn = self.parser.do(input_str)
+            rtn = self.parserInteractiveCommand.do(self.pipe.control, input_str)
             if rtn == Return.QUIT:
                 break
             

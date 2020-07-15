@@ -1,15 +1,13 @@
 #-*- coding:utf-8 -*-
 
-# Parser模块：
-# 1. 解析外部的传入命令。
-
 import os, sys, getopt, logging
 from parser.CommandPackage import *
 
-class ParserCommandArgument:
+class ParserAppOption:
+    # 分析应用程序的命令属性的option ！
+    # 1. 解析此应用外部的传入命令。
     
     def show_help(self):
-        # 和 PROGRAM_CMD 一致
         print 'program usage:'
         print '-h/--help: show help information.'
         print '-m/--model <name> load the given model.'
