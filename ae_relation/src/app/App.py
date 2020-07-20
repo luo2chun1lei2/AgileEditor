@@ -16,6 +16,7 @@ from parser.ParserAppOption import *
 from executor.Executor import *
 from executor.ExecutorApp import *
 from executor.ExecutorPipe import *
+from executor.ExecutorModel import *
 from input.Input import *
 from output.Output import *
 
@@ -35,7 +36,7 @@ class App():
     def __init__(self):
         # 为了解析应用程序启动的命令行。
         self.pipeApp = PipeSimple("app", ParserAppOption(), ExecutorApp(self))
-        self.quit = False
+        self.app_quit = False
     
     def do(self, argv):
         self.pipeApp.do(argv)
@@ -44,15 +45,16 @@ class App():
         output = Output()
         model = TestModel1()
         # TODO：有两层parser！
-        executor = ExecutorPipe(self) #ParserCommandLine(model) 
+        executor = ExecutorPipe(self) #ParserCommandLine(model)
+        self.executor2 = ExecutorModel(model)   # TODO: 对多个Executor怎么办？
         # 用于分析“交互模式”下的命令输入。
         self.parserInteractiveCommand = ParserInteractiveCommand(model)
         input = Input()
         
         self.pipe = PipeBasic(model_name, input, self.parserInteractiveCommand, executor, model, output)
 
-    def quit(self):
-        self.quit = True
+    def app_quit(self):
+        self.app_quit = True
 
     def _execute_script(self, script_path):
         # 执行一个脚本文件。
@@ -76,11 +78,12 @@ class App():
                     cmd += ll
                     
                 logging.debug('Execute line[%d]: %s' % (line_no, cmd))
-                cmdPkgs = self.parserInteractiveCommand.parse(self.pipe.executor, cmd)
+                cmdPkgs = self.parserInteractiveCommand.parse(cmd)
                 for pkg in cmdPkgs:
                     self.pipe.executor.execute(pkg)
+                    self.executor2.execute(pkg)
 
-                if quit:
+                if self.app_quit:
                     break
                 
                 cmd = ""
@@ -93,7 +96,7 @@ class App():
 
     # 在内部控制或者脚本可以执行的命令。
     # TODO : 应该用当前Parser或者当前Control来提供
-    CMDLINE_CMD = ['help', 'quit', 'test',
+    CMDLINE_CMD = ['help', 'app_quit', 'test',
                     'select', 'from', 'insert', 'update', 'delete', 'drop']
 
     def _enter_interview(self):
@@ -109,8 +112,9 @@ class App():
             cmdPkgs = self.parserInteractiveCommand.parse(input_str)
             for pkg in cmdPkgs:
                 self.pipe.executor.execute(pkg)
+                self.executor2.execute(pkg)
 
-            if quit:
+            if self.app_quit:
                 break
                 
             

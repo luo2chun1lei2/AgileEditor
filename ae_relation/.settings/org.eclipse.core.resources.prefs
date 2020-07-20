@@ -1,9 +1,12 @@
 eclipse.preferences.version=1
 encoding//src/Main.py=utf-8
+encoding//src/Try.py=utf-8
 encoding//src/app/App.py=utf-8
 encoding//src/app/__init__.py=utf-8
 encoding//src/executor/Executor.py=utf-8
 encoding//src/executor/ExecutorApp.py=utf-8
+encoding//src/executor/ExecutorModel.py=utf-8
+encoding//src/executor/ExecutorPipe.py=utf-8
 encoding//src/executor/__init__.py=utf-8
 encoding//src/input/Input.py=utf-8
 encoding//src/input/__init__.py=utf-8

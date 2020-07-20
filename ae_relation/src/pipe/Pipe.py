@@ -52,7 +52,3 @@ class PipeBasic(Pipe):
         self.executor = executor
         self.model = model
         self.output = output
-
-    # TODO: 以后要删掉！
-    def get_current_control(self):
-        return self.executor

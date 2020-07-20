@@ -24,16 +24,18 @@ class ParserInteractiveCommand(object):
         else:
             #executor.do(str_action.strip())
             pkgs = self.parserCommandLine.parse(str_action.strip())
-            cmdPkgs.append(pkgs)
+            cmdPkgs.extend(pkgs)
 
         return cmdPkgs
 
-    def _help(self):    # TODO: 多个parser时如何显示帮助信息?
+    def show_help(self):    # TODO: 多个parser时如何显示帮助信息?
         # 显示帮助信息。
-        print 'parser usage:'
-        print 'help: show help information.'
-        print 'quit: quit from parser.'
-        print 'test: test parser.'
+        print 'command:'
+        print '!help: show help information.'
+        print '!quit: quit from parser.'
+        print '!test: test parser.'
+        
+        self.parserCommandLine.show_help()
 
     def _inner_parse(self, cmdPkgs, str_action):
         # 解析命令，变成command package。
@@ -50,7 +52,7 @@ class ParserInteractiveCommand(object):
         elif str_action == 'help':
             pkg = CommandPackage(CommandId.HELP_PIPE)
         else:
-            print "Unknown parser command:%s" % str_action
+            logging.error("Unknown parser command:%s" % str_action)
         
         if pkg:
             cmdPkgs.append(pkg)

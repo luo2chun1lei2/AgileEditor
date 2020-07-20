@@ -12,6 +12,13 @@ class CommandId():
     MODEL_NAME = 5
     QUIT_PIPE = 6
     HELP_PIPE = 7
+    MODEL_SHOW = 8
+    MODEL_UMLCLASS = 9
+    MODEL_UML_COMPONENT = 10
+    MODEL_ADD_FIELD = 11
+    MODEL_ADD_METHOD = 12
+    MODEL_ADD_RELATION = 13
+    MODEL_ADD_INVOKE = 14
 
 class CommandPackage(object):
     # 只保存标准的数据包，

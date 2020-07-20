@@ -1,10 +1,11 @@
 # Agile Relation Editor
 
 不要人为复杂化！
+最好的设计是 底层以原子功能为主，顶层一个UI接口为主，中层是粘合结构。
 
 ## 安装：
 
-1. pip install prompt_toolkit
+1. pip install prompt_toolkit 需要升级到 2.0.9 以上。
 1. pip install CodernityDB
     这个是 Python 语言开发的，嵌入到程序中的NoSQL DB，是 key-value 类型。
 
