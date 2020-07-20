@@ -180,7 +180,7 @@ class TravelElements(object):
     def __init__(self):
         super(TravelElements, self).__init__()
         
-        self.uml = PlantUML("plantuml/plantuml.jar")
+        self.uml = PlantUML(util_get_exe_dir() + "/plantuml/plantuml.jar")
         self.data_fd, self.data_path = Utils.create_tmpfile("txt")
         logging.debug("Create tmp file:%s" % self.data_path)
         

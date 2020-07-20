@@ -9,7 +9,9 @@ from app.App import *
 ## 主要是启动App。
 
 def main(argv):
-    
+    PATH_THIS_FILE = os.path.abspath(__file__)
+    util_set_exe_dir(os.path.dirname(os.path.dirname(PATH_THIS_FILE)))
+
     app = App()
     app.do(argv)
 

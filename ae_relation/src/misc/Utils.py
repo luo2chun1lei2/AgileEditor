@@ -4,7 +4,7 @@
 Utilities
 '''
 
-import tempfile
+import tempfile, os
 
 def util_print_frame():
     ''' 打印出现错误的位置的上一个调用点，用于调试。
@@ -95,6 +95,17 @@ def util_split_command_args(str_args):
         start = i
     
     return args
+
+DIR_THIS_PROGRAM = None
+
+def util_set_exe_dir(path):
+    # 设置运行程序的(ae_relation)的位置
+    global DIR_THIS_PROGRAM
+    DIR_THIS_PROGRAM = path
+
+def util_get_exe_dir():
+    # 得到运行的程序(ae_relation)的位置
+    return DIR_THIS_PROGRAM
 
 ###########################################################
 ## 下面是单元测试
