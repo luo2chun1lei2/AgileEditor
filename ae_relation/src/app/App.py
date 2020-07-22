@@ -36,6 +36,7 @@ class App():
     def __init__(self):
         # 为了解析应用程序启动的命令行。
         self.pipeApp = PipeSimple("app", ParserAppOption(), ExecutorApp(self))
+        
         self.app_quit = False
     
     def do(self, argv):
@@ -53,7 +54,7 @@ class App():
         
         self.pipe = PipeBasic(model_name, input, self.parserInteractiveCommand, executor, model, output)
 
-    def app_quit(self):
+    def quit(self):
         self.app_quit = True
 
     def _execute_script(self, script_path):
@@ -62,23 +63,17 @@ class App():
         # return : bool: True, OK, False, failed.
         try:
             logging.debug('Open script "%s", and execute it.' % script_path)
-            f = open(script_path)
+            input = InputFile(script_path)
             
             # 读取文件中的每一行处理，如果行末有“\"，那么就将此行之下合并为此行。
             cmd = ""
             line_no = 0
-            for l in f:
+            while True:
+                line_no, cmd = input.read_line()
+                if cmd is None:
+                    break
                 
-                line_no += 1
-                ll = l.replace('\n', '').strip()
-                if len(ll) > 0 and ll[-1] == '\\':
-                    cmd += ll[:-1]
-                    continue
-                else:
-                    cmd += ll
-                    
-                logging.debug('Execute line[%d]: %s' % (line_no, cmd))
-                cmdPkgs = self.parserInteractiveCommand.parse(cmd)
+                cmdPkgs = self.parserInteractiveCommand.parse(line_no, cmd)
                 for pkg in cmdPkgs:
                     self.pipe.executor.execute(pkg)
                     self.executor2.execute(pkg)
@@ -105,11 +100,13 @@ class App():
         # TODO 提示的关键字，需要和下面的命令解析配套。
         word_completer = WordCompleter(App.CMDLINE_CMD, ignore_case=True)
         
+        line_no = 1
         while True:
             input_str = prompt('>', completer=word_completer,
                   complete_while_typing=False)
 
-            cmdPkgs = self.parserInteractiveCommand.parse(input_str)
+            cmdPkgs = self.parserInteractiveCommand.parse(line_no, input_str)
+            line_no = line_no + 1
             for pkg in cmdPkgs:
                 self.pipe.executor.execute(pkg)
                 self.executor2.execute(pkg)

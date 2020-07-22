@@ -182,7 +182,7 @@ class TravelElements(object):
         
         self.uml = PlantUML(util_get_exe_dir() + "/plantuml/plantuml.jar")
         self.data_fd, self.data_path = Utils.create_tmpfile("txt")
-        logging.debug("Create tmp file:%s" % self.data_path)
+        logging.debug("Create tmp input_file:%s" % self.data_path)
         
         self._write("@startuml")
     

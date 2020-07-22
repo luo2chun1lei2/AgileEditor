@@ -11,21 +11,35 @@ class ParserInteractiveCommand(object):
     def __init__(self, model):  #TODO: model是临时的。
         super(ParserInteractiveCommand, self).__init__()
         self.parserCommandLine = ParserCommandLine(model)
+        
+        # 最新的一行命令。
+        self.cur_cmd = ""
     
-    def parse(self, str_action):
+    def parse(self, line_no, line):
         # 分析和执行action.
-        # return: Return: 
+        # @param line_no int 行号，不一定是连续的。
+        # @param line string 一行输入。
+        # return: command package []:
+        #         None: 有可能输入信息不完整，无法完成分析！
+        
+        # 如果行的结尾是“\”，需要等下一行再分析。
+        # 输入文件类型脚本的特点，不放在parser中。
+        if len(line) > 0 and line[-1] == '\\':   
+            self.cur_cmd += line[:-1]
+            return None
+        else:
+            self.cur_cmd += line
 
         cmdPkgs = []
         
         # "!" 开头的是针对此层的操作，比如对 Container 的。
-        if str_action.startswith('!'):
-            self._inner_parse(cmdPkgs, str_action[1:])
+        if self.cur_cmd.startswith('!'):
+            self._inner_parse(cmdPkgs, self.cur_cmd[1:])
         else:
-            #executor.do(str_action.strip())
-            pkgs = self.parserCommandLine.parse(str_action.strip())
+            pkgs = self.parserCommandLine.parse(line_no, self.cur_cmd.strip())
             cmdPkgs.extend(pkgs)
 
+        self.cur_cmd = ""
         return cmdPkgs
 
     def show_help(self):    # TODO: 多个parser时如何显示帮助信息?

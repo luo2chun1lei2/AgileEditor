@@ -37,23 +37,24 @@ class ParserCommandLine(object):
         self.model = model
         self.no = 0
     
-    def parse(self, str_action):
-        # 执行action
-        # str_action: Action: 做的动作，以字符串格式
-        # return：CommandPackage[]
+    def parse(self, line_no, line):
+        # 分析输入。
+        # @param line_no int 行号
+        # @param line string 做的动作，以字符串格式
+        # @param return CommandPackage[]
     
         cmdPkgs = []
         self.no = self.no + 1
         
-        if str_action.startswith("#"):
+        if line.startswith("#"):
             # 是注释，什么都不用做。
-            logging.debug('One comment: %s.' % str_action)
+            logging.debug('One comment: %s.' % line)
             return cmdPkgs
 
         # TODO 不能用这个函数，因为会将“xxx xxx”的字符串也分割。
-        argv = util_split_command_args(str_action)
+        argv = util_split_command_args(line)
         if len(argv) == 0:
-            logging.debug('One empty line: %s.' % str_action)
+            logging.debug('One empty line: %s.' % line)
             return cmdPkgs
         
         if argv[0] == "help":

@@ -11,7 +11,8 @@ class Parser(object):
         
     def parse(self, input):
         # 对input进行分析
+        # TODO: 目前这个接口无法统一参数！
         # @param input any type
         # @return CommandPackage[]
         
-        return []
+        return None

@@ -26,7 +26,7 @@ class ExecutorPipe(Executor):
         if cmdPkg.cmdId == CommandId.HELP_PIPE:
             self.pipe.show_inner_command_help()
         elif cmdPkg.cmdId == CommandId.QUIT_PIPE:
-            self.pipe.app_quit()
+            self.pipe.quit()
         else:
             logging.error("Unknown parser command:%s" % cmdPkg.cmdId)
             
