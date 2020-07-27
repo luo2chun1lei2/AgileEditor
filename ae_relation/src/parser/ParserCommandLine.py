@@ -15,7 +15,7 @@ def program_usage():
     # 和 PROGRAM_CMD 一致
     print ('program usage:')
     print ('help: show help information.')
-    print ('script <script file path>: run pipe script')
+    print ('script <script file path>: run processor script')
 
 def control_usage():
     # 和 CMDLINE_CMD 一致。

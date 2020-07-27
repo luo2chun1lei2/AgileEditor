@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 建立基本的 “parserInteractiveCommand、executorApp、model” pipe。
+# 建立基本的 “parserInteractiveCommand、executorApp、model” processor。
 # App相当于一个Executor/Control。
 
 import os, sys, logging, getopt, shutil, traceback
 from parser.ParserCommandLine import *
 from mvc.model.TestModel1 import *
 
-from pipe.Pipe import *
+from processor.Pipe import *
 from parser.ParserInteractiveCommand import *
 from parser.ParserAppOption import *
 from executor.Executor import *
@@ -23,7 +23,7 @@ class App():
 
     def __init__(self):
         # 为了解析应用程序启动的命令行。
-        self.pipeApp = PipeSimple("app", ParserAppOption(), ExecutorApp(self))
+        self.pipeApp = ProcessorSimple("app", ParserAppOption(), ExecutorApp(self))
         
         self.app_quit = False
     
@@ -42,7 +42,7 @@ class App():
         # TODO: 多余？
         input = Input()
         
-        self.pipe = PipeBasic(model_name, input, self.parserInteractiveCommand, executor, model, output)
+        self.pipe = ProcessorBasic(model_name, input, self.parserInteractiveCommand, executor, model, output)
 
     def quit(self):
         self.app_quit = True
@@ -72,7 +72,7 @@ class App():
                     break
                 
                 cmd = ""
-                    
+
         except Exception, ex:
             print ex.message
             traceback.print_exc()

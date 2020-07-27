@@ -109,7 +109,7 @@
     1. Parser：负责将传入的输入导入到
         负责分析传入的命令，变成命令包(command package)，自己执行，或者发送给更下层的Control。
 5. Pipe层，功能主要是
-    1. Pipe: 容纳一个MVC实例，这样就允许App同时有不同的 Model。【目前不允许MVC之间交互】
+    1. Processor: 容纳一个MVC实例，这样就允许App同时有不同的 Model。【目前不允许MVC之间交互】
 6. App层，建立基本的程序运行结构，包括建立 input/parser/executor/model/view 模式。
     【这样设计的方案是，主要是建立命令执行和交互执行两种模式Mode】
     1. 解释命令行，然后创建 Parser + Container 模型，这样就建立基本的运行机制。
@@ -168,7 +168,7 @@ rlt --interview
 命令可以是下面几类：
 0. execute <script file>，脚本文件中可以包含下面所有的种类。
 1. app 管理应用程序 （$xxx）
-2. pipe 管理内部的处理管道 (!xxx)
+2. processor 管理内部的处理 (!xxx)
 3. model 针对MVC中的M，当然需要通过parser解析 (xxx)
 
 
@@ -207,6 +207,7 @@ pipe的结构挺好，但是怎么实现？
 1. pipe可能是临时的，比如在运行交互输入时，中间想执行一个脚本。那么这就同时有两个pipe，因为输入不同，所以Model和Executor一样。
     那么Executor是否可以同时运行在两个pipe中？
     回答：pipe必须能够允许其中的模块可以被其他的pipe同时顺次使用。
+        可以临时的创建一个Pipe，然后进行处理。完成后就销毁。
 2. pipe的概念是否太重？在普通的程序设计中，各个模块直接调用是否就行了？
     回答：不是，因为在app中存在调用这些模块的大量代码，这就是pipe应该存在的例证。
 

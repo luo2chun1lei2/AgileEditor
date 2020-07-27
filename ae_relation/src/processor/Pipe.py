@@ -1,12 +1,12 @@
 #-*- coding:utf-8 -*-
 
-# Pipe：
+# Processor：
 # input --> parserInteractiveCommand --> executorApp --> model --> output
 
 from parser.ParserCommandLine import *
 from mvc.model.TestModel1 import *
 
-class Pipe(object):
+class Processor(object):
     # 负责最基本的工作和接口，建立一个处理队列
     # 1. 整合 MVC 作为一个整体。
     # 2. TODO 对外提供什么标准操作？
@@ -24,12 +24,15 @@ class Pipe(object):
     #def do_action_by_current_control(self, str_action):
     #    #return: Return:
     #    return self.control.do(str_action.strip())
+    def do(self, input):
+        # Pipe开始正式运行。
+        pass
 
-class PipeSimple(Pipe):
+class ProcessorSimple(Processor):
     # 简单的Pipe，只需要指定Parser和Executor两个。
     def __init__(self, mvc_name, parser, executor):
-        # @param mvc_name string pipe name
-        super(PipeSimple, self).__init__(mvc_name)
+        # @param mvc_name string processor name
+        super(ProcessorSimple, self).__init__(mvc_name)
 
         self.parserInteractiveCommand = parser
         self.executor = executor
@@ -41,11 +44,11 @@ class PipeSimple(Pipe):
         for cmdPkg in cmdPkgs:
             self.executor.execute(cmdPkg)
 
-class PipeBasic(Pipe):
+class ProcessorBasic(Processor):
     # 可以使用的Pipe，简单的一个pipe，TODO:以后要允许有多个input和output。
     def __init__(self, mvc_name, input, parser, executor, model, output):
         # mvc_name: string: mvc name
-        super(PipeBasic, self).__init__(mvc_name)
+        super(ProcessorBasic, self).__init__(mvc_name)
 
         self.input = input
         self.parserInteractiveCommand = parser

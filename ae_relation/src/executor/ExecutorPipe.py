@@ -20,7 +20,7 @@ class ExecutorPipe(Executor):
 
     def execute(self, cmdPkg):
         # @param cmdPkg CommandPackage
-        logging.debug("Execute pipe command:%s" % cmdPkg.cmdId)
+        logging.debug("Execute processor command:%s" % cmdPkg.cmdId)
 
         # TODO 命令解析用 getopt，这样就允许用参数了。
         if cmdPkg.cmdId == CommandId.HELP_PIPE:

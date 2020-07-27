@@ -33,5 +33,5 @@ encoding//src/parser/ParserAppOption.py=utf-8
 encoding//src/parser/ParserCommandLine.py=utf-8
 encoding//src/parser/ParserInteractiveCommand.py=utf-8
 encoding//src/parser/__init__.py=utf-8
-encoding//src/pipe/Pipe.py=utf-8
-encoding//src/pipe/__init__.py=utf-8
+encoding//src/processor/Pipe.py=utf-8
+encoding//src/processor/__init__.py=utf-8
