@@ -30,9 +30,8 @@ class App():
         self.output = Output()
         self.model = TestModel1()
         # TODO：有两层parser！
-        self.executor = ExecutorPipe(self)
-        
-        self.executor2 = ExecutorModel(self.model)   # TODO: 对多个Executor怎么办？
+        self.executor = ExecutorList(ExecutorProcessor(self), 
+                                               ExecutorModel(self.model))
         # 用于分析“交互模式”下的命令输入。
         self.parserInteractiveCommand = ParserInteractiveCommand(self.model)
         
@@ -66,7 +65,6 @@ class App():
                 cmdPkgs = self.parserInteractiveCommand.parse(line_no, cmd)
                 for pkg in cmdPkgs:
                     self.processorCommandLine.executor.execute(pkg)
-                    self.executor2.execute(pkg)
 
                 if self.app_quit:
                     break
@@ -95,7 +93,6 @@ class App():
             cmdPkgs = self.parserInteractiveCommand.parse(line_no, cmd)
             for pkg in cmdPkgs:
                 self.processorInteractive.executor.execute(pkg)
-                self.executor2.execute(pkg)
 
             if self.app_quit:
                 break

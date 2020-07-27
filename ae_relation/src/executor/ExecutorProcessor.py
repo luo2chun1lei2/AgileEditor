@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 # Executor:
-# 执行的目标是Pipe。
+# 执行的目标是Processor。
 
 import logging
 
@@ -11,11 +11,11 @@ from misc.Return import *
 
 # TODO:这里的pipe是app, ExecutorPipe名字并不对。因为它不是针对Pipe的执行！
 #     是否将此模块合并到 ExecutorApp中，都是针对App的？
-class ExecutorPipe(Executor):
+class ExecutorProcessor(Executor):
     # 针对Pipe执行命令。
 
     def __init__(self, pipe):
-        super(ExecutorPipe, self).__init__()
+        super(ExecutorProcessor, self).__init__()
         self.processorCommandLine = pipe
 
     def execute(self, cmdPkg):
@@ -28,7 +28,8 @@ class ExecutorPipe(Executor):
         elif cmdPkg.cmdId == CommandId.QUIT_PIPE:
             self.processorCommandLine.quit()
         else:
-            logging.error("Unknown parser command:%s" % cmdPkg.cmdId)
+            #logging.error("Unknown parser command:%s" % cmdPkg.cmdId)
+            return Return.UNKNOWN
             
         return Return.OK
 

@@ -5,6 +5,7 @@ executor:
 '''
 
 from .Executor import *
+from executor.ExecutorList import *
 from .ExecutorApp import *
-from .ExecutorPipe import *
+from .ExecutorProcessor import *
 from .ExecutorModel import *

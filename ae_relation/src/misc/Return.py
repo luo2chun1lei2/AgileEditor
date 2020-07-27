@@ -9,6 +9,10 @@ u'''
 '''
 
 class Return:
-    OK   = 0
+    # 不是错误，而是无法处理。
+    UNKNOWN = 2
     QUIT = 1
+    OK   = 0
+    # 小于0的是错误，ERROR不是具体的错误信息。
     ERROR= -1
+    

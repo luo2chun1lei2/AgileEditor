@@ -61,9 +61,10 @@ class ExecutorModel(object):
             self._uml_add_invoke(cmdPkg)
         
         else: 
-            logging.error ("Unknown MVC command:%d" % cmdPkg.cmdId)
-            self.show_help()
-            return Return.ERROR
+#             logging.error ("Unknown MVC command:%d" % cmdPkg.cmdId)
+#             self.show_help()
+#             return Return.ERROR
+            return Return.UNKNOWN
         
         # TODO: 目前Control无法退出程序，只能执行命令。
         return Return.OK
