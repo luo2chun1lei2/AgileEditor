@@ -16,7 +16,7 @@ class ExecutorPipe(Executor):
 
     def __init__(self, pipe):
         super(ExecutorPipe, self).__init__()
-        self.pipe = pipe
+        self.processorCommandLine = pipe
 
     def execute(self, cmdPkg):
         # @param cmdPkg CommandPackage
@@ -24,9 +24,9 @@ class ExecutorPipe(Executor):
 
         # TODO 命令解析用 getopt，这样就允许用参数了。
         if cmdPkg.cmdId == CommandId.HELP_PIPE:
-            self.pipe.show_inner_command_help()
+            self.processorCommandLine.show_inner_command_help()
         elif cmdPkg.cmdId == CommandId.QUIT_PIPE:
-            self.pipe.quit()
+            self.processorCommandLine.quit()
         else:
             logging.error("Unknown parser command:%s" % cmdPkg.cmdId)
             

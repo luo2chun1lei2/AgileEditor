@@ -2,7 +2,7 @@
 
 from parser.ParserCommandLine import *
 from parser.CommandPackage import *
-from processor.Pipe import *
+from processor.Processor import *
 
 class ParserInteractiveCommand(object):
     # 1. 如果开头是"!"，解析。
