@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 建立基本的 “parserInteractiveCommand、executorApp、mvc” processor。
+# 建立基本的 “parserInteractiveCommand、executorApp、model” processor。
 # App相当于一个Executor/Control。
 # Interactive Mode = Interview.
 
 import os, sys, logging, getopt, shutil, traceback
 
-from mvc.model.TestModel1 import *
+from model.concrete.TestModel1 import *
 from processor import *
 from parser import *
 from executor import *
@@ -24,7 +24,7 @@ class App():
         self.processorApp.process(argv)
             
     def init_parser_container(self, model_name):
-        # TODO: mvc name应该用来建在model。
+        # TODO: model name应该用来建在model。
         self.output = Output()
         self.model = TestModel1()
         
@@ -39,6 +39,7 @@ class App():
             logging.debug('Open script "%s", and execute it.' % script_path)
             input = InputFile(script_path)
         
+            # TODO: 这里的设计不是很好，需要再想一想。
             executor1 = ExecutorProcessor(None)
             executor = ExecutorList(executor1,
                                     ExecutorModel(self.model))

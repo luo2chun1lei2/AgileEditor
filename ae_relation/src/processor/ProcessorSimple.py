@@ -4,7 +4,7 @@
 # parser --> executor
 
 from parser.ParserCommandLine import *
-from mvc.model.TestModel1 import *
+from model.concrete.TestModel1 import *
 from .Processor import *
 
 class ProcessorSimple(Processor):

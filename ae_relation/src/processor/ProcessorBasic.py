@@ -1,10 +1,10 @@
 #-*- coding:utf-8 -*-
 
 # Processor：
-# input --> parser -> --> executor --> mvc --> output
+# input --> parser -> --> executor --> model --> output
 
 from parser.ParserCommandLine import *
-from mvc.model.TestModel1 import *
+from model.concrete.TestModel1 import *
 from .Processor import *
 
 class ProcessorBasic(Processor):

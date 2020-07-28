@@ -3,7 +3,7 @@
 # 分析针对Model的命令。
 # 命令格式是 getopt 格式的。
 
-from mvc.Model import *
+from model.Model import *
 from misc.Return import *
 from misc.Utils import *
 from parser.CommandPackage import *

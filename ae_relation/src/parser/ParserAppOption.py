@@ -10,8 +10,8 @@ class ParserAppOption:
     def show_help(self):
         print 'program usage:'
         print '-h/--help: show help information.'
-        print '-m/--mvc <name> load the given mvc.'
-        print '-s/--script <path> run script after having loaded mvc.'
+        print '-m/--model <name> load the given model.'
+        print '-s/--script <path> run script after having loaded model.'
         print '-i/--interview start interview mode, if not, quit if run script.'
         print '--debug show log with debug level. If not, show information level.'
     
@@ -25,7 +25,7 @@ class ParserAppOption:
         try:
             opts, args = getopt.getopt(argv[1:],
                                        "hm:s:i",
-                                       ["help", "mvc=", "script=", "interview", "debug"])
+                                       ["help", "model=", "script=", "interview", "debug"])
         except getopt.GetoptError, err:
             print str(err)
             self.show_help()
@@ -42,7 +42,7 @@ class ParserAppOption:
             if o in ('-h', '--help'):
                 opt_help = True
                 opt_help_error = False
-            elif o in ('-m', '--mvc'):
+            elif o in ('-m', '--model'):
                 opt_model_name = a
             elif o in ('-s', '--script'):
                 opt_script_path = a
@@ -71,7 +71,7 @@ class ParserAppOption:
             cmdPkg.error = opt_help_error
             cmdPkgs.append(cmdPkg)
         
-        # set mvc name
+        # set model name
         if opt_model_name:
             cmdPkg = CommandPackage(CommandId.MODEL_NAME)
             cmdPkg.model_name = opt_model_name

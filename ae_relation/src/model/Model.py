@@ -7,7 +7,7 @@ import os, sys, logging, getopt, shutil, traceback
 from misc.PlantUML import *
 from misc.Storage import *
 from misc.Utils import *
-from mvc.Element import *
+from model.Element import *
 
 
 class UMLComponent(AElement):
