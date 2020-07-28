@@ -2,7 +2,8 @@
 
 # 针对Model的Executor。
 
-from model.Model import *
+from model import *
+from model.concrete.UMLModel import *
 from misc.Return import *
 from misc.Utils import *
 from parser.CommandPackage import *

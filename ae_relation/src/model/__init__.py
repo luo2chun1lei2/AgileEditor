@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
 '''
-MVC层，包含若干 Model+View+Control
-因为这三个是一整套的，所以就放在一个package下面。
+Model专门负责内部的数据建模。
 '''
+
+from .Element import *
+from .Relation import *
+from .Model import *
