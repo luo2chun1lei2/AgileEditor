@@ -24,7 +24,7 @@ class ParserInteractiveCommand(object):
         
         # 如果行的结尾是“\”，需要等下一行再分析。
         # 输入文件类型脚本的特点，不放在parser中。
-        if len(line) > 0 and line[-1] == '\\':   
+        if len(line) > 0 and line[-1] == '\\':
             self.cur_cmd += line[:-1]
             return None
         else:

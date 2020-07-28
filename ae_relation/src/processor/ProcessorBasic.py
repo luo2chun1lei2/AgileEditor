@@ -25,7 +25,7 @@ class ProcessorBasic(Processor):
     
     def quit(self):
         self.my_quit = True
-        
+
     def show_help(self):
         self.parser.show_help()
     
@@ -35,9 +35,14 @@ class ProcessorBasic(Processor):
         while True:
             line_no, cmd = self.input.read_line()
             if cmd is None:
-                    break
+                # 这是到了文件的结尾。
+                break
     
             cmdPkgs = self.parser.parse(line_no, cmd)
+            if cmdPkgs == None:
+                # 如果分析的行是未完成的，那么就继续分析。
+                continue
+
             for pkg in cmdPkgs:
                 self.executor.execute(pkg)
     

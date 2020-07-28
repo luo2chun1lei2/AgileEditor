@@ -7,7 +7,7 @@
 
 import os, sys, logging, getopt, shutil, traceback
 
-from model.concrete.TestModel1 import *
+from model.concrete.UMLModel import *
 from processor import *
 from parser import *
 from executor import *
@@ -26,7 +26,7 @@ class App():
     def init_parser_container(self, model_name):
         # TODO: model name应该用来建在model。
         self.output = Output()
-        self.model = Model()
+        self.model = UMLModel()
         
         # 用于分析“交互模式”下的命令输入。
         self.parserInteractiveCommand = ParserInteractiveCommand(self.model)

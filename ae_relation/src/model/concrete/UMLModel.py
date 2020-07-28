@@ -8,6 +8,7 @@ from misc import *
 
 from model.Relation import *
 from model.Element import *
+from model.Model import *
 
 class UMLComponent(AElement):
     # UML's component
@@ -264,6 +265,7 @@ class TravelElements(object):
         os.remove(self.data_path)
         shutil.rmtree(out_dir)
 
+# TODO: 这个最好放在Output中实现。
 class ShowSequence(TravelElements):
     # Travel Elements to create SEQUENCE diagram.
     # use PlantUML. 需要顺序。
@@ -381,3 +383,141 @@ class ShowSequence(TravelElements):
         self._write("hide footbox")
         return True
     
+
+class UMLModel(Model):
+    # UML的model。
+    def __init__(self):
+        super(UMLModel, self).__init__()
+
+    def show(self, cmdPkg):
+        logging.debug("show diagram of model.")
+        
+        diagram_type = cmdPkg.diagram
+        
+        if diagram_type in ( "class", "component"): 
+            travel = TravelElements()
+        elif diagram_type in ("sequence", "seq"):
+            travel = ShowSequence()
+        else:
+            travel = TravelElements()
+
+        travel.travel(self.elements.values())
+        travel.finish()
+    
+    def create_uml_class(self, cmdPkg):
+        e = UMLClass(cmdPkg.name, cmdPkg.no, cmdPkg.title, cmdPkg.color)
+        if self.add_element(cmdPkg.name, e):
+            return Return.ERROR
+        else:
+            return Return.OK
+    
+    def create_uml_component(self, cmdPkg):
+    
+        e = UMLComponent(cmdPkg.name, cmdPkg.no, cmdPkg.title, cmdPkg.color)
+        if self.add_element(cmdPkg.name, e):
+            return Return.ERROR
+        else:
+            return Return.OK
+        
+    def uml_class_add_field(self, cmdPkg):
+    
+        e = self.find_element(cmdPkg.target)
+        e = e.add_field(cmdPkg.name, cmdPkg.type)
+
+        return Return.OK
+    
+    def uml_class_add_method(self, cmdPkg):
+    
+        # find class or component
+        e = self.find_element(cmdPkg.target)
+        
+        # create a new Method element.
+        m = UMLMethod(cmdPkg.name, cmdPkg.no, cmdPkg.name, e)
+        if self.add_element(cmdPkg.name, m):
+            return Return.OK
+        else:
+            return Return.ERROR
+        
+        e = e.add_method(m)
+
+        return Return.OK
+
+    def uml_class_relation_set_relation(self, cmdPkg):
+    
+        e = self.find_element(cmdPkg.target)
+        from_e = self.find_element(cmdPkg.from_e)
+        to_e = self.find_element(cmdPkg.to)
+        e = e.set_relation(cmdPkg.name, from_e, to_e)
+
+        return Return.OK
+    
+    def uml_add_relation(self, cmdPkg):
+            
+        from_e = self.find_element(cmdPkg.from_e)
+        to_e = self.find_element(cmdPkg.to)
+        
+        if from_e is None or to_e is None:
+            return False
+    
+        if isinstance(from_e, UMLClass):
+            name = AGlobalName.get_unique_name("ClassRelation")
+            r = UMLClassRelation(name, cmdPkg.no)
+        elif isinstance(from_e, UMLComponent):
+            name = AGlobalName.get_unique_name("ComponentRelation")
+            r = UMLComponentRelation(name, cmdPkg.no)
+
+        if self.add_element(name, r):
+            return Return.ERROR
+        
+        r.set_relation(cmdPkg.type, cmdPkg.title, from_e, to_e)
+
+        return Return.OK
+    
+    def uml_add_invoke(self, cmdPkg):
+        
+        # 找到必须有的选项，和对应的对象。
+        from_parent_e = None
+        if cmdPkg.from_parent != None:
+            from_parent_e = self.find_element(cmdPkg.from_parent)
+        
+        if from_parent_e is None:
+            return False
+        
+        from_e = None
+        if cmdPkg.from_e is not None:
+            from_e = self.find_element(cmdPkg.from_e)
+        
+        if from_e is None:
+            return False
+        
+        to_parent_e = None
+        if cmdPkg.to_parent != None:
+            to_parent_e = self.find_element(cmdPkg.to_parent)
+        
+        if to_parent_e is None:
+            return False
+        
+        to_e = None
+        if cmdPkg.to is not None:
+            to_e = self.find_element(cmdPkg.to)
+            
+        if to_e is None:
+            return False
+        
+        # 将方法和类、组件联系在一起。
+        #rm = UMLElement2MethodRelation("Have", "have", _e, m)
+        #if self.add_element(m.name, rm):
+        #    return Return.ERROR
+    
+        # 添加 两个方法之间的关系。
+        #name = AGlobalName.get_unique_name(to_parent_e)
+        # TODO 名字不好起，在代码中是一个函数调用另外一个函数。
+        name = "%s->%s" % (cmdPkg.from_e, cmdPkg.to)
+        r = UMLMethodRelation(name, cmdPkg.no)
+        r.set_relation("Use", from_parent_e, from_e, to_parent_e, to_e)
+        
+        if not self.add_element(r.name, r):
+            return Return.ERROR
+
+        return Return.OK
+        

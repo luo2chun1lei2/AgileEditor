@@ -5,8 +5,8 @@
 
 ## 安装：
 
-1. pip install prompt_toolkit 需要升级到 2.0.9 以上。
-1. pip install CodernityDB
+1. sudo pip install prompt_toolkit 需要升级到 2.0.9 以上。
+1. sudo pip install CodernityDB
     这个是 Python 语言开发的，嵌入到程序中的NoSQL DB，是 key-value 类型。
 
 ## 有三个阶段：
