@@ -62,9 +62,9 @@ class ParserInteractiveCommand(object):
             pass
         elif str_action == 'quit':
             #return Return.QUIT
-            pkg = CommandPackage(CommandId.QUIT_PIPE)
+            pkg = CommandPackage(CommandId.QUIT_PROCESSOR)
         elif str_action == 'help':
-            pkg = CommandPackage(CommandId.HELP_PIPE)
+            pkg = CommandPackage(CommandId.HELP_PROCESSOR)
         else:
             logging.error("Unknown parser command:%s" % str_action)
         

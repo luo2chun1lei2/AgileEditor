@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 # Processor：
-# input --> parser -> --> executor --> model --> output
+# input --> parser -> --> executor --> mvc --> output
 
 from parser.ParserCommandLine import *
 from mvc.model.TestModel1 import *
@@ -14,13 +14,32 @@ class ProcessorBasic(Processor):
     def __init__(self, name, input, parser, executor, model, output):
         # name: string: processor name
         super(ProcessorBasic, self).__init__(name)
+        
+        self.my_quit = False
 
         self.input = input
-        self.parserInteractiveCommand = parser
+        self.parser = parser
         self.executor = executor
         self.model = model
         self.output = output
+    
+    def quit(self):
+        self.my_quit = True
         
+    def show_help(self):
+        self.parser.show_help()
+    
     def process(self):
-        # 处理。
-        pass
+        # 处理，有可能陷入无限循环等待。
+
+        while True:
+            line_no, cmd = self.input.read_line()
+            if cmd is None:
+                    break
+    
+            cmdPkgs = self.parser.parse(line_no, cmd)
+            for pkg in cmdPkgs:
+                self.executor.execute(pkg)
+    
+            if self.my_quit:
+                break

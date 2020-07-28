@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 建立基本的 “parserInteractiveCommand、executorApp、model” processor。
+# 建立基本的 “parserInteractiveCommand、executorApp、mvc” processor。
 # App相当于一个Executor/Control。
 # Interactive Mode = Interview.
 
@@ -19,32 +19,17 @@ class App():
     def __init__(self):
         # 为了解析应用程序启动的命令行。
         self.processorApp = ProcessorSimple("app", ParserAppOption(), ExecutorApp(self))
-        
-        self.app_quit = False
     
     def do(self, argv):
         self.processorApp.process(argv)
             
     def init_parser_container(self, model_name):
-        # TODO: model name应该用来建在model。
+        # TODO: mvc name应该用来建在model。
         self.output = Output()
         self.model = TestModel1()
-        # TODO：有两层parser！
-        self.executor = ExecutorList(ExecutorProcessor(self), 
-                                               ExecutorModel(self.model))
+        
         # 用于分析“交互模式”下的命令输入。
         self.parserInteractiveCommand = ParserInteractiveCommand(self.model)
-        
-        # TODO: 多余？
-        input = Input()
-        
-        self.processorCommandLine = ProcessorBasic(model_name, input,
-                                                   self.parserInteractiveCommand,
-                                                   self.executor, self.model, self.output)
-    
-
-    def quit(self):
-        self.app_quit = True
 
     def _execute_script(self, script_path):
         # 执行一个脚本文件。
@@ -53,25 +38,19 @@ class App():
         try:
             logging.debug('Open script "%s", and execute it.' % script_path)
             input = InputFile(script_path)
+        
+            executor1 = ExecutorProcessor(None)
+            executor = ExecutorList(executor1,
+                                    ExecutorModel(self.model))
+            processor = ProcessorBasic("script", input,
+                                            self.parserInteractiveCommand,
+                                            executor, self.model, self.output)
+            executor1.processor = processor
             
-            # 读取文件中的每一行处理，如果行末有“\"，那么就将此行之下合并为此行。
-            cmd = ""
-            line_no = 0
-            while True:
-                line_no, cmd = input.read_line()
-                if cmd is None:
-                    break
-                
-                cmdPkgs = self.parserInteractiveCommand.parse(line_no, cmd)
-                for pkg in cmdPkgs:
-                    self.processorCommandLine.executor.execute(pkg)
-
-                if self.app_quit:
-                    break
-                
-                cmd = ""
+            processor.process()
 
         except Exception, ex:
+            # 主要是捕获文件打不开的错误。
             print ex.message
             traceback.print_exc()
             return False
@@ -81,21 +60,14 @@ class App():
         
         input = InputConsole()
         
-        self.processorInteractive = ProcessorBasic("interview", input,
-                                                   self.parserInteractiveCommand,
-                                                   self.executor, self.model, self.output)
+        executor1 = ExecutorProcessor(None)
+        executor = ExecutorList(executor1,
+                                    ExecutorModel(self.model))
         
-        while True:
-            line_no, cmd = input.read_line()
-            if cmd is None:
-                    break
-
-            cmdPkgs = self.parserInteractiveCommand.parse(line_no, cmd)
-            for pkg in cmdPkgs:
-                self.processorInteractive.executor.execute(pkg)
-
-            if self.app_quit:
-                break
-
-    def show_inner_command_help(self):
-        self.processorCommandLine.parserInteractiveCommand.show_help()
+        processorInteractive = ProcessorBasic("interview", input,
+                                                   self.parserInteractiveCommand,
+                                                   executor, self.model, self.output)
+        
+        executor1.processor = processorInteractive
+        processorInteractive.process()
+        # 这里退出后，app就自然退出。以后可能建立更加复杂的机制。     

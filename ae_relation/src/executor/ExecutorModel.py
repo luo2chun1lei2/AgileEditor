@@ -85,7 +85,7 @@ class ExecutorModel(object):
         return (opts, args)
     
     def _show(self, cmdPkg):
-        logging.debug("show diagram of model.")
+        logging.debug("show diagram of mvc.")
         
         diagram_type = cmdPkg.diagram
         
@@ -201,7 +201,7 @@ class ExecutorModel(object):
         
         # 将方法和类、组件联系在一起。
         #rm = UMLElement2MethodRelation("Have", "have", _e, m)
-        #if self.model.add_element(m.name, rm):
+        #if self.mvc.add_element(m.name, rm):
         #    return Return.ERROR
     
         # 添加 两个方法之间的关系。

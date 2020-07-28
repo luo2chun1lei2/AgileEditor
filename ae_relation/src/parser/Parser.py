@@ -16,3 +16,6 @@ class Parser(object):
         # @return CommandPackage[]
         
         return None
+
+    def show_help(self):
+        assert False
