@@ -15,9 +15,10 @@ import getopt
 class ExecutorModel(object):
     # 执行针对Model的command package
     
-    def __init__(self, model):
+    def __init__(self, model, output):
         super(ExecutorModel, self).__init__()
         self.model = model
+        self.output = output
         self.no = 0
         
     def execute(self, cmdPkg):
@@ -25,7 +26,8 @@ class ExecutorModel(object):
         if cmdPkg.cmdId == CommandId.SHOW_HELP:
             self.show_help()    # TODO 显示谁的帮助？
         elif cmdPkg.cmdId == CommandId.MODEL_SHOW:
-            self.model.show(cmdPkg)
+            # 为了显示，就需要 Model和Output配合。
+            self.output.show(self.model, cmdPkg)
 
         elif cmdPkg.cmdId == CommandId.MODEL_UMLCLASS:
             # 类型。

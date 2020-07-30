@@ -6,3 +6,4 @@ Output
 '''
 
 from .Output import *
+from .OutputUML import *

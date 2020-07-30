@@ -29,6 +29,7 @@ encoding//src/model/concrete/__init__.py=utf-8
 encoding//src/model/element/Module.py=utf-8
 encoding//src/model/element/__init__.py=utf-8
 encoding//src/output/Output.py=utf-8
+encoding//src/output/OutputUML.py=utf-8
 encoding//src/output/__init__.py=utf-8
 encoding//src/parser/CommandPackage.py=utf-8
 encoding//src/parser/Parser.py=utf-8

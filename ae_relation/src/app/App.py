@@ -25,7 +25,7 @@ class App():
             
     def init_parser_container(self, model_name):
         # TODO: model name应该用来建在model。
-        self.output = Output()
+        self.output = OutputUML()
         self.model = UMLModel()
         
         # 用于分析“交互模式”下的命令输入。
@@ -42,7 +42,7 @@ class App():
             # TODO: 这里的设计不是很好，需要再想一想。
             executor1 = ExecutorProcessor(None)
             executor = ExecutorList(executor1,
-                                    ExecutorModel(self.model))
+                                    ExecutorModel(self.model, self.output))
             processor = ProcessorBasic("script", input,
                                             self.parserInteractiveCommand,
                                             executor, self.model, self.output)
@@ -63,7 +63,7 @@ class App():
         
         executor1 = ExecutorProcessor(None)
         executor = ExecutorList(executor1,
-                                    ExecutorModel(self.model))
+                                    ExecutorModel(self.model, self.output))
         
         processorInteractive = ProcessorBasic("interview", input,
                                                    self.parserInteractiveCommand,

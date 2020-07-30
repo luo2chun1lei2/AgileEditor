@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
-'''
-output
-'''
+
+# output
+# 输出的基础类。
+
+import logging
 
 class Output(object):
     def __init__(self):
