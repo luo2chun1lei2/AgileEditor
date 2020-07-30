@@ -1,44 +1,29 @@
 # -*- coding:utf-8 -*-
 
-# Input是所有Input的基类
-# 汇集所有的输入，比如Console、文本等。
-# 1. 以行为基本单位。但并不是说，一行就一定处理结果。文本后面不包括"\n"。
+# 普通的控制台输入。
 
-from __future__ import unicode_literals
-
-import logging, sys
+import logging, sys, platform, signal
 from .Input import *
-
-# 用于命令提示
-
-reload(sys)
-sys.setdefaultencoding('utf8')
-
-from prompt_toolkit import PromptSession
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter 
     
 # 在内部控制或者脚本可以执行的命令。
-# TODO : 应该用当前Parser或者当前Control来提供
-CMDLINE_CMD = ['help', 'app_quit', 'test',
-                    'select', 'from', 'insert', 'update', 'delete', 'drop']
-    
 class InputConsole(Input):
     # 从控制台获取输入。
     
     def __init__(self):
         super(InputConsole, self).__init__()
-        
-        # 设定命令的提示符号。
-        # TODO 提示的关键字，需要和下面的命令解析配套。
-        self.word_completer = WordCompleter(CMDLINE_CMD, ignore_case=True)
         self.line_no = 0
         
-    def read_line(self, wait=True):
-        input_str = prompt('>', completer=self.word_completer,
-              complete_while_typing=False)
+    def read_line(self, wait=True, ):
+        sys.stdout.write(">")
+        sys.stdout.flush()
+        
+        # Ignore Ctrl-Z stop signal
+        if platform.system() != "Windows":
+            signal.signal(signal.SIGTSTP, signal.SIG_IGN)
+        # Ignore Ctrl-C interrupt signal
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        
+        input_str = sys.stdin.readline().strip("\n")
         self.line_no = self.line_no + 1
         
         return self.line_no, input_str

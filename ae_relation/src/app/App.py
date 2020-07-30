@@ -59,7 +59,7 @@ class App():
 
     def _enter_interview(self):
         
-        input = InputConsole()
+        input = InputPrompt()
         
         executor1 = ExecutorProcessor(None)
         executor = ExecutorList(executor1,

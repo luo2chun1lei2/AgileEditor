@@ -7,3 +7,4 @@ input:
 from .Input import *
 from .InputFile import *
 from .InputConsole import *
+from .InputPrompt import *

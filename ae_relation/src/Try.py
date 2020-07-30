@@ -1,45 +1,18 @@
+# -*- coding:utf-8 -*-
 #!/usr/bin/env python
-"""
-这里是python的奇怪语法和第三方工具测试用的代码处。
-无关正式代码。
-"""
-from __future__ import print_function, unicode_literals
 
-from prompt_toolkit import PromptSession
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.history import InMemoryHistory
+#这里是python的奇怪语法和第三方工具测试用的代码处。
+#无关正式代码。
 
+import sys
 
 def main():
-    # Create some history first. (Easy for testing.)
-    history = InMemoryHistory()
-    history.append_string('import os')
-    history.append_string('print("hello")')
-    history.append_string('print("world")')
-    history.append_string('import path')
-
-    # Print help.
-    print('This CLI has fish-style auto-suggestion enable.')
-    print('Type for instance "pri", then you\'ll see a suggestion.')
-    print('Press the right arrow to insert the suggestion.')
-    print('Press Control-C to retry. Control-D to exit.')
-    print()
-
-    session = PromptSession(
-        history=history,
-        auto_suggest=AutoSuggestFromHistory(),
-        enable_history_search=True)
-
     while True:
-        try:
-            text = session.prompt('Say something: ')
-        except KeyboardInterrupt:
-            pass  # Ctrl-C pressed. Try again.
-        else:
+        #print ">",
+        s = sys.stdin.readline().strip("\n")
+        s = input ('>').strip("\n")
+        print "|%s|" % s
+        if s == "quit":
             break
-
-    print('You said: %s' % text)
-
-
 if __name__ == '__main__':
     main()
