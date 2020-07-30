@@ -101,7 +101,6 @@ class TravelElements(object):
         os.remove(self.data_path)
         shutil.rmtree(out_dir)
 
-# TODO: 这个最好放在Output中实现。
 class ShowSequence(TravelElements):
     # Travel Elements to create SEQUENCE diagram.
     # use PlantUML. 需要顺序。
