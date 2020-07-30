@@ -172,7 +172,7 @@ class UMLMethodRelation(ARelation):
         # to_element: AElement
         return self.relation_type, self.from_parent, self.from_element, \
             self.to_parent, self.to_element 
-        
+
 class TravelElements(object):
     # Travel Elements to create some thing
     # use PlantUML to create class and component diagram

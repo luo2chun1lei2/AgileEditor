@@ -1,18 +1,18 @@
 # -*- coding:utf-8 -*-
 
-# 作为测试程序的一个Model，从Model继承下来。
+# 测试UML的Model用的。
 # 内部有固定代码实现的测试模型。
-from model.Model import *
+from model import *
+from model.concrete.UMLModel import *
 
-class TestModel1(Model):
-    def __init__(self):
-        super(TestModel1, self).__init__()
+class TestUMLModel(unittest.TestCase):
 
-    def test_db(self):
-        test_db()
+    def test_1(self):
+        #test_db()
+        pass
     
-    def test1(self):
-        # TODO: 应该删除！
+    def abctest(self):
+        # 测试内部的类和函数。
         try:
             # set elements.
             e1 = UMLClass('ServiceProviderBridge')
