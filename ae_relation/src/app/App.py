@@ -22,7 +22,7 @@ class App():
     
     def do(self, argv):
         self.processorApp.process(argv)
-            
+
     def init_parser_container(self, model_name):
         # TODO: model name应该用来建在model。
         self.output = OutputUML()
