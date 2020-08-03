@@ -6,6 +6,7 @@
 from model.Model import *
 from misc.Return import *
 from misc.Utils import *
+from parser.Parser import *
 from parser.CommandPackage import *
 
 import logging
@@ -29,7 +30,7 @@ def control_usage():
     print ('delete: delete element or relation.')
     print ('drop: drop all data.')
 
-class ParserCommandLine(object):
+class ParserCommandLine(Parser):
     # 这个parser能够分析类似命令行的脚本。就是用getopt可以分析的命令行。
     
     def __init__(self, model):
@@ -51,7 +52,7 @@ class ParserCommandLine(object):
             logging.debug('One comment: %s.' % line)
             return cmdPkgs
 
-        # TODO 不能用这个函数，因为会将“xxx xxx”的字符串也分割。
+        # 不能用split这个函数，因为会将“xxx xxx”的字符串也分割。
         argv = util_split_command_args(line)
         if len(argv) == 0:
             logging.debug('One empty line: %s.' % line)

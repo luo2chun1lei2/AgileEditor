@@ -1,10 +1,11 @@
 #-*- coding:utf-8 -*-
 
+from parser.Parser import *
 from parser.ParserCommandLine import *
 from parser.CommandPackage import *
 from processor.Processor import *
 
-class ParserInteractiveCommand(object):
+class ParserInteractiveCommand(Parser):
     # 1. 如果开头是"!"，解析。
     # 2. 其他，传递到其他的Parser执行！
 

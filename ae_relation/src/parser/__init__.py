@@ -10,3 +10,4 @@ from .CommandPackage import *
 from .Parser import *
 from .ParserInteractiveCommand import *
 from .ParserAppOption import *
+from .ParserBasic import *

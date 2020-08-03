@@ -32,7 +32,8 @@ class App():
         self.model = ModelBasic() #UMLModel()
         
         # 用于分析“交互模式”下的命令输入。
-        self.parserInteractiveCommand = ParserInteractiveCommand(self.model)
+        #self.parserInteractiveCommand = ParserInteractiveCommand(self.model)
+        self.parserInteractiveCommand = ParserBasic(self.model)
 
     def _execute_script(self, script_path):
         # 执行一个脚本文件。

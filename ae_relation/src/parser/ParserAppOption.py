@@ -1,11 +1,16 @@
 #-*- coding:utf-8 -*-
 
 import os, sys, getopt, logging
+
+from parser.Parser import *
 from parser.CommandPackage import *
 
-class ParserAppOption:
+class ParserAppOption(Parser):
     # 分析应用程序的命令属性的option ！
     # 1. 解析此应用外部的传入命令。
+    
+    def __init__(self):  #TODO: model是临时的。
+        super(ParserAppOption, self).__init__()
     
     def show_help(self):
         print 'program usage:'
