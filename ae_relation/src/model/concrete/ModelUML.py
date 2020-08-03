@@ -173,10 +173,10 @@ class UMLMethodRelation(ARelation):
         return self.relation_type, self.from_parent, self.from_element, \
             self.to_parent, self.to_element 
 
-class UMLModel(Model):
+class ModelUML(Model):
     # UML的model。
     def __init__(self):
-        super(UMLModel, self).__init__()
+        super(ModelUML, self).__init__()
 
     def create_uml_class(self, cmdPkg):
         e = UMLClass(cmdPkg.name, cmdPkg.no, cmdPkg.title, cmdPkg.color)

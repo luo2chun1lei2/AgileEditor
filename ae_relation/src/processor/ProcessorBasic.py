@@ -4,7 +4,7 @@
 # input --> parser -> --> executor --> model --> output
 
 from parser.ParserCommandLine import *
-from model.concrete.UMLModelTest import *
+from model.concrete.ModelUMLTest import *
 from .Processor import *
 
 class ProcessorBasic(Processor):

@@ -7,7 +7,8 @@
 
 import os, sys, logging, getopt, shutil, traceback
 
-from model.concrete.UMLModel import *
+from model.concrete.ModelUML import *
+from model.concrete.ModelBasic import *
 from processor import *
 from parser import *
 from executor import *
@@ -24,9 +25,11 @@ class App():
         self.processorApp.process(argv)
 
     def init_parser_container(self, model_name):
+        
+        #TODO: 怎么选择不同的output？以及model之外的模块？
+        self.output = OutputGraphviz() #OutputUML()
         # TODO: model name应该用来建在model。
-        self.output = OutputUML()
-        self.model = UMLModel()
+        self.model = ModelBasic() #UMLModel()
         
         # 用于分析“交互模式”下的命令输入。
         self.parserInteractiveCommand = ParserInteractiveCommand(self.model)

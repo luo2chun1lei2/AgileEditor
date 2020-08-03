@@ -6,9 +6,11 @@
 import logging
 
 from .Output import *
-from model.concrete.UMLModel import *
+from model.concrete.ModelUML import *
 from misc import *
-    
+
+
+# TODO: Travel 这个类，还需要再进行处理，可以将Travel放在Model中，而具体的处理放在Output中。
 class TravelElements(object):
     # Travel Elements to create some thing
     # use PlantUML to create class and component diagram
@@ -227,6 +229,7 @@ class OutputUML(Output):
         
         diagram_type = cmdPkg.diagram
         
+        # 数据类型不同，遍历的方式也不同。
         if diagram_type in ( "class", "component"): 
             travel = TravelElements()
         elif diagram_type in ("sequence", "seq"):
@@ -235,4 +238,6 @@ class OutputUML(Output):
             travel = TravelElements()
 
         travel.travel(model.elements.values())
+        
+        # 遍历后，显示出来。
         travel.finish()

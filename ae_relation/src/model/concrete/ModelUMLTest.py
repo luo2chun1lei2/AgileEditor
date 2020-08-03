@@ -3,9 +3,9 @@
 # 测试UML的Model用的。
 # 内部有固定代码实现的测试模型。
 from model import *
-from model.concrete.UMLModel import *
+from model.concrete.ModelUML import *
 
-class TestUMLModel(unittest.TestCase):
+class ModelUMLTest(unittest.TestCase):
 
     def test_1(self):
         #test_db()

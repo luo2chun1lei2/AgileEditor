@@ -7,3 +7,4 @@ Output
 
 from .Output import *
 from .OutputUML import *
+from .OutputGraphivz import *

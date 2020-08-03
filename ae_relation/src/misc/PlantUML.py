@@ -1,12 +1,9 @@
 # -*- coding:utf-8 -*-
 
-'''
-控制PlantUML工具。
-本地必须有 plantuml.jar
-'''
+# 控制PlantUML工具。
+# 本地必须有 plantuml.jar
 
-import os, sys, subprocess
-
+import os, sys, subprocess, logging
 
 class PlantUML(object):
 
@@ -19,28 +16,25 @@ class PlantUML(object):
             print "Cannot find PlantUML jar of \"%s\" in %s." % (jar_path, os.getcwd())
             sys.exit(1)
 
-    def create_diagram(self, data_path, out_dir_path):
+    def create_diagram(self, data_path, out_path):
         # @param data_path:string: data file path
-        # @param out_dir_path:string: output directory, not file
+        # @param out_path:string: output directory, not file
         # @return True: ok, False: failed.
         
-        print "=== %s ===" % data_path
+        logging.debug("open %s" % data_path)
         f = open(data_path)
         for l in f:
-            print l
+            logging.debug(l)
         f.close()
         
-        command = "java -jar %s %s -o %s -t png" % (self.jar_path, data_path, out_dir_path)
+        command = "java -jar %s %s -o %s -t png" % (self.jar_path, data_path, out_path)
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE) 
         out, err = p.communicate()
         
         if err is not None:
             print err
             return False
-         
-        # for line in out.splitlines():
-        #    print line
 
-        # show png
+        # show diagram
         data_file_name = os.path.basename(data_path)
-        os.system('eog %s/%s.png' % (out_dir_path, os.path.splitext(data_file_name)[0]))
+        os.system('eog %s/%s.png' % (out_path, os.path.splitext(data_file_name)[0]))
