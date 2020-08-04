@@ -10,7 +10,7 @@ from executor.Executor import *
 from parser.CommandPackage import *
 
 class ExecutorApp(Executor):
-    # 执行
+    # 执行的目标是appliction.
     
     def __init__(self, app):
         super(ExecutorApp, self).__init__()

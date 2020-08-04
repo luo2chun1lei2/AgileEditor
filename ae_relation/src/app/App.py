@@ -46,7 +46,8 @@ class App():
             # TODO: 这里的设计不是很好，需要再想一想。
             executor1 = ExecutorProcessor(None)
             executor = ExecutorList(executor1,
-                                    ExecutorModel(self.model, self.output))
+                                    #ExecutorModelUML(self.model, self.output))
+                                    ExecutorModelBasic(self.model, self.output))
             processor = ProcessorBasic("script", input,
                                             self.parserInteractiveCommand,
                                             executor, self.model, self.output)
@@ -67,7 +68,7 @@ class App():
         
         executor1 = ExecutorProcessor(None)
         executor = ExecutorList(executor1,
-                                    ExecutorModel(self.model, self.output))
+                                    ExecutorModelUML(self.model, self.output))
         
         processorInteractive = ProcessorBasic("interview", input,
                                                    self.parserInteractiveCommand,

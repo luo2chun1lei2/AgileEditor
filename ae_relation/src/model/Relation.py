@@ -6,16 +6,18 @@
 #   A: 普通的类(Agile的缩写)
 #   Enable: 能力，相当于接口。
 
-import os, sys, logging, getopt
+import os, sys, logging
 
 from misc.GlobalName import *
 from .Element import *
 
-class ARelation(AElement):
+class Relation(Element):
+    # 描述一个或多个元素之间的关系。
     # Relation也是Element的一种。
     
     def __init__(self, category, name, no):
-        super(ARelation, self).__init__(category, name, no)
+        super(Relation, self).__init__(category, name, no)
+        # TODO: Relation涉及到的Element有顺序关系吗？
         self.elements = []
         
     def attach_element(self, element):

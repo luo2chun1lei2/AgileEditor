@@ -10,7 +10,7 @@ from model.Relation import *
 from model.Element import *
 from model.Model import *
 
-class UMLComponent(AElement):
+class UMLComponent(Element):
     # UML's component
     def __init__(self, name, no, title, color=None):
         super(UMLComponent, self).__init__("Component", name, no)
@@ -34,7 +34,7 @@ class UMLComponent(AElement):
 #         if method_name in self.methods:
 #             return self.methods[method_name]
 
-class UMLClass(AElement):
+class UMLClass(Element):
     # UML's class
     def __init__(self, name, no, title, color=None):
         super(UMLClass, self).__init__("Class", name, no)
@@ -57,7 +57,7 @@ class UMLClass(AElement):
 #         if method_name in self.methods:
 #             return self.methods[method_name]
 
-class UMLMethod(AElement):
+class UMLMethod(Element):
     # UML's method
     def __init__(self, name, no, title, parent, color=None):
         # TODO:这里category，有可能重复，因为函数有可能在不同的类或者component中重名。
@@ -83,16 +83,18 @@ class UMLMethod(AElement):
 
 # TODO: relation 是否应该区分 class 还是 component，虽然有不同的type，但是实现方面是没有什么区别的
 # 是有不同的。
-class UMLClassRelation(ARelation):
+class UMLClassRelation(Relation):
     # 类和类之间的关系
     def __init__(self, name, no):
         super(UMLClassRelation, self).__init__("ClassRelation", name, no)
 
     def set_relation(self, relation_type, title, from_element, to_element):    # TODO 此处参数是否应该不定个数?
-        # @param from_element:AElement:
+        # @param from_element:Element:
         # @param title: string:
-        # @param to_element:AElement:
+        # @param to_element:Element:
         # @param relation_type:string: Extension/Composition/Aggregation
+        
+        # TODO: 这里的element为什么不使用 Relation里面的 “elements” 来进行管理?
         self.from_element = from_element
         self.to_element = to_element
         self.relation_type = relation_type
@@ -100,19 +102,19 @@ class UMLClassRelation(ARelation):
     
     def get_relation(self):
         # relation_type: string
-        # from_element: AElement
-        # to_element: AElement
+        # from_element: Element
+        # to_element: Element
         return self.relation_type, self.title, self.from_element, self.to_element 
         
-class UMLComponentRelation(ARelation):
+class UMLComponentRelation(Relation):
     # 组件之间的关系
     def __init__(self, name, no):
         super(UMLComponentRelation, self).__init__("ComponentRelation", name, no)
 
     def set_relation(self, relation_type, title, from_element, to_element):
-        # @param from_element:AElement:
+        # @param from_element:Element:
         # @param title: string
-        # @param to_element:AElement:
+        # @param to_element:Element:
         # @param relation_type:string: Use
         self.from_element = from_element
         self.to_element = to_element
@@ -122,11 +124,11 @@ class UMLComponentRelation(ARelation):
     def get_relation(self):
         # relation_type: string
         # title: string
-        # from_element: AElement
-        # to_element: AElement
+        # from_element: Element
+        # to_element: Element
         return self.relation_type, self.title, self.from_element, self.to_element
     
-class UMLElement2MethodRelation(ARelation):
+class UMLElement2MethodRelation(Relation):
     # 其他元素和函数之间的关系。单向关系。
     def __init__(self, name, no):
         super(UMLElement2MethodRelation, self).__init__("Element2MethodRelation", name, no)
@@ -134,7 +136,7 @@ class UMLElement2MethodRelation(ARelation):
     def set_relation(self, relation_type, title, from_element, to_element):
         # @param relation_type: string: Have/  [一般函数和静态函数关系]
         # @param title: string
-        # @param from_element:AElement:
+        # @param from_element:Element:
         # @param to_element:UMLMethod:
         self.from_element = from_element
         self.to_element = to_element
@@ -144,20 +146,20 @@ class UMLElement2MethodRelation(ARelation):
     def get_relation(self):
         # relation_type: string
         # title: string
-        # from_element: AElement
-        # to_element: AElement
+        # from_element: Element
+        # to_element: Element
         return self.relation_type, self.title, self.from_element, self.to_element
     
-class UMLMethodRelation(ARelation):
+class UMLMethodRelation(Relation):
     # 函数之间的关系，基本上就是调用。
     def __init__(self, name, no):
         super(UMLMethodRelation, self).__init__("MethodRelation", name, no)
 
     def set_relation(self, relation_type, from_parent, from_element, to_parent, to_element):
-        # @param from_parent:AElement:
-        # @param from_method:AElement:
-        # @param to_parent:AElement:
-        # @param to_element:AElement:
+        # @param from_parent:Element:
+        # @param from_method:Element:
+        # @param to_parent:Element:
+        # @param to_element:Element:
         # @param to_method:string: Invoke
         
         self.relation_type = relation_type
@@ -168,8 +170,8 @@ class UMLMethodRelation(ARelation):
     
     def get_relation(self):
         # relation_type: string
-        # from_element: AElement
-        # to_element: AElement
+        # from_element: Element
+        # to_element: Element
         return self.relation_type, self.from_parent, self.from_element, \
             self.to_parent, self.to_element 
 

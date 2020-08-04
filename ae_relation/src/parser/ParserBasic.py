@@ -64,8 +64,11 @@ class ParserBasic(Parser):
                             
         elif argv[0] == "Relation":
             # 两个对象之间的关系。
-            # ex: Relation --title="get/send msg" --type="contain/own/type" \
+            # ex: Relation --title="get/send msg" --type="type/use/contain" \
             #        --from="Android Proxy" --to="Android ipc"
+            # type : A 是 B 的类型，你是人。
+            # use ： A 使用 B，不看电视。
+            # contain： A 包含 B，比如身体拥有手臂。
             
             cmdPkg = CommandPackage(CommandId.MODEL_RELATION)
             self._parse_one_action_and_setattr(argv[1:], "", ["title=", "type=", "from=", "to="],

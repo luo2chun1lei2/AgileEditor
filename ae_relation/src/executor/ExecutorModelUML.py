@@ -2,21 +2,19 @@
 
 # 针对Model的Executor。
 
+import logging, getopt
+
 from model import *
 from model.concrete.ModelUML import *
 from misc.Return import *
 from misc.Utils import *
 from parser.CommandPackage import *
 
-import logging
-import getopt
-
-
-class ExecutorModel(object):
+class ExecutorModelUML(object):
     # 执行针对Model的command package
     
     def __init__(self, model, output):
-        super(ExecutorModel, self).__init__()
+        super(ExecutorModelUML, self).__init__()
         self.model = model
         self.output = output
         self.no = 0

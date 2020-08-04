@@ -4,17 +4,20 @@
 Element --name=all
 Element --name=people
 Element --name=Mike
-Element --name=bike
+Element --name=Bike
+# 这是一辆自行车
 Element --name=a123
 
-Relation --from=all --to=people --type=contain --title=own
+# Relation 没有 name，只有title用于显示。
+# type: type/use/contain
+Relation --from=all --to=people --type=contain
 Relation --from=all --to=Mike --type=contain
-Relation --from=all --to=bike --type=contain
+Relation --from=all --to=Bike --type=contain
 Relation --from=all --to=a123 --type=contain
 
 Relation --from=people --to=Mike --type=type
-Relation --from=bike --to=a123 --type=type
+Relation --from=Bike --to=a123 --type=type
 
-Relation --from=abc --to=123 --type=own
+Relation --from=Mike --to=a123 --type=use --title=骑
 
 show basic
