@@ -1,9 +1,10 @@
 # -*- coding:utf-8 -*-
 
 # 应用程序层：
-# 建立基本的 “parserInteractiveCommand、executorApp、model” processor。
+# 建立基本的 “parser、executorApp、model” processor。
 # App相当于一个Executor/Control。
 # Interactive Mode = Interview.
+# TODO: 下面的processor的初始化非常的奇怪，应该更加统一。
 
 import os, sys, logging, getopt, shutil, traceback
 
@@ -20,22 +21,43 @@ class App():
     def __init__(self):
         # 为了解析应用程序启动的命令行。
         self.processorApp = ProcessorSimple("app", ParserAppOption(), ExecutorApp(self))
+        
+        self.cur_processor_name = None
+    
+    def show_help(self):
+        self.processorApp.show_help()
     
     def do(self, argv):
         self.processorApp.process(argv)
 
-    def init_parser_container(self, model_name):
+    def init_processor(self, processor_name):
+        # 根据processor的名字，建立processor实例。
+        # @param processor_name string 需要加载的processor的名字。
+        # @return boolean
         
-        #TODO: 怎么选择不同的output？以及model之外的模块？
-        self.output = OutputGraphviz() #OutputUML()
-        # TODO: model name应该用来建在model。
-        self.model = ModelBasic() #UMLModel()
+        self.cur_processor_name = processor_name
+        if self.cur_processor_name == "basic":
+            self.output = OutputGraphviz()
+            self.model = ModelBasic()
+            # 用于分析“交互模式”下的命令输入。
+            self.parser = ParserBasic(self.model)
+        elif self.cur_processor_name == "uml":
+            self.output = OutputUML()
+            self.model = ModelUML()
+            self.parser = ParserInteractiveCommand(self.model)
+        else:
+            logging.error("Unknown processor mode:%s" % self.cur_processor_name)
+            return False
         
-        # 用于分析“交互模式”下的命令输入。
-        #self.parserInteractiveCommand = ParserInteractiveCommand(self.model)
-        self.parserInteractiveCommand = ParserBasic(self.model)
+        return True
 
-    def _execute_script(self, script_path):
+    def load_model_data(self, data_name):
+        # 加载 model 的数据。 TODO: 目前还没有保存任何数据，都是用script来实现的。
+        # @param data_name string data name or path.
+        # @return Boolean
+        return True
+
+    def execute_script(self, script_path):
         # 执行一个脚本文件。
         # script_path : string: path of script file
         # return : bool: True, OK, False, failed.
@@ -45,11 +67,14 @@ class App():
         
             # TODO: 这里的设计不是很好，需要再想一想。
             executor1 = ExecutorProcessor(None)
-            executor = ExecutorList(executor1,
-                                    #ExecutorModelUML(self.model, self.output))
+            if self.cur_processor_name == "basic":
+                executor = ExecutorList(executor1,
                                     ExecutorModelBasic(self.model, self.output))
+            elif self.cur_processor_name == "uml":
+                executor = ExecutorList(executor1,
+                                    ExecutorModelUML(self.model, self.output))
             processor = ProcessorBasic("script", input,
-                                            self.parserInteractiveCommand,
+                                            self.parser,
                                             executor, self.model, self.output)
             executor1.processor = processor
             
@@ -62,16 +87,21 @@ class App():
             return False
         return True
 
-    def _enter_interview(self):
+    def enter_interview(self):
+        # 进入到“交互”模式中，直到交互结束，才会退出这个函数。
         
         input = InputPrompt()
         
         executor1 = ExecutorProcessor(None)
-        executor = ExecutorList(executor1,
+        if self.cur_processor_name == "basic":
+            executor = ExecutorList(executor1,
+                                    ExecutorModelBasic(self.model, self.output))
+        elif self.cur_processor_name == "uml":
+            executor = ExecutorList(executor1,
                                     ExecutorModelUML(self.model, self.output))
         
         processorInteractive = ProcessorBasic("interview", input,
-                                                   self.parserInteractiveCommand,
+                                                   self.parser,
                                                    executor, self.model, self.output)
         
         executor1.processor = processorInteractive

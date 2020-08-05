@@ -15,12 +15,15 @@ class ProcessorSimple(Processor):
         # @param mvc_name string processor name
         super(ProcessorSimple, self).__init__(mvc_name)
 
-        self.parserInteractiveCommand = parser
+        self.parser = parser
         self.executor = executor
+
+    def show_help(self):
+        self.parser.show_help()
 
     def process(self, input):
         #@param input Any 只要是parser可以接受的输入就可以。
         #@return None
-        cmdPkgs = self.parserInteractiveCommand.parse(input)
+        cmdPkgs = self.parser.parse(input)
         for cmdPkg in cmdPkgs:
             self.executor.execute(cmdPkg)

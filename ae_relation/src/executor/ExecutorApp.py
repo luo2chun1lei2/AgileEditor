@@ -10,7 +10,7 @@ from executor.Executor import *
 from parser.CommandPackage import *
 
 class ExecutorApp(Executor):
-    # 执行的目标是appliction.
+    # 执行的目标是application.
     
     def __init__(self, app):
         super(ExecutorApp, self).__init__()
@@ -24,20 +24,27 @@ class ExecutorApp(Executor):
             logging.basicConfig(level=cmdPkg.level,
                 format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
-        elif cmdPkg.cmdId == CommandId.SHOW_HELP:   #TODO 这里不正确，help和exit在一起。
-            self.app.parserApp.show_help()
+        elif cmdPkg.cmdId == CommandId.SHOW_HELP:   #TODO: 这里不正确，help和exit在一起。
+            self.app.show_help()
             if cmdPkg.error:
                 sys.exit(1)         # TODO: 这里不对，不应该这里用sys.exit退出！
             else:
                 sys.exit(0)
 
-        elif cmdPkg.cmdId == CommandId.EXECUTE_SCRIPT:
-            # if set script file, execute it.
-            self.app._execute_script(cmdPkg.script_path)
-
-        elif cmdPkg.cmdId == CommandId.ENTER_INTERVIEW: #TODO: 必须放在所有命令的后面，否则退出有问题。
-            # if it's interview mode, run for a loop until return quit.
-            self.app._enter_interview()
+        elif cmdPkg.cmdId == CommandId.LOAD_PROCESSOR:
+            if not self.app.init_processor(cmdPkg.processor_name):
+                sys.exit(1)
         
-        elif cmdPkg.cmdId == CommandId.MODEL_NAME:  # TODO 有先后顺序，必须在执行脚本前执行。
-            self.app.init_parser_container(cmdPkg.model_name)
+        elif cmdPkg.cmdId == CommandId.LOAD_DATA:
+            if not self.app.load_model_data(cmdPkg.data_name):
+                sys.exit(1)
+
+        elif cmdPkg.cmdId == CommandId.EXECUTE_SCRIPT:
+            if not self.app.execute_script(cmdPkg.script_path):
+                sys.exit(1)
+
+        elif cmdPkg.cmdId == CommandId.ENTER_INTERVIEW:
+            # if it's interview mode, run for a loop until return quit.
+            self.app.enter_interview()
+        
+        
