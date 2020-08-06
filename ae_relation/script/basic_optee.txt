@@ -1,0 +1,72 @@
+# 描述 optee 编译关系的图
+# ER --type=basic
+
+Element --name="Makefile"
+Element --name="common.mk"
+
+Relation --from="Makefile" --to="common.mk" --title=include
+
+Element --name="all"
+Element --name="optee-os"
+Element --name="optee-os-common"
+
+Relation --from="Makefile" --to="all" --title=has
+Relation --from="Makefile" --to="optee-os" --title=has
+Relation --from="common.mk" --to="optee-os-common" --title=has
+
+Relation --from="all" --to="optee-os" --title=depend
+Relation --from="optee-os" --to="optee-os-common" --title=depend
+
+Element --name="optee_os/Makefile:all"
+
+Relation --from="optee-os-common" --to="optee_os/Makefile:all" --title=depend
+
+Element --name="optee_os/Makefile"
+
+Element --name="mk/checkconf.mk"
+Element --name="core/core.mk"
+Element --name="ldelf/ldelf.mk"
+Element --name="ta/ta.mk"
+Element --name="ta/mk/build-user-ta.mk"
+Element --name="mk/cleandirs.mk"
+
+Relation --from="optee_os/Makefile" --to="optee_os/Makefile:all" --title=has
+
+Relation --from="optee_os/Makefile" --to="mk/checkconf.mk" --title=include
+Relation --from="optee_os/Makefile" --to="core/core.mk" --title=include
+Relation --from="optee_os/Makefile" --to="ldelf/ldelf.mk" --title=include
+Relation --from="optee_os/Makefile" --to="ta/ta.mk" --title=include
+Relation --from="optee_os/Makefile" --to="ta/mk/build-user-ta.mk" --title=include
+Relation --from="optee_os/Makefile" --to="mk/cleandirs.mk" --title=include
+
+Element --name="optee_os/mk/config.mk"
+Relation --from="core/core.mk" --to="optee_os/mk/config.mk" --title=include
+
+Element --name="optee_os/core/crypto.mk"
+Relation --from="core/core.mk" --to="optee_os/core/crypto.mk" --title=include
+#    --descript="设置需要哪些算法，作用在 optee_os/core/crypto/sub.mk"
+
+Element --name="optee_os/mk/lib.mk"
+Relation --from="core/core.mk" --to="optee_os/mk/lib.mk" --title=include
+# --descript="不是简单的包含，而是在不同的参数下，包含后扩展为不同的makefile内容，包括:
+# lib/libutils
+# lib/libmbedtls
+# core/lib/libtomcrypt
+
+Element --name="optee_os/mk/subdir.mk"
+Relation --from="core/core.mk" --to="optee_os/mk/subdir.mk" --title=include
+
+Element --name="optee_os/mk/compile.mk"
+Relation --from="core/core.mk" --to="optee_os/mk/compile.mk" --title=include
+
+
+Element --name="optee_os/core/crypto/sm3"
+Element --name="optee_os/core/crypto/sm4"
+
+Element --name="optee_os/core/lib/libtomcrypt"
+Element --name="optee_os/core/lib/libtomcrypt:sm2"
+Relation --from="optee_os/core/lib/libtomcrypt" --to="optee_os/core/lib/libtomcrypt:sm2" --title=include
+Relation --from="core/core.mk" --to="optee_os/core/lib/libtomcrypt" --title=生成库
+
+
+show basic
