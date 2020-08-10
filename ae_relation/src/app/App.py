@@ -39,15 +39,19 @@ class App():
         if self.cur_processor_name == "basic":
             self.output = OutputGraphviz()
             self.model = ModelBasic()
-            # 用于分析“交互模式”下的命令输入。
-            self.parser = ParserBasic(self.model)
+            # 解析基本模型语言的。
+            parser = ParserBasic(self.model)
         elif self.cur_processor_name == "uml":
             self.output = OutputUML()
             self.model = ModelUML()
-            self.parser = ParserInteractiveCommand(self.model)
+            # 解析UML模型语言的。
+            parser = ParserCommandLine(self.model)
         else:
             logging.error("Unknown processor mode:%s" % self.cur_processor_name)
             return False
+        
+        # 用于分析“交互模式”下的命令输入。
+        self.parser = ParserList(self.model, ParserInteractiveCommand(self.model), parser)
         
         return True
 

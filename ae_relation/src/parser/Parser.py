@@ -12,6 +12,8 @@ class Parser(object):
         # TODO: 目前这个接口无法统一参数！
         # @param input any type
         # @return CommandPackage[]
+        #         []: 输入的是注释，也有可能输入信息不完整，无法完成分析！
+        #         None: 就代表无法处理，可以其他Parser处理。
         
         return None
 

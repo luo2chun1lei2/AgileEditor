@@ -19,7 +19,7 @@ class ParserAppOption(Parser):
         print '-d/--data <name> load the given model data. If not set, use empty model data.'
         print '-s/--script <path> run script after loading processor and model.'
         print '-i/--interview start interview mode, if not, quit if run script.'
-        print '--debug show log with debug level. If not, only show information level.'
+        print '-g/--debug show log with debug level. If not, only show information level.'
     
     def parse(self, argv):
         # 解析命令行的设置
@@ -30,7 +30,7 @@ class ParserAppOption(Parser):
     
         try:
             opts, args = getopt.getopt(argv[1:],
-                                       "hp:d:s:i",
+                                       "hp:d:s:ig",
                                        ["help", "processor", "data=", "script=", "interview", "debug"])
         except getopt.GetoptError, err:
             print str(err)
@@ -57,7 +57,7 @@ class ParserAppOption(Parser):
                 opt_script_path = a
             elif o in ('-i', '--interview'):
                 opt_interview_mode = True
-            elif o in ('--debug'):
+            elif o in ('-g', '--debug'):
                 opt_log_debug = True
             else:
                 print 'Find unknown option:%s' % (o) 

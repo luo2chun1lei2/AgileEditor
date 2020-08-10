@@ -12,12 +12,14 @@ from parser.CommandPackage import *
 import logging
 import getopt
 
+# TODO: 还有用吗？没有就删除。
 def program_usage():
     # 和 PROGRAM_CMD 一致
     print ('program usage:')
     print ('help: show help information.')
     print ('script <script file path>: run processor script')
 
+# TODO: 还有用吗？没有就删除
 def control_usage():
     # 和 CMDLINE_CMD 一致。
     print ('control usage:')

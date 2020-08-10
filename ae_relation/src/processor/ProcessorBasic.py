@@ -39,8 +39,12 @@ class ProcessorBasic(Processor):
                 break
     
             cmdPkgs = self.parser.parse(line_no, cmd)
-            if cmdPkgs == None:
+            if cmdPkgs == []:
                 # 如果分析的行是未完成的，那么就继续分析。
+                continue
+
+            if cmdPkgs == None:
+                # 如果无法分析，也继续
                 continue
 
             for pkg in cmdPkgs:
