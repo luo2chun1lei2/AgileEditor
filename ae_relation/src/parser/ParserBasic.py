@@ -84,9 +84,9 @@ class ParserBasic(Parser):
         return cmdPkgs
 
     def show_help(self):
-        print 'command:'
-        print 'help: show help information.'
-        print ' NOT WRITE.'
+        print 'Commands for BASIC mode:'
+        print '  help : show help information.'
+        print '  ... <wait for implementation>.'
 
     # TODO: 下面两个函数放到util中比较好。
     def _parse_one_action(self, argv, short_args, long_args):

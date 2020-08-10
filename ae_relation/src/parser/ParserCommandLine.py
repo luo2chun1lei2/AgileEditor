@@ -138,9 +138,9 @@ class ParserCommandLine(Parser):
         return cmdPkgs
 
     def show_help(self):
-        print 'command:'
-        print 'help: show help information.'
-        print 'script -l <path>: load script.'
+        print 'Commands for UML mode:'
+        print '  help : show help information.'
+        print '  ... <wait for implementation>.'
 
     def _parse_one_action(self, argv, short_args, long_args):
         try:

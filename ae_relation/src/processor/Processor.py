@@ -25,4 +25,6 @@ class Processor(object):
         assert False
         
     def show_help(self):
+        # 显示processor的帮助信息。
+        # 一般会包括内部的parser的信息，因为parser是面对用户的。
         assert False

@@ -41,10 +41,10 @@ class ParserInteractiveCommand(Parser):
 
     def show_help(self):    # TODO: 多个parser时如何显示帮助信息?
         # 显示帮助信息。
-        print 'command:'
-        print '!help: show help information.'
-        print '!quit: quit from parser.'
-        print '!test: test parser.'
+        print 'Interactive commands to processor:'
+        print '  !help : show help information.'
+        print '  !quit : quit from processor.'
+        print '  !script <file> : run script file.'
 
     def _inner_parse(self, cmdPkgs, str_action):
         # 解析命令，变成command package。

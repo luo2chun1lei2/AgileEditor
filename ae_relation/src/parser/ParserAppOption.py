@@ -13,13 +13,13 @@ class ParserAppOption(Parser):
         super(ParserAppOption, self).__init__()
     
     def show_help(self):
-        print 'program usage:'
-        print '-h/--help: show help information.'
-        print '-p/--processor <name> load processor, if not set use simple processor.'
-        print '-d/--data <name> load the given model data. If not set, use empty model data.'
-        print '-s/--script <path> run script after loading processor and model.'
-        print '-i/--interview start interview mode, if not, quit if run script.'
-        print '-g/--debug show log with debug level. If not, only show information level.'
+        print 'Commands for Application options:'
+        print '  -h/--help : show help information.'
+        print '  -p/--processor <name> : load processor, if not set use simple processor.'
+        print '  -d/--data <name> : load the given model data. If not set, use empty model data.'
+        print '  -s/--script <path> : run script after loading processor and model.'
+        print '  -i/--interview : start interview mode, if not, quit if run script.'
+        print '  -g/--debug : show log with debug level. If not, only show information level.'
     
     def parse(self, argv):
         # 解析命令行的设置

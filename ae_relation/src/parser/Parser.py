@@ -18,4 +18,5 @@ class Parser(object):
         return None
 
     def show_help(self):
+        # 显示帮助信息，主要是可以接受的文字的格式。
         assert False
