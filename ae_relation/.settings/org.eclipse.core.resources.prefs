@@ -17,6 +17,7 @@ encoding//src/input/InputPrompt.py=utf-8
 encoding//src/input/__init__.py=utf-8
 encoding//src/misc/GlobalName.py=utf-8
 encoding//src/misc/Graphivz.py=utf-8
+encoding//src/misc/JoinLines.py=utf-8
 encoding//src/misc/PlantUML.py=utf-8
 encoding//src/misc/Return.py=utf-8
 encoding//src/misc/Storage.py=utf-8

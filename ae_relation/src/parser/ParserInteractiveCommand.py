@@ -2,6 +2,7 @@
 
 import logging
 
+from misc import *
 from parser.Parser import *
 from parser.CommandPackage import *
 from processor.Processor import *
@@ -13,8 +14,7 @@ class ParserInteractiveCommand(Parser):
     def __init__(self, model):
         super(ParserInteractiveCommand, self).__init__()
         
-        # 最新的一行命令。
-        self.cur_cmd = ""
+        self.join_lines = JoinLines()
     
     def parse(self, line_no, line):
         # 分析和执行action.
@@ -22,24 +22,29 @@ class ParserInteractiveCommand(Parser):
         # @param line string 一行输入。
         # return: CommandPackage[]
         
+        cur_cmd = None
         # 如果行的结尾是“\”，需要等下一行再分析。
-        # 输入文件类型脚本的特点，不放在parser中。
-        if len(line) > 0 and line[-1] == '\\':
-            self.cur_cmd += line[:-1]
-            return []
+        if self.join_lines.in_join():
+            cur_cmd = self.join_lines.join(line_no, line)
+            if cur_cmd == None:
+                return [] # 继续
         else:
-            self.cur_cmd += line
-
-        cmdPkgs = []
-        
-        # "!" 开头的是针对此层的操作，比如对 Container 的。
-        if self.cur_cmd.startswith('!'):
-            self._inner_parse(cmdPkgs, self.cur_cmd[1:])
-        else:
-            logging.debug("Without '!', so 、“%s” is not my command."  % self.cur_cmd)
+            cmdPkgs = []
+            
+            # "!" 开头的是针对此层的操作，比如对 Container 的。
+            if line.startswith('!'):
+                cur_cmd = self.join_lines.join(line_no, line)
+                if cur_cmd == None:
+                    return [] # 继续
+                
+                
+        if cur_cmd == None:
+            # 忽略
             cmdPkgs = None
-
-        self.cur_cmd = ""
+        else:
+            # 分析
+            self._inner_parse(cmdPkgs, cur_cmd[1:])
+            
         return cmdPkgs
 
     def show_help(self):

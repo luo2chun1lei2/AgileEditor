@@ -6,8 +6,7 @@
 import logging, getopt
 
 from model.Model import *
-from misc.Return import *
-from misc.Utils import *
+from misc import *
 from parser.Parser import *
 from parser.CommandPackage import *
 
@@ -18,12 +17,18 @@ class ParserUML(Parser):
         super(ParserUML, self).__init__()
         self.model = model
         self.no = 0
+        
+        self.join_lines = JoinLines()
     
     def parse(self, line_no, line):
         # 分析输入。
         # @param line_no int 行号
         # @param line string 做的动作，以字符串格式
         # @param return CommandPackage[]
+        
+        line = self.join_lines.join(line_no, line)
+        if line == None:
+            return []
     
         cmdPkgs = []
         self.no = self.no + 1

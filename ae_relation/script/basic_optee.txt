@@ -65,8 +65,10 @@ Element --name="optee_os/core/crypto/sm4"
 
 Element --name="optee_os/core/lib/libtomcrypt"
 Element --name="optee_os/core/lib/libtomcrypt:sm2"
-Relation --from="optee_os/core/lib/libtomcrypt" --to="optee_os/core/lib/libtomcrypt:sm2" --title=include
-Relation --from="core/core.mk" --to="optee_os/core/lib/libtomcrypt" --title=生成库
+Relation --from="optee_os/core/lib/libtomcrypt" --to="optee_os/core/lib/libtomcrypt:sm2" \
+    --title=include
+Relation --from="core/core.mk" --to="optee_os/core/lib/libtomcrypt" \
+    --title=生成库
 
 
 show basic
