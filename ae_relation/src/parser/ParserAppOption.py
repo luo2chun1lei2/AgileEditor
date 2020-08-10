@@ -77,6 +77,9 @@ class ParserAppOption(Parser):
         # help
         if opt_help == True:
             cmdPkg = CommandPackage(CommandId.SHOW_HELP)
+            cmdPkgs.append(cmdPkg)
+            
+            cmdPkg = CommandPackage(CommandId.QUIT)
             cmdPkg.error = opt_help_error
             cmdPkgs.append(cmdPkg)
             

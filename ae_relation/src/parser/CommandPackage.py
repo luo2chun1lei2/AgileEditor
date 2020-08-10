@@ -6,6 +6,7 @@
 class CommandId():
     # Application and processor
     SET_LOG_LEVEL = 1
+    # 显示的是此parser自己的help信息。
     SHOW_HELP = 2
     QUIT = 3
     EXECUTE_SCRIPT = 4
@@ -13,6 +14,7 @@ class CommandId():
     LOAD_PROCESSOR = 6
     LOAD_DATA = 7
     QUIT_PROCESSOR = 8
+    # 显示的是 processor 的帮助信息，其实是processor内部的所有parser帮助信息。
     HELP_PROCESSOR = 9
     MODEL_SHOW = 10
     
