@@ -22,9 +22,7 @@ class ExecutorModelBasic(object):
         
     def execute(self, cmdPkg):
         
-        if cmdPkg.cmdId == CommandId.SHOW_HELP:
-            self.show_help()
-        elif cmdPkg.cmdId == CommandId.MODEL_SHOW:
+        if cmdPkg.cmdId == CommandId.MODEL_SHOW:
             # 为了显示，就需要 Model和Output配合。
             self.output.show(self.model, cmdPkg)
 
@@ -40,9 +38,3 @@ class ExecutorModelBasic(object):
             return Return.UNKNOWN
 
         return Return.OK
-
-    def show_help(self):
-        print 'command:'
-        print 'help: show help information.'
-        print 'element: add element.'
-        print 'relation: add relation.'

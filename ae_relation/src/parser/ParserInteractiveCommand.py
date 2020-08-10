@@ -1,5 +1,7 @@
 #-*- coding:utf-8 -*-
 
+import logging
+
 from parser.Parser import *
 from parser.CommandPackage import *
 from processor.Processor import *
@@ -34,12 +36,13 @@ class ParserInteractiveCommand(Parser):
         if self.cur_cmd.startswith('!'):
             self._inner_parse(cmdPkgs, self.cur_cmd[1:])
         else:
-            return None
+            logging.debug("Without '!', so 、“%s” is not my command."  % self.cur_cmd)
+            cmdPkgs = None
 
         self.cur_cmd = ""
         return cmdPkgs
 
-    def show_help(self):    # TODO: 多个parser时如何显示帮助信息?
+    def show_help(self):
         # 显示帮助信息。
         print 'Interactive commands to processor:'
         print '  !help : show help information.'
@@ -48,7 +51,7 @@ class ParserInteractiveCommand(Parser):
 
     def _inner_parse(self, cmdPkgs, str_action):
         # 解析命令，变成command package。
-        # TODO 命令解析用 getopt，这样就允许用参数了。
+        # TODO: 命令解析用 getopt，这样就允许用参数了。
         pkg = None
 
         if len(str_action) == 0:
@@ -56,7 +59,6 @@ class ParserInteractiveCommand(Parser):
         elif str_action.startswith("#"):
             pass
         elif str_action == 'quit':
-            #return Return.QUIT
             pkg = CommandPackage(CommandId.QUIT_PROCESSOR)
         elif str_action == 'help':
             pkg = CommandPackage(CommandId.HELP_PROCESSOR)

@@ -21,9 +21,7 @@ class ExecutorModelUML(object):
         
     def execute(self, cmdPkg):
         
-        if cmdPkg.cmdId == CommandId.SHOW_HELP:
-            self.show_help()    # TODO 显示谁的帮助？
-        elif cmdPkg.cmdId == CommandId.MODEL_SHOW:
+        if cmdPkg.cmdId == CommandId.MODEL_SHOW:
             # 为了显示，就需要 Model和Output配合。
             self.output.show(self.model, cmdPkg)
 

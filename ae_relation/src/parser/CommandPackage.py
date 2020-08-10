@@ -7,7 +7,7 @@ class CommandId():
     # Application and processor
     SET_LOG_LEVEL = 1
     # 显示的是此parser自己的help信息。
-    SHOW_HELP = 2
+    SHOW_APP_HELP = 2
     QUIT = 3
     EXECUTE_SCRIPT = 4
     ENTER_INTERVIEW = 5

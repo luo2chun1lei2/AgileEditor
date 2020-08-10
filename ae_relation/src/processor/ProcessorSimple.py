@@ -3,7 +3,7 @@
 # Processor：
 # parser --> executor
 
-from parser.ParserCommandLine import *
+from parser.ParserUML import *
 from model.concrete.ModelUMLTest import *
 from .Processor import *
 

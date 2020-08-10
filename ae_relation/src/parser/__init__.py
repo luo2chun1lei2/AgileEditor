@@ -9,7 +9,7 @@ from .CommandPackage import *
 
 from .Parser import *
 from .ParserInteractiveCommand import *
-from .ParserCommandLine import *
+from parser.ParserUML import *
 from .ParserAppOption import *
 from .ParserBasic import *
 from .ParserList import *

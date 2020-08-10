@@ -24,7 +24,7 @@ class ExecutorApp(Executor):
             logging.basicConfig(level=cmdPkg.level,
                 format='[%(asctime)s,%(levelname)s][%(funcName)s/%(filename)s:%(lineno)d]%(message)s')
 
-        elif cmdPkg.cmdId == CommandId.SHOW_HELP:   #TODO: 这里不正确，help和exit在一起。
+        elif cmdPkg.cmdId == CommandId.SHOW_APP_HELP:
             self.app.show_help()
             
         elif cmdPkg.cmdId == CommandId.QUIT:

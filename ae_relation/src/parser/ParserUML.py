@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 
-# 分析针对Model的命令。
+# 分析针对 UML Model的命令。
 # 命令格式是 getopt 格式的。
+
+import logging, getopt
 
 from model.Model import *
 from misc.Return import *
@@ -9,34 +11,11 @@ from misc.Utils import *
 from parser.Parser import *
 from parser.CommandPackage import *
 
-import logging
-import getopt
-
-# TODO: 还有用吗？没有就删除。
-def program_usage():
-    # 和 PROGRAM_CMD 一致
-    print ('program usage:')
-    print ('help: show help information.')
-    print ('script <script file path>: run processor script')
-
-# TODO: 还有用吗？没有就删除
-def control_usage():
-    # 和 CMDLINE_CMD 一致。
-    print ('control usage:')
-    print ('help: show help information.')
-    print ('quit: quit from control.')
-    print ('test: test this program.')
-    print ('select: select on element and do something to it.')
-    print ('insert: insert element.')
-    print ('update: update properties of element.')
-    print ('delete: delete element or relation.')
-    print ('drop: drop all data.')
-
-class ParserCommandLine(Parser):
+class ParserUML(Parser):
     # 这个parser能够分析类似命令行的脚本。就是用getopt可以分析的命令行。
     
     def __init__(self, model):
-        super(ParserCommandLine, self).__init__()
+        super(ParserUML, self).__init__()
         self.model = model
         self.no = 0
     
@@ -61,7 +40,7 @@ class ParserCommandLine(Parser):
             return cmdPkgs
         
         if argv[0] == "help":
-            cmdPkg = CommandPackage(CommandId.SHOW_HELP)
+            cmdPkg = CommandPackage(CommandId.HELP_PROCESSOR)
             
         elif argv[0] == "show":
             # ex: show sequence/class/component
@@ -128,9 +107,8 @@ class ParserCommandLine(Parser):
                                                   cmdPkg, ["from_parent", "from_e", "to_parent", "to"])
         
         else: 
-            logging.error ("Unknown MVC command:%s" % argv[0])
-            #self.show_help()
-            return cmdPkgs
+            logging.error ("Unknown command:%s" % argv[0])
+            return None
         
         cmdPkg.no = self.no
         cmdPkgs.append(cmdPkg)

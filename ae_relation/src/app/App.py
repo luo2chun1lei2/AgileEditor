@@ -45,7 +45,7 @@ class App():
             self.output = OutputUML()
             self.model = ModelUML()
             # 解析UML模型语言的。
-            parser = ParserCommandLine(self.model)
+            parser = ParserUML(self.model)
         else:
             logging.error("Unknown processor mode:%s" % self.cur_processor_name)
             return False

@@ -39,7 +39,7 @@ class ParserBasic(Parser):
             return cmdPkgs
         
         if argv[0] == "help":
-            cmdPkg = CommandPackage(CommandId.SHOW_HELP)
+            cmdPkg = CommandPackage(CommandId.HELP_PROCESSOR)
             
         elif argv[0] == "show":
             # ex: show sequence/class/component
@@ -76,7 +76,7 @@ class ParserBasic(Parser):
 
         else: 
             logging.error ("Unknown command:%s" % argv[0])
-            return cmdPkgs
+            return None
         
         cmdPkg.no = self.no
         cmdPkgs.append(cmdPkg)

@@ -3,7 +3,7 @@
 # Processor：
 # input --> parserInteractiveCommand --> executorApp --> model --> output
 
-from parser.ParserCommandLine import *
+from parser.ParserUML import *
 
 class Processor(object):
     # 负责最基本的工作和接口，建立一个处理队列
