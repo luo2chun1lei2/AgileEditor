@@ -7,9 +7,9 @@ Element --name="common.mk"
 
 Relation --from="Makefile" --to="common.mk" --title=include
 
-Element --name="all"
-Element --name="optee-os"
-Element --name="optee-os-common"
+Element --name="all" --type=function
+Element --name="optee-os" --type=function
+Element --name="optee-os-common" --type=function
 
 Relation --from="Makefile" --to="all" --title=has
 Relation --from="Makefile" --to="optee-os" --title=has
@@ -18,7 +18,7 @@ Relation --from="common.mk" --to="optee-os-common" --title=has
 Relation --from="all" --to="optee-os" --title=depend
 Relation --from="optee-os" --to="optee-os-common" --title=depend
 
-Element --name="optee_os/Makefile:all"
+Element --name="optee_os/Makefile:all" --type=function
 
 Relation --from="optee-os-common" --to="optee_os/Makefile:all" --title=depend
 
@@ -65,7 +65,7 @@ Element --name="optee_os/core/crypto/sm3"
 Element --name="optee_os/core/crypto/sm4"
 
 Element --name="optee_os/core/lib/libtomcrypt"
-Element --name="optee_os/core/lib/libtomcrypt:sm2"
+Element --name="optee_os/core/lib/libtomcrypt:sm2" --type=function
 Relation --from="optee_os/core/lib/libtomcrypt" --to="optee_os/core/lib/libtomcrypt:sm2" \
     --title=include
 Relation --from="core/core.mk" --to="optee_os/core/lib/libtomcrypt" \

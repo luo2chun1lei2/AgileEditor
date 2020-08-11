@@ -62,10 +62,10 @@ class TravelElements(object):
                 type = e.element_type
                 if type == "type":
                     text += " shape=diamond,"
-                elif type == "instance":
-                    text += " shape=box,"
                 elif type == "function":
                     text += " shape=ellipse,"
+                else: #type == "instance":
+                    text += " shape=box,"
                     
                 text += "];"
                 self._write(text)
