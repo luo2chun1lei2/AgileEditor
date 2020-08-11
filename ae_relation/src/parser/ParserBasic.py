@@ -65,16 +65,16 @@ class ParserBasic(Parser):
             # 如果title是空的，那么title就是name。
             
             cmdPkg = CommandPackage(CommandId.MODEL_ELEMENT)
-            self._parse_one_action_and_setattr(argv[1:], "", ["name=", "title="],
-                                                  cmdPkg, ["name", "title"])
+            self._parse_one_action_and_setattr(argv[1:], "", ["name=", "title=", "type="],
+                                                  cmdPkg, ["name", "title", "type"])
                             
         elif argv[0] == "Relation":
             # 两个对象之间的关系。
-            # ex: Relation --title="get/send msg" --type="type/use/contain" \
+            # ex: Relation --title="get/send msg" --type="type/depend/own" \
             #        --from="Android Proxy" --to="Android ipc"
             # type : A 是 B 的类型，你是人。
-            # use ： A 使用 B，不看电视。
-            # contain： A 包含 B，比如身体拥有手臂。
+            # depend ： A 依赖 B，比如使用、引用等。
+            # own： A 包含 B，比如身体拥有手臂。
             
             cmdPkg = CommandPackage(CommandId.MODEL_RELATION)
             self._parse_one_action_and_setattr(argv[1:], "", ["title=", "type=", "from=", "to="],

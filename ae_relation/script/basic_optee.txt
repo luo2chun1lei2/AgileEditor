@@ -1,5 +1,6 @@
 # 描述 optee 编译关系的图
-# ER --type=basic
+# 怎么在这里描述关系的基本模型是什么？
+# !ER --type=basic
 
 Element --name="Makefile"
 Element --name="common.mk"

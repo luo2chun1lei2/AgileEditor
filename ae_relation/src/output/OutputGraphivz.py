@@ -45,20 +45,29 @@ class TravelElements(object):
                     
                 if type == "type":
                     text += "dir=\"both\", arrowtail=\"onormal\", arrowhead=\"none\", "
-                elif type == "use":
+                elif type == "depend":
                     text += "" # 使用缺省的箭头。
-                elif type == "contain":
+                elif type == "own":
                     text += "dir=\"both\", arrowtail=\"diamond\", arrowhead=\"vee\","
                 
                 text += "];"
 
                 self._write(text)
             elif isinstance(e, Element):
-                text = "%s" % (e.name)
+                text = "%s [" % (e.name)
+                
                 if e.title != None:
-                    text = " [label=\"%s\"]" % (e.title)
+                    text += " label=\"%s\"," % (e.title)
                     
-                text += ";"
+                type = e.element_type
+                if type == "type":
+                    text += " shape=diamond,"
+                elif type == "instance":
+                    text += " shape=box,"
+                elif type == "function":
+                    text += " shape=ellipse,"
+                    
+                text += "];"
                 self._write(text)
                 
         return True

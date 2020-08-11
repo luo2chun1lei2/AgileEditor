@@ -1,23 +1,24 @@
 # 基本的模型，都是通用的元素和关系。
 # 意思是说：Mike有一辆自行车
 
-Element --name=all
-Element --name=people
-Element --name=Mike
-Element --name=Bike
+# Element的type="type/instance/function"
+Element --name=all --type=instance
+Element --name=people --type=type
+Element --name=Mike --type=instance
+Element --name=Bike --type=type
 # 这是一辆自行车
-Element --name=a123
+Element --name=a123 --type=instance
 
 # Relation 没有 name，只有title用于显示。
-# type: type/use/contain
-Relation --from=all --to=people --type=contain
-Relation --from=all --to=Mike --type=contain
-Relation --from=all --to=Bike --type=contain
-Relation --from=all --to=a123 --type=contain
+# type: type/own/depend
+Relation --from=all --to=people --type=own
+Relation --from=all --to=Mike --type=own
+Relation --from=all --to=Bike --type=own
+Relation --from=all --to=a123 --type=own
 
 Relation --from=people --to=Mike --type=type
 Relation --from=Bike --to=a123 --type=type
 
-Relation --from=Mike --to=a123 --type=use --title=骑
+Relation --from=Mike --to=a123 --type=depend --title=骑
 
 show basic

@@ -16,6 +16,7 @@ class ModelBasic(Model):
     def create_element(self, cmdPkg):
         e = Element("Element", cmdPkg.name, cmdPkg.no)
         e.title = cmdPkg.title
+        e.element_type = cmdPkg.type
         if self.add_element(cmdPkg.name, e):
             return Return.ERROR
         else:
