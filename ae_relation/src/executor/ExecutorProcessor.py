@@ -10,7 +10,7 @@ from parser.CommandPackage import *
 from misc.Return import *
 
 class ExecutorProcessor(Executor):
-    # 针对Pipe执行命令。
+    # 针对Processor执行命令。
 
     def __init__(self, processor):
         super(ExecutorProcessor, self).__init__()

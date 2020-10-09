@@ -52,23 +52,51 @@ class ParserInteractiveCommand(Parser):
         print 'Interactive commands to processor:'
         print '  !help : show help information.'
         print '  !quit : quit from processor.'
-        print '  !script <file> : run script file.'
+        print '  !processor <name> : load processor by given name.'
+        print '  !script <file> : run script file(absolute path or relative to current path).'
 
     def _inner_parse(self, cmdPkgs, str_action):
         # 解析命令，变成command package。
-        # TODO: 命令解析用 getopt，这样就允许用参数了。
+        
         pkg = None
-
+        
         if len(str_action) == 0:
             pass
         elif str_action.startswith("#"):
             pass
-        elif str_action == 'quit':
+        
+        # TODO 这里有一个严重的问题，就是script、processor执行的都是AppExecutor的命令，
+        # 而不是 UML或Basic的命令。
+        
+        argv = util_split_command_args(str_action)
+        if len(argv) == 0:
+            logging.debug('One empty line: %s.' % str_action)
+            return
+        
+        if argv[0] == "quit":
             pkg = CommandPackage(CommandId.QUIT_PROCESSOR)
-        elif str_action == 'help':
+        elif argv[0] == 'help':
             pkg = CommandPackage(CommandId.HELP_PROCESSOR)
+        elif argv[0] == 'processor':
+            if len(argv) != 2:
+                logging.error("Processor needs a name.")
+                return
+            pkg = CommandPackage(CommandId.LOAD_PROCESSOR)
+            pkg.processor_name = argv[1]
+        elif argv[0] == 'script':
+            if len(argv) != 2:
+                logging.error("Script needs a file path.")
+                return
+        
+            if not os.path.exists(argv[1]):
+                logging.error("This Script path \"%s\" doesn't exist." % argv[1])
+                return
+            
+            pkg = CommandPackage(CommandId.EXECUTE_SCRIPT)
+            pkg.script_path = argv[1]
         else:
             logging.error("Unknown parser command:%s" % str_action)
+            return
         
         if pkg:
             cmdPkgs.append(pkg)

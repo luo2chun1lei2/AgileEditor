@@ -96,18 +96,21 @@ class App():
         
         input = InputPrompt()
         
-        executor1 = ExecutorProcessor(None)
+        executorProcessor = ExecutorProcessor(None)
+        executorApp = ExecutorApp(self)
         if self.cur_processor_name == "basic":
-            executor = ExecutorList(executor1,
+            executor = ExecutorList(executorProcessor,
+                                    executorApp,
                                     ExecutorModelBasic(self.model, self.output))
         elif self.cur_processor_name == "uml":
-            executor = ExecutorList(executor1,
+            executor = ExecutorList(executorProcessor,
+                                    executorApp,
                                     ExecutorModelUML(self.model, self.output))
         
         processorInteractive = ProcessorBasic("interview", input,
                                                    self.parser,
                                                    executor, self.model, self.output)
         
-        executor1.processor = processorInteractive
+        executorProcessor.processor = processorInteractive
         processorInteractive.process()
         # 这里退出后，app就自然退出。以后可能建立更加复杂的机制。     
