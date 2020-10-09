@@ -27,11 +27,11 @@ class ParserAppOption(Parser):
         # @return CommandPackage[] 整理后的任务组
         
         cmdPkgs = []
-    
+        
         try:
             opts, args = getopt.getopt(argv[1:],
                                        "hp:d:s:ig",
-                                       ["help", "processor", "data=", "script=", "interview", "debug"])
+                                       ["help", "processor=", "data=", "script=", "interview", "debug"])
         except getopt.GetoptError, err:
             print str(err)
             self.show_help()
