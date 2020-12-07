@@ -5,7 +5,7 @@
 
 import logging, getopt
 
-from model.Model import *
+from model.level1.Model import *
 from misc import *
 from parser.Parser import *
 from parser.CommandPackage import *

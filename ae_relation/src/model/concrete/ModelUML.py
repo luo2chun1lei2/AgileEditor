@@ -6,9 +6,9 @@ import os, sys, logging, getopt, shutil, traceback
 
 from misc import *
 
-from model.Relation import *
-from model.Element import *
-from model.Model import *
+from model.level1.Relation import *
+from model.level1.Element import *
+from model.level1.Model import *
 
 class UMLComponent(Element):
     # UML's component

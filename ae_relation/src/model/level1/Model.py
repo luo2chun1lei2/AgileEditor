@@ -6,8 +6,8 @@ import os, sys, logging, getopt, shutil, traceback
 
 from misc import *
 
-from model.Relation import *
-from model.Element import *
+from model.level1.Relation import *
+from model.level1.Element import *
 
 class Model(object):
     # 模型，所有的元素都包含在里面，这里形成一个Map，是<名字, 元素实例>。

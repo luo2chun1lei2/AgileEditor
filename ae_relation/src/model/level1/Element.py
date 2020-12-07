@@ -1,11 +1,6 @@
 #-*- coding:utf-8 -*-
 
-
-# Element and Relation,
-# 属于容器中的所有对象的最基础类型。
-# 类的开头：
-#   A: 普通的类(Agile的缩写)
-#   Enable: 能力，相当于接口。
+# 所有对象的最基础类型。
 
 import os, sys, logging, getopt
 

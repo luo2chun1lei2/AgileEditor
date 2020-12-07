@@ -3,7 +3,7 @@
 # Parser：
 # 分析基本的Element和Relation的脚本。
 
-from model.Model import *
+from model.level1.Model import *
 from misc.Return import *
 from misc.Utils import *
 from parser.Parser import *

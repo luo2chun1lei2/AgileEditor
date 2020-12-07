@@ -9,7 +9,7 @@
 import os, sys, logging
 
 from misc.GlobalName import *
-from .Element import *
+from model.level1.Element import *
 
 class Relation(Element):
     # 描述一个或多个元素之间的关系。
