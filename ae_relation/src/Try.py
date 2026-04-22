@@ -1,5 +1,5 @@
+#!/usr/bin/env python2
 # -*- coding:utf-8 -*-
-#!/usr/bin/env python
 
 #这里是python的奇怪语法和第三方工具测试用的代码处。
 #无关正式代码。

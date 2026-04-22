@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding:utf-8 -*-
 
 '''
@@ -6,6 +6,10 @@ ae入口。
 '''
 
 import sys, logging
+
+import gi
+gi.require_version('Gtk', '3.0')
+gi.require_version('GtkSource', '3.0')
 
 ''' 提供的服务，组件并不是问题所在，服务才是。
     这里服务应该尽量隐藏组件内部实现的特点，留下通用、完整的服务接口，方便以后改为其他技术实现的组件。

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding:utf-8 -*-
 '''
 用clang分析代码，可以用于标记查询和单词补全。
